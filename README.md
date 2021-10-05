@@ -8,9 +8,10 @@
 git clone https://github.com/naoya9411/mahjong-sns.git
 ```
 
+
 2. Expo CLI のインストール
 
-[Expo 公式サイト](https://expo.dev/)
+<a href="https://expo.dev/" target="blank">Expo公式サイト</a>
 
 ```bash
 npm install -g expo-cli
@@ -23,11 +24,13 @@ expo --version
 4.12.0 # 例
 ```
 
+
 3. 依存関係のインストール
 
 ```bash
 npm install
 ```
+
 
 4. expo 起動
 
