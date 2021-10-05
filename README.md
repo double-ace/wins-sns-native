@@ -9,7 +9,7 @@ git clone https://github.com/naoya9411/mahjong-sns.git
 ```
 
 
-2. Expo CLI のインストール
+2. （まだExpo導入していない場合）Expo CLI のインストール
 
 <a href="https://expo.dev/" target="blank">Expo公式サイト</a>
 
