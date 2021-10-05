@@ -1,15 +1,6 @@
 ## ローカル開発環境の構築
 
-1. リポジトリのクローン
-
-作成したい場所にカレントディレクトリを移動させて下記を実行
-
-```bash
-git clone https://github.com/naoya9411/mahjong-sns.git
-```
-
-
-2. （まだExpo導入していない場合）Expo CLI のインストール
+### （まだExpo導入していない場合）Expo CLI のインストール
 
 <a href="https://expo.dev/" target="blank">Expo公式サイト</a>
 
@@ -24,15 +15,23 @@ expo --version
 4.12.0 # 例
 ```
 
+1. リポジトリのクローン
 
-3. 依存関係のインストール
+作成したい場所にカレントディレクトリを移動させて下記を実行
+
+```bash
+git clone https://github.com/naoya9411/mahjong-sns.git
+```
+
+
+2. 依存関係のインストール
 
 ```bash
 npm install
 ```
 
 
-4. expo 起動
+3. expo 起動
 
 ```bash
 npm run start
