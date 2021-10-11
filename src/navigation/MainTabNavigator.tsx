@@ -1,7 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { HomeScreen } from '../screens/HomeScreen';
-import { DMScreen } from '../screens/DMScreen';
+import { ChatScreen } from '../screens/ChatScreen';
 import { MediaScreen } from '../screens/MediaScreen';
 import { MyPageScreen } from '../screens/MyPageScreen';
 import { Entypo } from '@expo/vector-icons';
@@ -17,7 +17,7 @@ export const MainTabNavigator = () => {
         name="Home"
         component={HomeScreen}
         options={{
-          tabBarLabel: 'HOME',
+          tabBarLabel: 'ホーム',
           tabBarIcon: ({ size, color }) => (
             <Entypo name="home" size={size} color={color} />
           ),
@@ -27,17 +27,17 @@ export const MainTabNavigator = () => {
         name="Media"
         component={MediaScreen}
         options={{
-          tabBarLabel: 'MEDIA',
+          tabBarLabel: "WIN'Sブログ",
           tabBarIcon: ({ size, color }) => (
             <Entypo name="folder-images" size={size} color={color} />
           ),
         }}
       />
       <Tab.Screen
-        name="DM"
-        component={DMScreen}
+        name="Chat"
+        component={ChatScreen}
         options={{
-          tabBarLabel: 'DM',
+          tabBarLabel: 'チャット',
           tabBarIcon: ({ size, color }) => (
             <Entypo name="message" size={size} color={color} />
           ),
@@ -47,7 +47,7 @@ export const MainTabNavigator = () => {
         name="MyPage"
         component={MyPageScreen}
         options={{
-          tabBarLabel: 'MyPage',
+          tabBarLabel: 'マイページ',
           tabBarIcon: ({ size, color }) => (
             <Ionicons name="person" size={size} color={color} />
           ),
