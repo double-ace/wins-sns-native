@@ -18,6 +18,7 @@ export const MainTabNavigator = () => {
         component={HomeScreen}
         options={{
           tabBarLabel: 'ホーム',
+          title: 'ホーム',
           tabBarIcon: ({ size, color }) => (
             <Entypo name="home" size={size} color={color} />
           ),
