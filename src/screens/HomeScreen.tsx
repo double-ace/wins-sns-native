@@ -1,9 +1,19 @@
-import React from 'react';
-import { StyleSheet, SafeAreaView, View, FlatList, Text } from 'react-native';
-import { Avatar, FAB } from 'react-native-elements';
+import React, { useState, useEffect } from 'react';
+import {
+  StyleSheet,
+  SafeAreaView,
+  View,
+  FlatList,
+  Text,
+  ListRenderItemInfo,
+} from 'react-native';
+import { Avatar, FAB, Button } from 'react-native-elements';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import { postData } from '../../assets/postData.json';
+import { getData } from '../scripts/asyncStore';
+import axios, { AxiosResponse } from 'axios';
+import { requestHttpGet } from '../scripts/requestBase';
 
 type PostData = {
   id: string | number;
@@ -14,17 +24,39 @@ type PostData = {
 
 const posts: PostData[] = postData;
 
-export const HomeScreen = () => {
-  const renderItem = ({ item }) => {
+export const HomeScreen = ({ navigation }) => {
+  const [access, setAccess] = useState('');
+  const [shop, setShop] = useState<string[]>([]);
+
+  useEffect(() => {
+    const sample = async () => {
+      const aa = await getData('access');
+      aa ? setAccess(aa) : null;
+    };
+
+    sample();
+  });
+
+  const getMyShop = async () => {
+    // const res: AxiosResponse<string[]> = await axios.get(
+    //   'http://192.168.11.2:8080/api/v1/core/belong-to/'
+    // );
+    const res = await requestHttpGet('/api/v1/core/belong-to/');
+    res.data[0] ? setShop(res.data) : null;
+    alert(res.data[0].shop);
+  };
+
+  const renderItem = ({ item }: ListRenderItemInfo<PostData>) => {
     return (
       <View style={styles.postContainer} key={item.id}>
+        <Button title="test" onPress={getMyShop} />
         <View style={styles.postHeader}>
           <Avatar
             size="medium"
             rounded
             avatarStyle={styles.avatar}
             icon={{ name: 'home' }}
-            onPress={() => console.log('Works!')}
+            onPress={() => alert('Works!')}
             activeOpacity={0.7}
           />
           <View style={styles.postHeaderTxtContainer}>
@@ -44,14 +76,11 @@ export const HomeScreen = () => {
       <FlatList data={posts} renderItem={renderItem} scrollEnabled />
       <FAB
         placement="right"
-        color="#00e383"
+        color="#04cc77"
         buttonStyle={styles.fab}
+        onPress={() => navigation.navigate('PostCreateModal')}
         icon={
-          <MaterialCommunityIcons
-            name="playlist-edit"
-            size={24}
-            color="black"
-          />
+          <MaterialCommunityIcons name="playlist-edit" size={24} color="#fff" />
         }
       />
     </SafeAreaView>
@@ -62,7 +91,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FAFAFB',
-    paddingHorizontal: 8,
+    paddingVertical: 8,
   },
   postContainer: {
     backgroundColor: '#fff',

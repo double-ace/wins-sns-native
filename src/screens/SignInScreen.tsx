@@ -1,10 +1,28 @@
+import axios from 'axios';
 import React, { useState } from 'react';
 import { SafeAreaView, TextInput, View, StyleSheet } from 'react-native';
 import { Button } from 'react-native-elements';
+import { requestHttpPost } from '../scripts/requestBase';
+import { setData, getData } from '../scripts/asyncStore';
 
 export const SignInScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  const login = async () => {
+    const param = { email, password };
+    try {
+      const res = await requestHttpPost('/api/v1/auth/jwt/create/', param);
+      const ret = await setData('access', res.data.access);
+      alert(res.data.access);
+      // await setData('refresh', res.data.refresh);
+      if (ret) {
+        navigation.navigate('Home');
+      }
+    } catch (e) {
+      alert(e);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -31,7 +49,7 @@ export const SignInScreen = ({ navigation }) => {
           title="ログイン"
           buttonStyle={styles.btn}
           titleStyle={styles.btnTitle}
-          onPress={() => navigation.navigate('Home')}
+          onPress={login}
         />
       </View>
     </SafeAreaView>
