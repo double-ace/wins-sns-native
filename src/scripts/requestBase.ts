@@ -3,7 +3,7 @@ import { getData } from './asyncStore';
 
 const baseUrl = 'http://192.168.11.2:8080';
 
-type ResponseData = {
+export type ResponseData = {
   result: boolean;
   data: any;
 };
@@ -44,23 +44,27 @@ export const requestHttpGet = async (
 
 export const requestHttpPost = async (
   endpoint: string,
-  param: { [key: string]: string }
+  param: { [key: string]: string },
+  requiredHeader: boolean = true
 ): Promise<ResponseData> => {
   let ret: ResponseData = {
     result: false,
     data: '',
   };
+  console.log(requiredHeader);
 
-  await axios
-    .post(baseUrl + endpoint, param)
-    .then((res) => {
-      if (res.data) {
-        ret = { ...ret, result: true, data: res.data };
-      }
-    })
-    .catch((e) => {
-      console.log(e);
-    });
+  const headers = requiredHeader ? await createHeader() : null;
+
+  try {
+    const res = headers
+      ? await axios.post(baseUrl + endpoint, param, headers)
+      : await axios.post(baseUrl + endpoint, param);
+    if (res.data) {
+      ret = { ...ret, result: true, data: res.data };
+    }
+  } catch (e) {
+    console.log(e);
+  }
 
   return ret;
 };
@@ -80,9 +84,9 @@ const createHeader = async () => {
   }
 
   // alert(token);
-  return { headers: {
-    'Authorization': `JWT ${token}`,
-  }};
+  return {
+    headers: {
+      Authorization: `JWT ${token}`,
+    },
+  };
 };
-
-
