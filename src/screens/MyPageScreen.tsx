@@ -13,7 +13,7 @@ import { AntDesign } from '@expo/vector-icons';
 import { postData } from '../../assets/postData.json';
 
 type PostData = {
-  id: string | number;
+  id: string;
   poster: string;
   date: Date | string;
   content: string;
@@ -21,10 +21,10 @@ type PostData = {
 
 const posts: PostData[] = postData;
 
-export const MyPageScreen = () => {
+export const MyPageScreen = ({ navigation }) => {
   const renderItem = ({ item }) => {
     return (
-      <View style={styles.postContainer} key={item.id}>
+      <View style={styles.postContainer}>
         <View style={styles.postHeader}>
           <Avatar
             size="medium"
@@ -82,7 +82,7 @@ export const MyPageScreen = () => {
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.follow}
-                onPress={() => alert('follow press')}
+                onPress={() => navigation.navigate('Follow')}
               >
                 <Text>フォロー</Text>
                 <Text>10</Text>
@@ -98,7 +98,7 @@ export const MyPageScreen = () => {
           <Button
             title="ポイント管理"
             buttonStyle={styles.pointManageBtn}
-            onPress={() => alert('point manage')}
+            onPress={() => navigation.navigate('PointManage')}
           />
           <Button
             title="ログアウト"
@@ -108,7 +108,12 @@ export const MyPageScreen = () => {
         </View>
       </View>
       <View>
-        <FlatList data={posts} renderItem={renderItem} scrollEnabled />
+        <FlatList
+          data={posts}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          scrollEnabled
+        />
       </View>
     </View>
   );

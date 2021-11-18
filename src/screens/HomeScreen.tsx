@@ -49,7 +49,6 @@ export const HomeScreen = ({ navigation }) => {
   const renderItem = ({ item }: ListRenderItemInfo<PostData>) => {
     return (
       <View style={styles.postContainer} key={item.id}>
-        <Button title="test" onPress={getMyShop} />
         <View style={styles.postHeader}>
           <Avatar
             size="medium"

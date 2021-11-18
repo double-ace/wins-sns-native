@@ -1,16 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   SafeAreaView,
   FlatList,
   View,
   Text,
+  TextInput,
   ListRenderItemInfo,
 } from 'react-native';
 import { Avatar } from 'react-native-elements';
 import { chatMessage } from '../../assets/chatMessage.json';
 
 type ChatMessage = {
+  id: string;
   message: string;
   sendFrom: string;
   date: string;
@@ -18,17 +20,10 @@ type ChatMessage = {
 
 export const ChatScreen = () => {
   const messages: ChatMessage[] = chatMessage;
+  const [content, setContent] = useState('');
 
   const renderItem = ({ item }: ListRenderItemInfo<ChatMessage>) => {
-    // 日付の整形
-
-    // 秒以下は省略
-
-    // 当日の場合は時刻のみ表示
-
-    // 今年の場合は年を月以下を表示
-
-    return item.sendFrom === 'wins' ? (
+    return item.sendFrom === 'shop' ? (
       <View style={styles.messageContainerFromShop}>
         <Avatar
           size="small"
@@ -66,8 +61,26 @@ export const ChatScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <FlatList data={messages} renderItem={renderItem} scrollEnabled />
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <FlatList
+          data={messages}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          scrollEnabled
+        />
+      </View>
+      <View style={styles.inputContainer}>
+        <TextInput
+          multiline
+          numberOfLines={4}
+          value={content}
+          onChangeText={(value) => setContent(value)}
+          editable
+          style={styles.textBox}
+          maxLength={150}
+        />
+      </View>
     </SafeAreaView>
   );
 };
@@ -76,7 +89,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 8,
-    paddingVertical: 12,
+    paddingTop: 12,
+    marginBottom: 40,
   },
   avatar: {
     backgroundColor: '#cccccc',
@@ -115,5 +129,20 @@ const styles = StyleSheet.create({
   },
   dateText: {
     color: '#6B7280',
+  },
+  inputContainer: {
+    position: 'absolute',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+    paddingVertical: 4,
+    bottom: 0,
+    width: '100%',
+    height: 40,
+    backgroundColor: '#10B981',
+  },
+  textBox: {
+    backgroundColor: '#fff',
+    borderRadius: 40,
+    paddingHorizontal: 8,
   },
 });

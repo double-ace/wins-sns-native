@@ -3,20 +3,29 @@ import { StyleSheet, View, Text, TextInput } from 'react-native';
 import { Button } from 'react-native-elements';
 import { requestHttpPost } from '../scripts/requestBase';
 
-export const CreatePostScreen = () => {
+export const CreatePostScreen = ({ navigation }) => {
   const [content, setContent] = useState('');
 
-  const handlePost = () => {
-    const token = requestHttpPost('/api/v1/sns/post/', {
-      shop: '',
-      post: content,
-    });
+  const handlePost = async () => {
+    try {
+      const res = await requestHttpPost('/api/v1/sns/post/', {
+        shop: '',
+        post: content,
+      });
+      navigation.goBack();
+    } catch {
+      console.log('create post error');
+    }
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.headerBtn}>
-        <Button title="キャンセル" type="clear" />
+        <Button
+          title="キャンセル"
+          onPress={() => navigation.goBack()}
+          type="clear"
+        />
         <Button
           title="投稿"
           buttonStyle={styles.createBtn}
@@ -29,6 +38,7 @@ export const CreatePostScreen = () => {
         value={content}
         onChangeText={(value) => setContent(value)}
         placeholder="入力してください"
+        autoFocus
         editable
         style={styles.textBox}
         maxLength={150}

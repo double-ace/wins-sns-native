@@ -1,32 +1,42 @@
 import axios from 'axios';
 import React, { useState } from 'react';
-import { SafeAreaView, TextInput, View, StyleSheet } from 'react-native';
+import { SafeAreaView, TextInput, View, Text, StyleSheet } from 'react-native';
 import { Button } from 'react-native-elements';
-import { requestHttpPost } from '../scripts/requestBase';
+import { authLogin } from '../scripts/requestAuth';
 import { setData, getData } from '../scripts/asyncStore';
 
 export const SignInScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [invalid, setInvalid] = useState(false);
 
   const login = async () => {
     const param = { email, password };
     try {
-      const res = await requestHttpPost('/api/v1/auth/jwt/create/', param);
-      const ret = await setData('access', res.data.access);
-      alert(res.data.access);
-      // await setData('refresh', res.data.refresh);
-      if (ret) {
-        navigation.navigate('Home');
+      const res = await authLogin({ email, password });
+      if (res) {
+        invalid === false ? setInvalid(false) : null;
+        navigation.navigate('Main');
+      } else {
+        setInvalid(true);
       }
     } catch (e) {
+      setInvalid(true);
       alert(e);
     }
+    // 開発用
+    console.log('error');
+    navigation.navigate('Main');
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.inner}>
+        {invalid ? (
+          <Text style={styles.invalidText}>
+            メールアドレスまたはパスワードが正しくありません
+          </Text>
+        ) : null}
         <TextInput
           style={styles.input}
           value={email}
@@ -82,5 +92,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#fff',
     fontWeight: 'bold',
+  },
+  invalidText: {
+    color: 'red',
+    marginBottom: 8,
   },
 });
