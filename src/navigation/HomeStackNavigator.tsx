@@ -10,7 +10,7 @@ export const RootStackScreen = () => {
     <RootStack.Navigator screenOptions={{ headerShown: false }}>
       <RootStack.Group>
         <RootStack.Screen name="SignIn" component={SignInScreen} />
-        <RootStack.Screen name="Home" component={DrawerNavigator} />
+        <RootStack.Screen name="Main" component={DrawerNavigator} />
       </RootStack.Group>
     </RootStack.Navigator>
   );
