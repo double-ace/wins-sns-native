@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   StyleSheet,
@@ -24,7 +23,7 @@ const result = posts
 export const PointManageScreen = () => {
   const renderItem = ({ item }) => {
     return (
-      <View style={styles.point_list} key={item.id}>
+      <View style={styles.pointList} key={item.id}>
         <Text>{item.date}</Text>
         <Text>{item.point}pt</Text>
       </View>
@@ -35,16 +34,16 @@ export const PointManageScreen = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.main}>
         <View style={styles.point}>
-          <Text style={styles.point_text}>{result}pt</Text>
+          <Text style={styles.pointText}>{result}pt</Text>
         </View>
         <View>
           <TouchableOpacity style={styles.qr} onPress={() => alert('qr表示')}>
-            <Text style={styles.qr_text}>QRコード表示</Text>
+            <Text style={styles.qrText}>QRコード表示</Text>
           </TouchableOpacity>
         </View>
       </View>
       <View style={styles.log}>
-        <Text style={styles.point_log}>ポイント履歴</Text>
+        <Text style={styles.pointLog}>ポイント履歴</Text>
       </View>
       <FlatList data={posts} renderItem={renderItem} scrollEnabled />
     </SafeAreaView>
@@ -71,7 +70,7 @@ const styles = StyleSheet.create({
     borderWidth: 15,
     marginVertical: 10,
   },
-  point_text: {
+  pointText: {
     backgroundColor: '#fff',
     fontSize: 30,
   },
@@ -84,7 +83,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 15,
   },
-  qr_text: {
+  qrText: {
     fontSize: 20,
     fontWeight: 'bold',
     color: 'white',
@@ -94,11 +93,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: '#E9EAEB',
   },
-  point_log: {
+  pointLog: {
     fontSize: 16,
     paddingLeft: 20,
   },
-  point_list: {
+  pointList: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 12,
