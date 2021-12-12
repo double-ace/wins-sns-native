@@ -75,7 +75,7 @@ export const HomeScreen = ({ navigation }) => {
       <FlatList data={posts} renderItem={renderItem} scrollEnabled />
       <FAB
         placement="right"
-        color="#04cc77"
+        color="#00EF80"
         buttonStyle={styles.fab}
         onPress={() => navigation.navigate('PostCreateModal')}
         icon={

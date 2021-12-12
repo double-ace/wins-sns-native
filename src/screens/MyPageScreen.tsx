@@ -102,6 +102,7 @@ export const MyPageScreen = ({ navigation }) => {
           />
           <Button
             title="ログアウト"
+            titleStyle={styles.logoutTitle}
             buttonStyle={styles.logoutBtn}
             onPress={() => alert('logout')}
           />
@@ -153,13 +154,18 @@ const styles = StyleSheet.create({
   pointManageBtn: {
     borderRadius: 40,
     paddingVertical: 12,
-    backgroundColor: '#35E19C',
+    backgroundColor: '#00EF80',
     marginBottom: 8,
+  },
+  logoutTitle: {
+    color: '#FF1A1A',
   },
   logoutBtn: {
     borderRadius: 40,
     paddingVertical: 12,
-    backgroundColor: '#FF1A1A',
+    backgroundColor: 'transparent',
+    borderColor: '#FF1A1A',
+    borderWidth: 1,
   },
   postContainer: {
     backgroundColor: '#fff',

@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   createBtn: {
-    backgroundColor: '#4bb88a',
+    backgroundColor: '#00EF80',
     width: 96,
     borderRadius: 40,
   },
