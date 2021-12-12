@@ -89,7 +89,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 8,
-    paddingTop: 12,
     marginBottom: 40,
   },
   avatar: {
@@ -105,13 +104,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   message: {
-    backgroundColor: '#34D399',
+    backgroundColor: '#00EF80',
     padding: 8,
     borderRadius: 4,
     maxWidth: 240,
   },
   messageFromShop: {
-    backgroundColor: '#D1D5DB',
+    backgroundColor: '#fff',
     padding: 8,
     borderRadius: 4,
     maxWidth: 240,
@@ -138,7 +137,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: '100%',
     height: 40,
-    backgroundColor: '#10B981',
+    backgroundColor: '#00EF80',
   },
   textBox: {
     backgroundColor: '#fff',
