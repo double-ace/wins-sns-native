@@ -43,7 +43,7 @@ export const MyPageScreen = ({ navigation }) => {
               name="delete"
               size={24}
               color="red"
-              onPress={() => alert('削除しますか？？')}
+              onPress={() => alert('削除しますか？')}
             />
           </View>
         </View>
@@ -77,19 +77,25 @@ export const MyPageScreen = ({ navigation }) => {
                 style={styles.follow}
                 onPress={() => alert('post press')}
               >
-                <Text>投稿</Text>
-                <Text>10</Text>
+                <View style={styles.activities}>
+                  <Text style={styles.activitiesList}>投稿</Text>
+                  <Text>10</Text>
+                </View>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.follow}
                 onPress={() => navigation.navigate('Follow')}
               >
-                <Text>フォロー</Text>
-                <Text>10</Text>
+                <View style={styles.activities}>
+                  <Text style={styles.activitiesList}>フォロー</Text>
+                  <Text>10</Text>
+                </View>
               </TouchableOpacity>
               <TouchableOpacity onPress={() => alert('follower press')}>
-                <Text style={styles.follow}>フォロワー</Text>
-                <Text>10</Text>
+                <View style={styles.activities}>
+                  <Text style={styles.activitiesList}>フォロワー</Text>
+                  <Text>10</Text>
+                </View>
               </TouchableOpacity>
             </View>
           </View>
@@ -102,7 +108,6 @@ export const MyPageScreen = ({ navigation }) => {
           />
           <Button
             title="ログアウト"
-            titleStyle={styles.logoutTitle}
             buttonStyle={styles.logoutBtn}
             onPress={() => alert('logout')}
           />
@@ -154,18 +159,13 @@ const styles = StyleSheet.create({
   pointManageBtn: {
     borderRadius: 40,
     paddingVertical: 12,
-    backgroundColor: '#00EF80',
+    backgroundColor: '#35E19C',
     marginBottom: 8,
-  },
-  logoutTitle: {
-    color: '#FF1A1A',
   },
   logoutBtn: {
     borderRadius: 40,
     paddingVertical: 12,
-    backgroundColor: 'transparent',
-    borderColor: '#FF1A1A',
-    borderWidth: 1,
+    backgroundColor: '#FF1A1A',
   },
   postContainer: {
     backgroundColor: '#fff',
@@ -195,5 +195,14 @@ const styles = StyleSheet.create({
   dustBox: {
     position: 'absolute',
     right: 0,
+  },
+  activities: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 10,
+  },
+  activitiesList: {
+    fontSize: 16,
   },
 });
