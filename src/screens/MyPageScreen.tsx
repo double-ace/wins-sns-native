@@ -43,7 +43,7 @@ export const MyPageScreen = ({ navigation }) => {
               name="delete"
               size={24}
               color="red"
-              onPress={() => alert('削除しますか？')}
+              onPress={() => alert('削除しますか？？')}
             />
           </View>
         </View>
