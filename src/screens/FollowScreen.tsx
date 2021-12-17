@@ -37,7 +37,7 @@ export const FollowScreen = () => {
           </View>
           <TouchableOpacity
             style={styles.followContainer}
-            onPress={() => setFollow('フォローを解除する')}
+            onPress={() => setFollow('フォローを解除する!')}
           >
             <Text style={styles.followText}>{follow}</Text>
           </TouchableOpacity>
