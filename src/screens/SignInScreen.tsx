@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 import { SafeAreaView, TextInput, View, Text, StyleSheet } from 'react-native';
-import { Button } from 'react-native-elements';
+import { Button } from 'native-base';
 import { authLogin } from '../scripts/requestAuth';
 import { setData, getData } from '../scripts/asyncStore';
 
@@ -55,12 +55,9 @@ export const SignInScreen = ({ navigation }) => {
           placeholder="Password"
           secureTextEntry
         />
-        <Button
-          title="ログイン"
-          buttonStyle={styles.btn}
-          titleStyle={styles.btnTitle}
-          onPress={login}
-        />
+        <Button onPress={login} bg="#00EB7D" _text={{ color: '#fff' }}>
+          ログイン
+        </Button>
       </View>
     </SafeAreaView>
   );

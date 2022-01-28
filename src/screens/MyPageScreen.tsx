@@ -8,7 +8,7 @@ import {
   Alert,
   TouchableOpacity,
 } from 'react-native';
-import { Avatar, Button } from 'react-native-elements';
+import { Link, Avatar, Button } from 'native-base';
 import { AntDesign } from '@expo/vector-icons';
 import { postData } from '../../assets/postData.json';
 
@@ -26,14 +26,10 @@ export const MyPageScreen = ({ navigation }) => {
     return (
       <View style={styles.postContainer}>
         <View style={styles.postHeader}>
-          <Avatar
-            size="medium"
-            rounded
-            avatarStyle={styles.avatar}
-            icon={{ name: 'home' }}
-            onPress={() => console.log('Works!')}
-            activeOpacity={0.7}
-          />
+          <Link onPress={() => console.log('Works!')}>
+            <Avatar size="md"></Avatar>
+          </Link>
+
           <View style={styles.postHeaderTxtContainer}>
             <Text style={styles.posterName}>{item.poster}</Text>
             <Text style={styles.postDate}>{item.date}</Text>
@@ -57,19 +53,9 @@ export const MyPageScreen = ({ navigation }) => {
     <View style={styles.container}>
       <View style={styles.topContainer}>
         <View style={styles.userInfoContainer}>
-          <Avatar
-            size={120}
-            rounded
-            avatarStyle={styles.avatar}
-            icon={{ name: 'home' }}
-            onPress={() => console.log('Works!')}
-            activeOpacity={0.7}
-          >
-            <Avatar.Accessory
-              size={32}
-              onPress={() => alert('edit profile image')}
-            />
-          </Avatar>
+          <Link onPress={() => console.log('Works!')}>
+            <Avatar size="2xl"></Avatar>
+          </Link>
           <View style={styles.userInfoRightContainer}>
             <Text style={styles.name}>my name</Text>
             <View style={styles.followContainer}>
@@ -95,17 +81,10 @@ export const MyPageScreen = ({ navigation }) => {
           </View>
         </View>
         <View>
-          <Button
-            title="ポイント管理"
-            buttonStyle={styles.pointManageBtn}
-            onPress={() => navigation.navigate('PointManage')}
-          />
-          <Button
-            title="ログアウト"
-            titleStyle={styles.logoutTitle}
-            buttonStyle={styles.logoutBtn}
-            onPress={() => alert('logout')}
-          />
+          <Button onPress={() => navigation.navigate('PointManage')}>
+            ポイント管理
+          </Button>
+          <Button onPress={() => alert('logout')}>ログアウト</Button>
         </View>
       </View>
       <View>

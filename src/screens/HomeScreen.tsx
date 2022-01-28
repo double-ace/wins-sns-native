@@ -7,7 +7,7 @@ import {
   Text,
   ListRenderItemInfo,
 } from 'react-native';
-import { Avatar, FAB, Button } from 'react-native-elements';
+import { Link, Avatar, Button } from 'native-base';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import { postData } from '../../assets/postData.json';
@@ -50,14 +50,9 @@ export const HomeScreen = ({ navigation }) => {
     return (
       <View style={styles.postContainer} key={item.id}>
         <View style={styles.postHeader}>
-          <Avatar
-            size="medium"
-            rounded
-            avatarStyle={styles.avatar}
-            icon={{ name: 'home' }}
-            onPress={() => alert('Works!')}
-            activeOpacity={0.7}
-          />
+          <Link onPress={() => alert('Works!')}>
+            <Avatar size="md" />
+          </Link>
           <View style={styles.postHeaderTxtContainer}>
             <Text style={styles.posterName}>{item.poster}</Text>
             <Text style={styles.postDate}>{item.date}</Text>
@@ -73,15 +68,6 @@ export const HomeScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <FlatList data={posts} renderItem={renderItem} scrollEnabled />
-      <FAB
-        placement="right"
-        color="#00EF80"
-        buttonStyle={styles.fab}
-        onPress={() => navigation.navigate('PostCreateModal')}
-        icon={
-          <MaterialCommunityIcons name="playlist-edit" size={24} color="#fff" />
-        }
-      />
     </SafeAreaView>
   );
 };
