@@ -26,7 +26,8 @@ export const SignInScreen = ({ navigation }) => {
     }
     // 開発用
     console.log('error');
-    navigation.navigate('Main');
+    // navigation.navigate('Main');
+    navigation.navigate('RegistUserInfo');
   };
 
   return (
