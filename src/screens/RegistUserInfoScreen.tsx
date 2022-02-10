@@ -7,76 +7,117 @@ import {
   Text,
   StyleSheet,
   Pressable,
+  Keyboard,
+  TouchableWithoutFeedback,
+  Platform,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
-import { Button } from 'react-native-elements';
-import { authLogin } from '../scripts/requestAuth';
+import {
+  Text as NBText,
+  Stack,
+  Button,
+  Select,
+  Radio,
+  Link,
+  KeyboardAvoidingView,
+} from 'native-base';
+import { requestHttpPost } from '../scripts/requestBase';
 import { setData, getData } from '../scripts/asyncStore';
+import { prefectures } from '../../assets/prefectures.json';
 
 export const RegistUserInfoScreen = ({ navigation }) => {
-  const [email, setEmail] = useState('');
-  const [birth, setBirth] = useState({ year: 2000, month: 1, date: 1 });
-  const [address, setAdress] = useState({ prefecture: '', city: '' });
+  const [familyName, setfamilyName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [birthDate, setBirthDate] = useState('');
+  const [address, setAddress] = useState({ prefecture: '', city: '' });
   const [hearFrom, setHearFrom] = useState('');
   const [introduced, setIntroduced] = useState('');
   const [phoneNum, setPhoneNum] = useState('');
+  const [hopeRate, setHopeRate] = useState('0.5');
   const [password, setPassword] = useState('');
   const [invalid, setInvalid] = useState(false);
 
-  const hearFromList = [
-    {
-      label: '麻雀王国',
-      value: 'mahjongKingdom',
-    },
-    {
-      label: 'Twitter',
-      value: 'twitter',
-    },
-    {
-      label: '看板',
-      value: 'signboard',
-    },
-    {
-      label: '紹介',
-      value: 'introduced',
-    },
-    {
-      label: 'その他',
-      value: 'others',
-    },
+  const hearFromList: string[] = [
+    '麻雀王国',
+    'Twitter',
+    '看板',
+    '紹介',
+    'その他',
   ];
 
-  const login = async () => {
-    const param = { email, password };
-    try {
-      const res = await authLogin({ email, password });
-      if (res) {
-        invalid === false ? setInvalid(false) : null;
-        navigation.navigate('Main');
-      } else {
-        setInvalid(true);
-      }
-    } catch (e) {
-      setInvalid(true);
-      alert(e);
-    }
-    // 開発用
-    console.log('error');
-    navigation.navigate('Main');
-  };
+  const hopeRateList: string[] = ['0.5', '1.0', 'どちらでも'];
 
-  const now = new Date();
-  const yearList: number[] = [];
-  for (let i = 1902; i <= now.getFullYear(); i++) {
-    yearList.push(i);
-  }
-  const pickerYearItem = yearList.map((year) => {
-    return <Picker.Item label={year.toString()} value={year} />;
+  // 都道府県選択リスト
+  const prefectureItem = prefectures.map(({ name }) => {
+    return <Select.Item label={name} key={name} value={name} />;
   });
 
+  // 来店きっかけ選択リスト
+  const hearFromItem = hearFromList.map((item) => {
+    return (
+      <Radio value={item} key={item} mr="2">
+        {item}
+      </Radio>
+    );
+  });
+
+  // 希望レート選択リスト
+  const hopeRateItem = hopeRateList.map((item) => {
+    return (
+      <Radio value={item} key={item} mr="2">
+        {item}
+      </Radio>
+    );
+  });
+
+  const formatBirthDate = (val: string) => {
+    if (val.length <= 4) {
+      setBirthDate(val);
+    } else {
+      setBirthDate(val);
+    }
+  };
+
+  const regist = async () => {
+    // const formItem = {
+    //   familyName,
+    //   firstName,
+    //   birthDate,
+    //   addressPrefecture: address.prefecture,
+    //   addressCity: address.city,
+    //   hearFrom,
+    //   introduced: hearFrom === '紹介' ? introduced : null,
+    //   phoneNumber: phoneNum,
+    //   hopeRate,
+    // };
+    const formItem = {
+      family_name: familyName,
+      first_name: firstName,
+      nickname: familyName + ' ' + firstName,
+      birth_date: birthDate,
+      address_prefecture: address.prefecture,
+      address_city: address.city,
+      hear_from: hearFrom,
+      introduced: hearFrom === '紹介' ? introduced : null,
+      phone_number: phoneNum,
+      hope_rate: hopeRate,
+    };
+    console.log(formItem);
+    const res = await requestHttpPost('/api/v1/user/profile/', formItem, true)
+    if (res.result) {
+      navigation.navigate('Main');
+    }
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.inner}>
+    <TouchableWithoutFeedback
+      style={styles.inner}
+      onPress={() => Keyboard.dismiss()}
+    >
+        <KeyboardAvoidingView
+          h={{ base: '700px', lg: 'auto' }}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+      <SafeAreaView style={styles.container}>
         {invalid ? (
           <Text style={styles.invalidText}>
             メールアドレスまたはパスワードが正しくありません
@@ -87,15 +128,15 @@ export const RegistUserInfoScreen = ({ navigation }) => {
           <View style={styles.nameInputContainer}>
             <TextInput
               style={[styles.input, styles.nameInput]}
-              value={email}
-              onChangeText={(text) => setEmail(text)}
+              value={familyName}
+              onChangeText={(text) => setfamilyName(text)}
               textContentType="familyName"
               placeholder="姓"
             />
             <TextInput
               style={[styles.input, styles.nameInput]}
-              value={email}
-              onChangeText={(text) => setEmail(text)}
+              value={firstName}
+              onChangeText={(text) => setFirstName(text)}
               textContentType="givenName"
               placeholder="名"
             />
@@ -103,50 +144,95 @@ export const RegistUserInfoScreen = ({ navigation }) => {
         </View>
         <View style={styles.birthContainer}>
           <Text>生年月日</Text>
-          <Picker
-            selectedValue={birth.year}
-            onValueChange={(value) =>
-              setBirth((pre) => ({ ...pre, year: value }))
-            }
-          >
-            {pickerYearItem}
-          </Picker>
+          <TextInput
+            style={styles.input}
+            value={birthDate}
+            onChangeText={(text) => formatBirthDate(text)}
+            keyboardType="phone-pad"
+            textContentType="telephoneNumber"
+            placeholder="YYYY/MM/DD"
+          />
         </View>
         <View style={styles.addressContainer}>
           <Text style={styles.label}>お住まい</Text>
+          <Stack direction={{ base: 'row' }}>
+            <Select
+              selectedValue={address.prefecture}
+              minWidth="100"
+              onValueChange={(val) =>
+                setAddress({ ...address, prefecture: val })
+              }
+            >
+              {prefectureItem}
+            </Select>
+            <TextInput
+              style={[styles.input, styles.nameInput]}
+              value={address.city}
+              onChangeText={(val) => setAddress({ ...address, city: val })}
+              textContentType="givenName"
+              placeholder="名"
+            />
+          </Stack>
         </View>
-        <View style={styles.hearFromContainer}>
-          <Text style={styles.label}>ご来店のきっかけ</Text>
-        </View>
-        <View style={styles.introducedContainer}>
-          <Text style={styles.label}>ご紹介者様</Text>
-          <TextInput
-            style={styles.input}
-            value={introduced}
-            onChangeText={(text) => setIntroduced(text)}
-            textContentType="emailAddress"
-            placeholder="麻雀太郎"
-          />
-        </View>
-        <View style={styles.phoneContainer}>
-          <Text style={styles.label}>お電話番号</Text>
-          <TextInput
-            style={styles.input}
-            value={phoneNum}
-            onChangeText={(text) => setPhoneNum(text)}
-            keyboardType="phone-pad"
-            textContentType="telephoneNumber"
-            placeholder="09012345678"
-          />
-        </View>
-        <Button
-          title="登録"
-          buttonStyle={styles.btn}
-          titleStyle={styles.btnTitle}
-          onPress={login}
-        />
-      </View>
-    </SafeAreaView>
+        <Stack my="4">
+          <NBText fontSize="md" mb="2">
+            ご来店のきっかけ
+          </NBText>
+          <Radio.Group
+            name="hearFromRadioGroup"
+            value={hearFrom}
+            onChange={(val) => setHearFrom(val)}
+          >
+            <Stack direction={{ base: 'row' }} flexWrap="wrap">
+              {hearFromItem}
+            </Stack>
+          </Radio.Group>
+        </Stack>
+        {hearFrom === '紹介' ? (
+          <View style={styles.introducedContainer}>
+            <Text style={styles.label}>ご紹介者様</Text>
+            <TextInput
+              style={styles.input}
+              value={introduced}
+              onChangeText={(text) => setIntroduced(text)}
+              textContentType="emailAddress"
+              placeholder="麻雀太郎"
+            />
+          </View>
+        ) : null}
+
+          <View style={styles.phoneContainer}>
+            <Text style={styles.label}>お電話番号</Text>
+            <TextInput
+              style={styles.input}
+              value={phoneNum}
+              onChangeText={(text) => setPhoneNum(text)}
+              keyboardType="phone-pad"
+              textContentType="telephoneNumber"
+              placeholder="09012345678"
+            />
+          </View>
+        <Stack my="4">
+          <NBText fontSize="md" mb="2">
+            ご希望レート
+          </NBText>
+          <Radio.Group
+            name="hopeRateRadioGroup"
+            value={hopeRate}
+            onChange={(val) => setHopeRate(val)}
+          >
+            <Stack direction={{ base: 'row' }} flexWrap="wrap">
+              {hopeRateItem}
+            </Stack>
+          </Radio.Group>
+        </Stack>
+        <Button onPress={regist} bg="#00EB7D" _text={{ color: '#fff' }}>
+          登録
+        </Button>
+        <Link alignSelf="flex-end" onPress={() => navigation.navigate('SignIn')}>ログイン画面へ戻る</Link>
+      </SafeAreaView>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 };
 
