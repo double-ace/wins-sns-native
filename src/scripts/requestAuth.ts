@@ -1,30 +1,63 @@
 import { getData, setData } from './asyncStore';
 import { requestHttpPost, ResponseData } from './requestBase';
 
-type LoginParams = {
+type AuthParams = {
   email: string;
   password: string;
 };
 
-export const authLogin = async (params: LoginParams) => {
-  let ret = false;
+export const authLogin = async (params: AuthParams): Promise<any> => {
+  // let ret = false;
+  const ret: {result: boolean; status: number | undefined} = {
+    result: false,
+    status: 0,
+  }
   try {
     const res = await requestHttpPost(
       '/api/v1/auth/jwt/create/',
       params,
-      false
+      false,
     );
     if (res.result) {
       await setData('access', res.data.access);
       await setData('refresh', res.data.refresh);
+      ret.result = true
+      ret.status = res.status
+      console.log('ret: ', ret)
+    }
+  } catch (e) {
+    console.log('authLoginError=========')
+    alert(e);
+  }
+
+  return ret;
+};
+
+export const createAccount = async (params: AuthParams): Promise<boolean> => {
+  let ret = false;
+  try {
+    const createRes = await requestHttpPost(
+      '/api/v1/user/create/',
+      params,
+      false,
+    );
+    // if (createRes.status === 201) {
+    if (true) {
+      const tokenRes = await requestHttpPost(
+        '/api/v1/auth/jwt/create/',
+        params,
+        false,
+      );
+      await setData('access', tokenRes.data.access);
+      await setData('refresh', tokenRes.data.refresh);
       ret = true;
     }
   } catch (e) {
     alert(e);
   }
 
-  return ret;
-};
+  return ret
+}
 
 export const useRefreshToken = async () => {
   const refresh = await getData('refresh');
