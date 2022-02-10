@@ -11,17 +11,19 @@ const CustomDrawer = () => {
 
   useEffect(() => {
     const getMyShop = async () => {
-      const res = await requestHttpGet('/api/v1/core/belong-to/');
-      res.data[0] ? setShops(res.data) : null;
+      // const res = await requestHttpGet('/api/v1/core/belong-to/');
+      // res.data[0] ? setShops(res.data) : null;
     };
 
     getMyShop();
-  },[]);
+  }, []);
 
   return (
     <DrawerContentScrollView>
       {shops.map((shop: any) => {
-        return <DrawerItem label={shop.shop} onPress={() => console.log('aa')} />;
+        return (
+          <DrawerItem label={shop.shop} onPress={() => console.log('aa')} />
+        );
       })}
     </DrawerContentScrollView>
   );
