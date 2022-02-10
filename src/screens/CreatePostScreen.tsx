@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput } from 'react-native';
-import { Button } from 'react-native-elements';
+import { Button } from 'native-base';
 import { requestHttpPost } from '../scripts/requestBase';
 
 export const CreatePostScreen = ({ navigation }) => {
@@ -21,16 +21,8 @@ export const CreatePostScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.headerBtn}>
-        <Button
-          title="キャンセル"
-          onPress={() => navigation.goBack()}
-          type="clear"
-        />
-        <Button
-          title="投稿"
-          buttonStyle={styles.createBtn}
-          onPress={handlePost}
-        />
+        <Button onPress={() => navigation.goBack()}>キャンセル</Button>
+        <Button onPress={handlePost}>投稿</Button>
       </View>
       <TextInput
         multiline

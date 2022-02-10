@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { convertRemToAbsolute } from 'native-base/lib/typescript/theme/tools';
 
 type StoreData = {
   key: string;
@@ -20,12 +21,24 @@ export const getData = async (key: string): Promise<string | null> => {
   try {
     value = await AsyncStorage.getItem(key);
     if (!value) {
-      console.log('データが存在しません');
+      console.log(`${key}が存在しません`);
     }
 
     return value;
   } catch (e) {
     console.log(e);
     return value;
+  }
+};
+
+export const delData = async (key: string): Promise<boolean> => {
+  try {
+    await AsyncStorage.removeItem(key, (error) =>
+      console.log('removeItem: ', error)
+    );
+    return true;
+  } catch (e) {
+    console.log('delData: ', e);
+    return false;
   }
 };

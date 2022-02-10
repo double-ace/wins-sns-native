@@ -1,87 +1,50 @@
-import React, { useState, useEffect } from 'react';
+import { Flex, Stack, Button } from 'native-base';
+import React from 'react';
 import {
   StyleSheet,
   SafeAreaView,
   View,
   FlatList,
   Text,
-  ListRenderItemInfo,
+  TouchableOpacity,
 } from 'react-native';
-import { Avatar, FAB, Button } from 'react-native-elements';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Ionicons } from '@expo/vector-icons';
-import { postData } from '../../assets/postData.json';
-import { getData } from '../scripts/asyncStore';
-import axios, { AxiosResponse } from 'axios';
-import { requestHttpGet } from '../scripts/requestBase';
+import { pointData } from '../../assets/pointData.json';
 
-type PostData = {
+type PointData = {
   id: string | number;
-  poster: string;
   date: Date | string;
-  content: string;
+  point: string;
 };
 
-const posts: PostData[] = postData;
+const posts: PointData[] = pointData;
+const result = posts
+  .reduce((sum, item) => sum + Number(item.point), 0)
+  .toLocaleString();
 
 export const HomeScreen = ({ navigation }) => {
-  const [access, setAccess] = useState('');
-  const [shop, setShop] = useState<string[]>([]);
-
-  useEffect(() => {
-    const sample = async () => {
-      const aa = await getData('access');
-      aa ? setAccess(aa) : null;
-    };
-
-    sample();
-  });
-
-  const getMyShop = async () => {
-    // const res: AxiosResponse<string[]> = await axios.get(
-    //   'http://192.168.11.2:8080/api/v1/core/belong-to/'
-    // );
-    const res = await requestHttpGet('/api/v1/core/belong-to/');
-    res.data[0] ? setShop(res.data) : null;
-    alert(res.data[0].shop);
-  };
-
-  const renderItem = ({ item }: ListRenderItemInfo<PostData>) => {
+  const renderItem = ({ item }) => {
     return (
-      <View style={styles.postContainer} key={item.id}>
-        <View style={styles.postHeader}>
-          <Avatar
-            size="medium"
-            rounded
-            avatarStyle={styles.avatar}
-            icon={{ name: 'home' }}
-            onPress={() => alert('Works!')}
-            activeOpacity={0.7}
-          />
-          <View style={styles.postHeaderTxtContainer}>
-            <Text style={styles.posterName}>{item.poster}</Text>
-            <Text style={styles.postDate}>{item.date}</Text>
-          </View>
-        </View>
-        <View style={styles.postContent}>
-          <Text>{item.content}</Text>
-        </View>
+      <View style={styles.pointList} key={item.id}>
+        <Text>{item.date}</Text>
+        <Text>{item.point}pt</Text>
       </View>
     );
   };
 
   return (
     <SafeAreaView style={styles.container}>
+      <Flex justifyContent="center" alignItems="center" bg="white" py="8">
+        <View style={styles.point}>
+          <Text style={styles.pointText}>{result}pt</Text>
+        </View>
+        <View>
+        <Button style={styles.qr} my="6" _text={{fontSize: 16, fontWeight: 'bold'}} onPress={() => alert('qr表示')}>QRコード表示</Button>
+        </View>
+      </Flex>
+      <View style={styles.log}>
+        <Text style={styles.pointLog}>ポイント履歴</Text>
+      </View>
       <FlatList data={posts} renderItem={renderItem} scrollEnabled />
-      <FAB
-        placement="right"
-        color="#00EF80"
-        buttonStyle={styles.fab}
-        onPress={() => navigation.navigate('PostCreateModal')}
-        icon={
-          <MaterialCommunityIcons name="playlist-edit" size={24} color="#fff" />
-        }
-      />
     </SafeAreaView>
   );
 };
@@ -89,35 +52,54 @@ export const HomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAFAFB',
-    paddingVertical: 8,
   },
-  postContainer: {
+  point: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 190,
+    height: 190,
+    elevation: 2,
+    borderColor: '#00EFF0',
+    borderRadius: 95,
+    borderWidth: 15,
+    marginVertical: 10,
+  },
+  pointText: {
     backgroundColor: '#fff',
+    fontSize: 30,
+  },
+  qr: {
+    width: 280,
+    height: 45,
+    borderRadius: 110,
+    backgroundColor: '#00EF80',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  qrText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  log: {
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderColor: '#E9EAEB',
+  },
+  pointLog: {
+    fontSize: 16,
+    paddingLeft: 20,
+  },
+  pointList: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingVertical: 25,
+    backgroundColor: '#fff',
+    marginHorizontal: 8,
     marginBottom: 4,
     borderWidth: 1,
     borderColor: '#E9EAEB',
   },
-  avatar: {
-    backgroundColor: '#cccccc',
-  },
-  postHeader: {
-    flexDirection: 'row',
-    marginBottom: 12,
-  },
-  postHeaderTxtContainer: {
-    justifyContent: 'space-evenly',
-    marginLeft: 8,
-  },
-  postContent: {},
-  posterName: {
-    // fontWeight: 'bold',
-    fontSize: 16,
-  },
-  postDate: {
-    color: '#A8A8A8',
-  },
-  fab: {},
 });

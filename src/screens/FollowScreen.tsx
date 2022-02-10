@@ -7,7 +7,7 @@ import {
   Text,
   TouchableOpacity,
 } from 'react-native';
-import { Avatar } from 'react-native-elements';
+import { Link, Avatar } from 'native-base';
 import { userData } from '../../assets/userData.json';
 
 type UserData = {
@@ -24,14 +24,9 @@ export const FollowScreen = () => {
     return (
       <View style={styles.userContainer} key={item.id}>
         <View style={styles.userHeader}>
-          <Avatar
-            size="medium"
-            rounded
-            avatarStyle={styles.avatar}
-            icon={{ name: 'home' }}
-            onPress={() => console.log('Works!')}
-            activeOpacity={0.7}
-          />
+          <Link onPress={() => console.log('Works!')}>
+            <Avatar size="md" />
+          </Link>
           <View style={styles.userHeaderTxtContainer}>
             <Text style={styles.userName}>{item.name}</Text>
           </View>

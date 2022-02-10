@@ -8,7 +8,7 @@ import {
   TextInput,
   ListRenderItemInfo,
 } from 'react-native';
-import { Avatar } from 'react-native-elements';
+import { Avatar } from 'native-base';
 import { chatMessage } from '../../assets/chatMessage.json';
 
 type ChatMessage = {
@@ -25,13 +25,7 @@ export const ChatScreen = () => {
   const renderItem = ({ item }: ListRenderItemInfo<ChatMessage>) => {
     return item.sendFrom === 'shop' ? (
       <View style={styles.messageContainerFromShop}>
-        <Avatar
-          size="small"
-          rounded
-          avatarStyle={styles.avatar}
-          icon={{ name: 'home' }}
-          activeOpacity={0.7}
-        />
+        <Avatar size="sm" />
         <View style={styles.msAndDateFromShop}>
           <View style={styles.messageFromShop}>
             <Text style={styles.messageText}>{item.message}</Text>
@@ -49,13 +43,7 @@ export const ChatScreen = () => {
             <Text style={styles.dateText}>{item.date}</Text>
           </View>
         </View>
-        <Avatar
-          size="small"
-          rounded
-          avatarStyle={styles.avatar}
-          icon={{ name: 'home' }}
-          activeOpacity={0.7}
-        />
+        <Avatar size="sm" />
       </View>
     );
   };
