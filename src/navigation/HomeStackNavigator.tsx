@@ -3,7 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { SignInScreen } from '../screens/SignInScreen';
 import { SignUpScreen } from '../screens/SignUpScreen';
 import { RegistUserInfoScreen } from '../screens/RegistUserInfoScreen';
-import { DrawerNavigator } from './DrawerNavigator';
+import { MainTabNavigator } from './MainTabNavigator';
 import { getData, setAccess } from '../scripts/asyncStore';
 import { requestHttpGet } from '../scripts/requestBase';
 
@@ -34,7 +34,7 @@ export const RootStackScreen = () => {
           name="RegistUserInfo"
           component={RegistUserInfoScreen}
         />
-        <RootStack.Screen name="Main" component={DrawerNavigator} />
+        <RootStack.Screen name="Main" component={MainTabNavigator} />
       </RootStack.Group>
     </RootStack.Navigator>
   );
