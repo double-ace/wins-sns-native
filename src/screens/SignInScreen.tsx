@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { TouchableWithoutFeedback, Keyboard, SafeAreaView, TextInput, View, Text, StyleSheet } from 'react-native';
+import {
+  TouchableWithoutFeedback,
+  Keyboard,
+  SafeAreaView,
+  TextInput,
+  View,
+  Text,
+  StyleSheet,
+} from 'react-native';
 import { Button, Link } from 'native-base';
 import { Loading } from '../components/Loading';
 import { authLogin } from '../scripts/requestAuth';
@@ -53,14 +61,14 @@ export const SignInScreen = ({ navigation }) => {
 
   const checkProfile = async () => {
     const res = await requestHttpGet('/api/v1/user/profile/');
-    if (res.data.length) {
-    // プロフィール情報が取得できた場合はメイン画面へ、取得できない場合はユーザ情報登録画面へ遷移
-    console.log('profile: ', res);
-    res.data.length
-      ? navigation.navigate('Main')
-      : navigation.navigate('RegistUserInfo');
+    if (res.result) {
+      // プロフィール情報が取得できた場合はメイン画面へ、取得できない場合はユーザ情報登録画面へ遷移
+      console.log('profile: ', res);
+      res.data.length
+        ? navigation.navigate('Main', { userId: res.data[0].user })
+        : navigation.navigate('RegistUserInfo');
     }
-    await delData('access')
+    await delData('access');
     setIsLoading(false);
   };
 
@@ -70,37 +78,47 @@ export const SignInScreen = ({ navigation }) => {
         <Loading />
       ) : (
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        <SafeAreaView style={styles.container}>
-          <View style={styles.inner}>
-            {invalid ? (
-              <Text style={styles.invalidText}>
-                メールアドレスまたはパスワードが正しくありません
-              </Text>
-            ) : null}
-            <TextInput
-              style={styles.input}
-              value={email}
-              onChangeText={(text) => setEmail(text)}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              textContentType="emailAddress"
-              placeholder="メールアドレス"
-            />
-            <TextInput
-              style={styles.input}
-              value={password}
-              onChangeText={(text) => setPassword(text)}
-              autoCapitalize="none"
-              textContentType="password"
-              placeholder="パスワード"
-              secureTextEntry
-            />
-            <Button onPress={login} my="2" bg="#00EB7D" _text={{ color: '#fff' }}>
-              ログイン
-            </Button>
-            <Link alignSelf="flex-end" onPress={() => navigation.navigate('SignUp')}>アカウントをお持ちでない方</Link>
-          </View>
-        </SafeAreaView>
+          <SafeAreaView style={styles.container}>
+            <View style={styles.inner}>
+              {invalid ? (
+                <Text style={styles.invalidText}>
+                  メールアドレスまたはパスワードが正しくありません
+                </Text>
+              ) : null}
+              <TextInput
+                style={styles.input}
+                value={email}
+                onChangeText={(text) => setEmail(text)}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                textContentType="emailAddress"
+                placeholder="メールアドレス"
+              />
+              <TextInput
+                style={styles.input}
+                value={password}
+                onChangeText={(text) => setPassword(text)}
+                autoCapitalize="none"
+                textContentType="password"
+                placeholder="パスワード"
+                secureTextEntry
+              />
+              <Button
+                onPress={login}
+                my="2"
+                bg="#00EB7D"
+                _text={{ color: '#fff' }}
+              >
+                ログイン
+              </Button>
+              <Link
+                alignSelf="flex-end"
+                onPress={() => navigation.navigate('SignUp')}
+              >
+                アカウントをお持ちでない方
+              </Link>
+            </View>
+          </SafeAreaView>
         </TouchableWithoutFeedback>
       )}
     </>

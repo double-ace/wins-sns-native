@@ -44,12 +44,12 @@ const MyPageStackScreen = () => {
   );
 };
 
-export const MainTabNavigator = () => {
+export const MainTabNavigator = ({ route }) => {
   return (
     <Tab.Navigator>
       <Tab.Screen
         name="HomeStack"
-        component={HomeStackScreen}
+        children={() => <HomeScreen userId={route.params.userId} />}
         options={{
           headerShown: false,
           tabBarLabel: 'ホーム',
@@ -75,7 +75,7 @@ export const MainTabNavigator = () => {
         component={SearchScreen}
         options={{
           headerShown: false,
-          tabBarLabel: "検索",
+          tabBarLabel: '検索',
           tabBarIcon: ({ size, color }) => (
             <Ionicons name="search" size={size} color={color} />
           ),
@@ -86,7 +86,7 @@ export const MainTabNavigator = () => {
         component={ChatScreen}
         options={{
           headerShown: false,
-          tabBarLabel: "チャット",
+          tabBarLabel: 'チャット',
           tabBarIcon: ({ size, color }) => (
             <Entypo name="message" size={size} color={color} />
           ),
@@ -97,7 +97,7 @@ export const MainTabNavigator = () => {
         component={FriendRequestScreen}
         options={{
           headerShown: false,
-          tabBarLabel: "申請一覧",
+          tabBarLabel: '申請一覧',
           tabBarIcon: ({ size, color }) => (
             <Ionicons name="people" size={size} color={color} />
           ),
@@ -108,7 +108,7 @@ export const MainTabNavigator = () => {
         component={MyPageStackScreen}
         options={{
           headerShown: false,
-          tabBarLabel: "マイページ",
+          tabBarLabel: 'マイページ',
           tabBarIcon: ({ size, color }) => (
             <Ionicons name="person" size={size} color={color} />
           ),
