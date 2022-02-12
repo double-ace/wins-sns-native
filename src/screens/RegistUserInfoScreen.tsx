@@ -102,9 +102,9 @@ export const RegistUserInfoScreen = ({ navigation }) => {
       hope_rate: hopeRate,
     };
     console.log(formItem);
-    const res = await requestHttpPost('/api/v1/user/profile/', formItem, true)
+    const res = await requestHttpPost('/api/v1/user/profile/', formItem, true);
     if (res.result) {
-      navigation.navigate('Main');
+      navigation.navigate('Main', { userId: res.data[0].user });
     }
   };
 
@@ -113,93 +113,93 @@ export const RegistUserInfoScreen = ({ navigation }) => {
       style={styles.inner}
       onPress={() => Keyboard.dismiss()}
     >
-        <KeyboardAvoidingView
-          h={{ base: '700px', lg: 'auto' }}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        >
-      <SafeAreaView style={styles.container}>
-        {invalid ? (
-          <Text style={styles.invalidText}>
-            メールアドレスまたはパスワードが正しくありません
-          </Text>
-        ) : null}
-        <View style={styles.nameContainer}>
-          <Text style={styles.label}>お名前</Text>
-          <View style={styles.nameInputContainer}>
-            <TextInput
-              style={[styles.input, styles.nameInput]}
-              value={familyName}
-              onChangeText={(text) => setfamilyName(text)}
-              textContentType="familyName"
-              placeholder="姓"
-            />
-            <TextInput
-              style={[styles.input, styles.nameInput]}
-              value={firstName}
-              onChangeText={(text) => setFirstName(text)}
-              textContentType="givenName"
-              placeholder="名"
-            />
+      <KeyboardAvoidingView
+        h={{ base: '700px', lg: 'auto' }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <SafeAreaView style={styles.container}>
+          {invalid ? (
+            <Text style={styles.invalidText}>
+              メールアドレスまたはパスワードが正しくありません
+            </Text>
+          ) : null}
+          <View style={styles.nameContainer}>
+            <Text style={styles.label}>お名前</Text>
+            <View style={styles.nameInputContainer}>
+              <TextInput
+                style={[styles.input, styles.nameInput]}
+                value={familyName}
+                onChangeText={(text) => setfamilyName(text)}
+                textContentType="familyName"
+                placeholder="姓"
+              />
+              <TextInput
+                style={[styles.input, styles.nameInput]}
+                value={firstName}
+                onChangeText={(text) => setFirstName(text)}
+                textContentType="givenName"
+                placeholder="名"
+              />
+            </View>
           </View>
-        </View>
-        <View style={styles.birthContainer}>
-          <Text>生年月日</Text>
-          <TextInput
-            style={styles.input}
-            value={birthDate}
-            onChangeText={(text) => formatBirthDate(text)}
-            keyboardType="phone-pad"
-            textContentType="telephoneNumber"
-            placeholder="YYYY/MM/DD"
-          />
-        </View>
-        <View style={styles.addressContainer}>
-          <Text style={styles.label}>お住まい</Text>
-          <Stack direction={{ base: 'row' }}>
-            <Select
-              selectedValue={address.prefecture}
-              minWidth="100"
-              onValueChange={(val) =>
-                setAddress({ ...address, prefecture: val })
-              }
-            >
-              {prefectureItem}
-            </Select>
-            <TextInput
-              style={[styles.input, styles.nameInput]}
-              value={address.city}
-              onChangeText={(val) => setAddress({ ...address, city: val })}
-              textContentType="givenName"
-              placeholder="名"
-            />
-          </Stack>
-        </View>
-        <Stack my="4">
-          <NBText fontSize="md" mb="2">
-            ご来店のきっかけ
-          </NBText>
-          <Radio.Group
-            name="hearFromRadioGroup"
-            value={hearFrom}
-            onChange={(val) => setHearFrom(val)}
-          >
-            <Stack direction={{ base: 'row' }} flexWrap="wrap">
-              {hearFromItem}
-            </Stack>
-          </Radio.Group>
-        </Stack>
-        {hearFrom === '紹介' ? (
-          <View style={styles.introducedContainer}>
-            <Text style={styles.label}>ご紹介者様</Text>
+          <View style={styles.birthContainer}>
+            <Text>生年月日</Text>
             <TextInput
               style={styles.input}
-              value={introduced}
-              onChangeText={(text) => setIntroduced(text)}
-              textContentType="emailAddress"
-              placeholder="麻雀太郎"
+              value={birthDate}
+              onChangeText={(text) => formatBirthDate(text)}
+              keyboardType="phone-pad"
+              textContentType="telephoneNumber"
+              placeholder="YYYY/MM/DD"
             />
           </View>
-        ) : null}
+          <View style={styles.addressContainer}>
+            <Text style={styles.label}>お住まい</Text>
+            <Stack direction={{ base: 'row' }}>
+              <Select
+                selectedValue={address.prefecture}
+                minWidth="100"
+                onValueChange={(val) =>
+                  setAddress({ ...address, prefecture: val })
+                }
+              >
+                {prefectureItem}
+              </Select>
+              <TextInput
+                style={[styles.input, styles.nameInput]}
+                value={address.city}
+                onChangeText={(val) => setAddress({ ...address, city: val })}
+                textContentType="givenName"
+                placeholder="名"
+              />
+            </Stack>
+          </View>
+          <Stack my="4">
+            <NBText fontSize="md" mb="2">
+              ご来店のきっかけ
+            </NBText>
+            <Radio.Group
+              name="hearFromRadioGroup"
+              value={hearFrom}
+              onChange={(val) => setHearFrom(val)}
+            >
+              <Stack direction={{ base: 'row' }} flexWrap="wrap">
+                {hearFromItem}
+              </Stack>
+            </Radio.Group>
+          </Stack>
+          {hearFrom === '紹介' ? (
+            <View style={styles.introducedContainer}>
+              <Text style={styles.label}>ご紹介者様</Text>
+              <TextInput
+                style={styles.input}
+                value={introduced}
+                onChangeText={(text) => setIntroduced(text)}
+                textContentType="emailAddress"
+                placeholder="麻雀太郎"
+              />
+            </View>
+          ) : null}
 
           <View style={styles.phoneContainer}>
             <Text style={styles.label}>お電話番号</Text>
@@ -212,25 +212,30 @@ export const RegistUserInfoScreen = ({ navigation }) => {
               placeholder="09012345678"
             />
           </View>
-        <Stack my="4">
-          <NBText fontSize="md" mb="2">
-            ご希望レート
-          </NBText>
-          <Radio.Group
-            name="hopeRateRadioGroup"
-            value={hopeRate}
-            onChange={(val) => setHopeRate(val)}
+          <Stack my="4">
+            <NBText fontSize="md" mb="2">
+              ご希望レート
+            </NBText>
+            <Radio.Group
+              name="hopeRateRadioGroup"
+              value={hopeRate}
+              onChange={(val) => setHopeRate(val)}
+            >
+              <Stack direction={{ base: 'row' }} flexWrap="wrap">
+                {hopeRateItem}
+              </Stack>
+            </Radio.Group>
+          </Stack>
+          <Button onPress={regist} bg="#00EB7D" _text={{ color: '#fff' }}>
+            登録
+          </Button>
+          <Link
+            alignSelf="flex-end"
+            onPress={() => navigation.navigate('SignIn')}
           >
-            <Stack direction={{ base: 'row' }} flexWrap="wrap">
-              {hopeRateItem}
-            </Stack>
-          </Radio.Group>
-        </Stack>
-        <Button onPress={regist} bg="#00EB7D" _text={{ color: '#fff' }}>
-          登録
-        </Button>
-        <Link alignSelf="flex-end" onPress={() => navigation.navigate('SignIn')}>ログイン画面へ戻る</Link>
-      </SafeAreaView>
+            ログイン画面へ戻る
+          </Link>
+        </SafeAreaView>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );

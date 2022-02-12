@@ -1,5 +1,5 @@
-import { Flex, Stack, Button } from 'native-base';
-import React from 'react';
+import { Flex, Stack, Button, Modal, HStack } from 'native-base';
+import React, { useState } from 'react';
 import {
   StyleSheet,
   SafeAreaView,
@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { pointData } from '../../assets/pointData.json';
+import QRCode from 'react-native-qrcode-svg';
 
 type PointData = {
   id: string | number;
@@ -21,13 +22,22 @@ const result = posts
   .reduce((sum, item) => sum + Number(item.point), 0)
   .toLocaleString();
 
-export const HomeScreen = ({ navigation }) => {
+export const HomeScreen = ({ userId }) => {
+  const [showQRCode, setShowQRCode] = useState(false);
   const renderItem = ({ item }) => {
     return (
-      <View style={styles.pointList} key={item.id}>
+      <HStack
+        justifyContent="space-between"
+        px="2"
+        py="6"
+        bg="white"
+        borderBottomWidth={1}
+        borderColor="blueGray.200"
+        key={item.id}
+      >
         <Text>{item.date}</Text>
         <Text>{item.point}pt</Text>
-      </View>
+      </HStack>
     );
   };
 
@@ -38,7 +48,22 @@ export const HomeScreen = ({ navigation }) => {
           <Text style={styles.pointText}>{result}pt</Text>
         </View>
         <View>
-        <Button style={styles.qr} my="6" _text={{fontSize: 16, fontWeight: 'bold'}} onPress={() => alert('qr表示')}>QRコード表示</Button>
+          <Modal isOpen={showQRCode} onClose={() => setShowQRCode(false)}>
+            <Modal.CloseButton
+              onPress={() => setShowQRCode(false)}
+              position="absolute"
+              top="16"
+            />
+            <QRCode size={200} value={userId} />
+          </Modal>
+          <Button
+            style={styles.qr}
+            my="6"
+            _text={{ fontSize: 16, fontWeight: 'bold' }}
+            onPress={() => setShowQRCode(true)}
+          >
+            QRコード表示
+          </Button>
         </View>
       </Flex>
       <View style={styles.log}>
@@ -90,16 +115,5 @@ const styles = StyleSheet.create({
   pointLog: {
     fontSize: 16,
     paddingLeft: 20,
-  },
-  pointList: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 12,
-    paddingVertical: 25,
-    backgroundColor: '#fff',
-    marginHorizontal: 8,
-    marginBottom: 4,
-    borderWidth: 1,
-    borderColor: '#E9EAEB',
   },
 });
