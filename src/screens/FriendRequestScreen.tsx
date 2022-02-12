@@ -1,10 +1,30 @@
-import * as React from "react";
-import { View, StyleSheet, Dimensions, StatusBar, TouchableOpacity, Animated, Pressable, ListRenderItemInfo, FlatList } from "react-native";
-import { TabView, SceneMap } from "react-native-tab-view";
-import { NativeBaseProvider, Box, Text, Center, useColorModeValue, HStack, Link, Avatar, Spacer, Button } from "native-base";
-import Constants from "expo-constants";
+import * as React from 'react';
+import {
+  View,
+  StyleSheet,
+  Dimensions,
+  StatusBar,
+  Animated,
+  SafeAreaView,
+  Pressable,
+  ListRenderItemInfo,
+  FlatList,
+} from 'react-native';
+import { TabView, SceneMap } from 'react-native-tab-view';
+import {
+  NativeBaseProvider,
+  Box,
+  Text,
+  Center,
+  useColorModeValue,
+  HStack,
+  Link,
+  Avatar,
+  Spacer,
+  Button,
+} from 'native-base';
+import Constants from 'expo-constants';
 import { postData } from '../../assets/postData.json';
-
 
 type PostData = {
   id: string | number;
@@ -16,19 +36,15 @@ type PostData = {
 const posts: PostData[] = postData;
 
 const RequestRoute = () => {
-  return (
-    <FlatList data={posts} renderItem={renderReqItem} scrollEnabled />
-  )
-}
+  return <FlatList data={posts} renderItem={renderReqItem} scrollEnabled />;
+};
 
 const ApproveRoute = () => {
-  return (
-    <FlatList data={posts} renderItem={renderAppItem} scrollEnabled />
-  )
-}
+  return <FlatList data={posts} renderItem={renderAppItem} scrollEnabled />;
+};
 
 const initialLayout = {
-  width: Dimensions.get("window").width
+  width: Dimensions.get('window').width,
 };
 const renderScene = SceneMap({
   request: RequestRoute,
@@ -46,7 +62,9 @@ const renderReqItem = ({ item }: ListRenderItemInfo<PostData>) => {
           <Text style={styles.posterName}>{item.poster}</Text>
         </View>
         <Spacer />
-        <Button px="6" h="10" mr="2" colorScheme="error" variant="outline">取消</Button>
+        <Button px="6" h="10" mr="2" colorScheme="error" variant="outline">
+          取消
+        </Button>
       </HStack>
     </Box>
   );
@@ -63,8 +81,12 @@ const renderAppItem = ({ item }: ListRenderItemInfo<PostData>) => {
           <Text style={styles.posterName}>{item.poster}</Text>
         </View>
         <Spacer />
-        <Button px="6" h="10" mr="2" colorScheme="error" variant="outline">拒否</Button>
-        <Button px="6" h="10">許可</Button>
+        <Button px="6" h="10" mr="2" colorScheme="error" variant="outline">
+          拒否
+        </Button>
+        <Button px="6" h="10" bg="tertiary.400">
+          許可
+        </Button>
       </HStack>
     </Box>
   );
@@ -72,50 +94,85 @@ const renderAppItem = ({ item }: ListRenderItemInfo<PostData>) => {
 
 export const FriendRequestScreen = () => {
   const [index, setIndex] = React.useState(0);
-  const [routes] = React.useState([{
-    key: "request",
-    title: "申請中"
-  }, {
-    key: "approve",
-    title: "承認待ち"
-  },
+  const [routes] = React.useState([
+    {
+      key: 'request',
+      title: '申請中',
+    },
+    {
+      key: 'approve',
+      title: '承認待ち',
+    },
   ]);
 
   const renderTabBar = (props: any) => {
-    const inputRange = props.navigationState.routes.map((x: any, i: number) => i);
+    const inputRange = props.navigationState.routes.map(
+      (x: any, i: number) => i
+    );
     return (
       <Box flexDirection="row" bg="white">
-      {props.navigationState.routes.map((route: any, i: number) => {
-      const opacity = props.position.interpolate({
-        inputRange,
-        outputRange: inputRange.map((inputIndex: number) => inputIndex === i ? 1 : 0.5)
-      });
-      const color = index === i ? useColorModeValue("#000", "#e5e5e5") : useColorModeValue("#1f2937", "#a1a1aa");
-      const borderColor = index === i ? "cyan.500" : useColorModeValue("coolGray.200", "gray.400");
-      return <Box borderBottomWidth="3" borderColor={borderColor} flex={1} alignItems="center" p="3">
-            <Pressable onPress={() => {
-          console.log(i);
-          setIndex(i);
-        }}>
-              <Animated.Text style={{
-            color
-          }}>{route.title}</Animated.Text>
-            </Pressable>
-          </Box>;
-    })}
-    </Box>
-    )
+        {props.navigationState.routes.map((route: any, i: number) => {
+          const opacity = props.position.interpolate({
+            inputRange,
+            outputRange: inputRange.map((inputIndex: number) =>
+              inputIndex === i ? 1 : 0.5
+            ),
+          });
+          const color =
+            index === i
+              ? useColorModeValue('#000', '#e5e5e5')
+              : useColorModeValue('#1f2937', '#a1a1aa');
+          const borderColor =
+            index === i
+              ? 'emerald.300'
+              : useColorModeValue('coolGray.200', 'gray.400');
+          return (
+            <Box
+              borderBottomWidth="3"
+              borderColor={borderColor}
+              flex={1}
+              alignItems="center"
+              p="3"
+            >
+              <Pressable
+                onPress={() => {
+                  console.log(i);
+                  setIndex(i);
+                }}
+              >
+                <Animated.Text
+                  style={{
+                    color,
+                  }}
+                >
+                  {route.title}
+                </Animated.Text>
+              </Pressable>
+            </Box>
+          );
+        })}
+      </Box>
+    );
   };
 
   return (
-    <TabView navigationState={{
-      index,
-      routes
-    }} renderScene={renderScene} renderTabBar={renderTabBar} onIndexChange={setIndex} initialLayout={initialLayout} style={{
-      marginTop: StatusBar.currentHeight
-    }} />
-  )
-}
+    <SafeAreaView style={styles.container}>
+      <TabView
+        navigationState={{
+          index,
+          routes,
+        }}
+        renderScene={renderScene}
+        renderTabBar={renderTabBar}
+        onIndexChange={setIndex}
+        initialLayout={initialLayout}
+        style={{
+          marginTop: StatusBar.currentHeight,
+        }}
+      />
+    </SafeAreaView>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
