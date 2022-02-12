@@ -1,11 +1,10 @@
-import { Flex, Stack, Button, Modal, HStack } from 'native-base';
+import { Flex, Button, Modal, HStack, Center, Text, Box } from 'native-base';
 import React, { useState } from 'react';
 import {
   StyleSheet,
   SafeAreaView,
   View,
   FlatList,
-  Text,
   TouchableOpacity,
 } from 'react-native';
 import { pointData } from '../../assets/pointData.json';
@@ -42,11 +41,17 @@ export const HomeScreen = ({ userId }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Flex justifyContent="center" alignItems="center" bg="white" py="8">
-        <View style={styles.point}>
-          <Text style={styles.pointText}>{result}pt</Text>
-        </View>
+    <SafeAreaView style={{ flex: 1 }}>
+      <Flex justifyContent="center" alignItems="center" bg="white" py={10}>
+        <Center
+          h={190}
+          w={190}
+          borderRadius={100}
+          borderWidth={15}
+          borderColor="#00EFF0"
+        >
+          <Text fontSize={30}>{result}pt</Text>
+        </Center>
         <View>
           <Modal isOpen={showQRCode} onClose={() => setShowQRCode(false)}>
             <Modal.CloseButton
@@ -57,7 +62,10 @@ export const HomeScreen = ({ userId }) => {
             <QRCode size={200} value={userId} />
           </Modal>
           <Button
-            style={styles.qr}
+            w={250}
+            h={45}
+            borderRadius={100}
+            bg="green.400"
             my="6"
             _text={{ fontSize: 16, fontWeight: 'bold' }}
             onPress={() => setShowQRCode(true)}
@@ -66,54 +74,15 @@ export const HomeScreen = ({ userId }) => {
           </Button>
         </View>
       </Flex>
-      <View style={styles.log}>
-        <Text style={styles.pointLog}>ポイント履歴</Text>
-      </View>
+      <Box
+        bg="white"
+        borderBottomWidth={1}
+        borderColor="#E9EAEB"
+        _text={{ fontSize: 16, paddingLeft: 2 }}
+      >
+        ポイント履歴
+      </Box>
       <FlatList data={posts} renderItem={renderItem} scrollEnabled />
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  point: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 190,
-    height: 190,
-    elevation: 2,
-    borderColor: '#00EFF0',
-    borderRadius: 95,
-    borderWidth: 15,
-    marginVertical: 10,
-  },
-  pointText: {
-    backgroundColor: '#fff',
-    fontSize: 30,
-  },
-  qr: {
-    width: 280,
-    height: 45,
-    borderRadius: 110,
-    backgroundColor: '#00EF80',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  qrText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-  log: {
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderColor: '#E9EAEB',
-  },
-  pointLog: {
-    fontSize: 16,
-    paddingLeft: 20,
-  },
-});
