@@ -1,12 +1,6 @@
 import { Flex, Button, Modal, HStack, Center, Text, Box } from 'native-base';
 import React, { useState } from 'react';
-import {
-  StyleSheet,
-  SafeAreaView,
-  View,
-  FlatList,
-  TouchableOpacity,
-} from 'react-native';
+import { SafeAreaView, View, FlatList } from 'react-native';
 import { pointData } from '../../assets/pointData.json';
 import QRCode from 'react-native-qrcode-svg';
 
