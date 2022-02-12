@@ -1,13 +1,17 @@
 import React from 'react';
+import { SafeAreaView, View, FlatList } from 'react-native';
 import {
-  StyleSheet,
-  SafeAreaView,
-  View,
-  FlatList,
-  Alert,
-  TouchableOpacity,
-} from 'react-native';
-import { Link, Avatar, Button, Text, Stack, Box, Pressable, Switch, Flex, Spacer, HStack } from 'native-base';
+  Link,
+  Avatar,
+  Button,
+  Text,
+  Stack,
+  Box,
+  Pressable,
+  Switch,
+  Spacer,
+  HStack,
+} from 'native-base';
 import { AntDesign, Ionicons, Feather } from '@expo/vector-icons';
 import { postData } from '../../assets/postData.json';
 import { delData } from '../scripts/asyncStore';
@@ -28,85 +32,100 @@ export const MyPageScreen = ({ navigation }) => {
       await delData('access');
       navigation.navigate('SignIn');
     } catch (e) {
-      console.log('logoutError========')
+      console.log('logoutError========');
       console.log(e);
     }
   };
 
   const getMyProfile = async () => {
     // ユーザ名とプロフ画像取得
-    const proRes = await requestHttpGet('/api/v1/user/profile')
+    const proRes = await requestHttpGet('/api/v1/user/profile');
     // 友達一覧取得
-    const friendRes = await requestHttpGet('')
-  }
+    const friendRes = await requestHttpGet('');
+  };
 
   const renderItem = ({ item }) => {
     return (
-      <View style={styles.postContainer}>
+      <Box
+        bg="white"
+        px={2}
+        py={2}
+        borderBottomWidth={1}
+        borderColor="blueGray.200"
+      >
         <HStack alignItems="center">
           <Link onPress={() => console.log('Works!')}>
             <Avatar size="md"></Avatar>
           </Link>
-          <View style={styles.postHeaderTxtContainer}>
-            <Text style={styles.posterName}>{item.poster}</Text>
+          <Box ml={2}>
+            <Text fontSize={16}>{item.poster}</Text>
             <Text color="blueGray.500">来店時間{item.date}</Text>
-          </View>
+          </Box>
           <Spacer />
           <Box mr="2">
             <Text color="blueGray.600">通知送信</Text>
-            <Switch size="sm"  />
+            <Switch size="sm" />
           </Box>
           <Box>
             <Text color="blueGray.600">通知受取</Text>
             <Switch size="sm" />
           </Box>
           <Spacer />
-          <View style={styles.dustBox}>
+          <Box position="absolute" right={0}>
             <AntDesign
               name="delete"
               size={24}
               color="red"
               onPress={() => alert('削除しますか？')}
             />
-          </View>
+          </Box>
         </HStack>
-      </View>
+      </Box>
     );
   };
   return (
-    <Box style={styles.container} bg="primary.100">
-      <Box position="relative" style={styles.topContainer}>
-        <Pressable position="absolute" right="2" top="2" ml="4" onPress={() => alert('settings')}>
+    <SafeAreaView style={{ flex: 1 }}>
+      <Box p={2} position="relative">
+        <Pressable
+          position="absolute"
+          right="2"
+          top="2"
+          ml="4"
+          onPress={() => alert('settings')}
+        >
           <Ionicons name="settings" size={28} color="gray" />
         </Pressable>
-        <View style={styles.userInfoContainer}>
-          <Link position="relative"  onPress={() => alert('Works!')}>
+        <HStack alignItems="center" mb={2}>
+          <Link position="relative" onPress={() => alert('Works!')}>
             <Avatar size="xl"></Avatar>
             <Box position="absolute" bottom="1" right="0">
               <Feather name="edit" size={18} color="gray" />
             </Box>
           </Link>
-          <View style={styles.userInfoRightContainer}>
+          <Box ml={2}>
             <Stack flexDirection="row" alignItems="center">
               <Box>
-                <Text fontSize="3xl">my name<Feather name="edit" size={15} color="gray" /></Text>
+                <Text fontSize="3xl">
+                  my name
+                  <Feather name="edit" size={15} color="gray" />
+                </Text>
               </Box>
-
             </Stack>
             <Box flexDirection="row" justifyContent="space-between">
-              <TouchableOpacity
-                style={styles.follow}
+              <Pressable
+                alignItems="center"
                 onPress={() => navigation.navigate('friend')}
               >
                 <Text>友達</Text>
                 <Text>10</Text>
-              </TouchableOpacity>
-              <Button variant="outline" px="8" ml="4">来店通知をOFF</Button>
+              </Pressable>
+              <Button variant="outline" px="8" ml="4">
+                来店通知をOFF
+              </Button>
             </Box>
-          </View>
-        </View>
+          </Box>
+        </HStack>
         <View>
-          {/* <Button onPress={() => navigation.navigate('PointManage')}> */}
           <Button onPress={() => navigation.navigate('PointManage')}>
             ポイント管理
           </Button>
@@ -121,80 +140,6 @@ export const MyPageScreen = ({ navigation }) => {
           scrollEnabled
         />
       </View>
-    </Box>
+    </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    width: '100%'
-  },
-  topContainer: {
-    padding: 12,
-  },
-  userInfoContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  userInfoRightContainer: {
-    marginLeft: 14,
-  },
-  followContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  follow: {
-    alignItems: 'center',
-  },
-  follower: {},
-  avatar: {
-    backgroundColor: '#cccccc',
-  },
-  name: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
-  },
-  pointManageBtn: {
-    borderRadius: 40,
-    paddingVertical: 12,
-    backgroundColor: '#00EF80',
-    marginBottom: 8,
-  },
-  logoutTitle: {
-    color: '#FF1A1A',
-  },
-  logoutBtn: {
-    borderRadius: 40,
-    paddingVertical: 12,
-    backgroundColor: 'transparent',
-    borderColor: '#FF1A1A',
-    borderWidth: 1,
-  },
-  postContainer: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: '#E9EAEB',
-  },
-  postHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  postHeaderTxtContainer: {
-    justifyContent: 'space-evenly',
-    marginLeft: 8,
-  },
-  postContent: {},
-  posterName: {
-    // fontWeight: 'bold',
-    fontSize: 16,
-  },
-  dustBox: {
-    position: 'absolute',
-    right: 0,
-  },
-});
