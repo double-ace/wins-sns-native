@@ -88,6 +88,7 @@ export const MyPageScreen = ({ navigation }) => {
       <Box p={2} position="relative">
         <Pressable
           position="absolute"
+          zIndex={100}
           right="2"
           top="2"
           ml="4"
@@ -126,9 +127,6 @@ export const MyPageScreen = ({ navigation }) => {
           </Box>
         </HStack>
         <View>
-          <Button onPress={() => navigation.navigate('PointManage')}>
-            ポイント管理
-          </Button>
           <Button onPress={logout}>ログアウト</Button>
         </View>
       </Box>
