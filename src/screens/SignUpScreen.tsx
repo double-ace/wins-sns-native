@@ -1,9 +1,17 @@
 import React, { useState } from 'react';
-import { TouchableWithoutFeedback, Keyboard, SafeAreaView, TextInput, View, Text, StyleSheet } from 'react-native';
+import {
+  TouchableWithoutFeedback,
+  Keyboard,
+  SafeAreaView,
+  TextInput,
+  View,
+  Text,
+  StyleSheet,
+} from 'react-native';
 import { Button, Link } from 'native-base';
 import { authLogin } from '../scripts/requestAuth';
 import { setData, getData } from '../scripts/asyncStore';
-import {createAccount} from '../scripts/requestAuth'
+import { createAccount } from '../scripts/requestAuth';
 
 export const SignUpScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -36,18 +44,18 @@ export const SignUpScreen = ({ navigation }) => {
     if (password === confirmPw) {
       const param = { email, password };
       try {
-        const res = await createAccount({ email, password })
+        const res = await createAccount({ email, password });
         if (res) {
-          navigation.navigate('RegistUserInfo');
+          navigation.reset({ index: 0, routes: [{ name: 'RegistUserInfo' }] });
         } else {
-          const clone = Object.assign({}, validList)
-          clone.common.isValid = true
-          setValidList({...clone})
+          const clone = Object.assign({}, validList);
+          clone.common.isValid = true;
+          setValidList({ ...clone });
         }
       } catch (e) {
-        const clone = Object.assign({}, validList)
-        clone.common.isValid = true
-        setValidList({...clone})
+        const clone = Object.assign({}, validList);
+        clone.common.isValid = true;
+        setValidList({ ...clone });
         alert(e);
       }
     } else {
@@ -61,48 +69,62 @@ export const SignUpScreen = ({ navigation }) => {
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-    <SafeAreaView style={styles.container}>
-      <View style={styles.inner}>
-        {validList.common.isValid ? (
-          <Text style={styles.invalidText}>
-            メールアドレスまたはパスワードが正しくありません
-          </Text>
-        ) : null}
-        <TextInput
-          style={styles.input}
-          value={email}
-          onChangeText={(text) => setEmail(text)}
-          autoCapitalize="none"
-          keyboardType="email-address"
-          textContentType="emailAddress"
-          placeholder="メールアドレス"
-        />
-        <TextInput
-          style={styles.input}
-          value={password}
-          onChangeText={(text) => setPassword(text)}
-          autoCapitalize="none"
-          textContentType="password"
-          placeholder="パスワード"
-          secureTextEntry
-        />
-        <TextInput
-          style={styles.input}
-          value={confirmPw}
-          onChangeText={(text) => setConfirmPw(text)}
-          autoCapitalize="none"
-          textContentType="password"
-          placeholder="パスワード(確認用)"
-          secureTextEntry
-        />
-        <Button onPress={signUp} my="2" bg="#00EB7D" _text={{ color: '#fff' }}>
-          アカウント作成
-        </Button>
-        <Link alignSelf="flex-end" onPress={() => navigation.navigate('SignIn')}>アカウント作成済の方</Link>
-      </View>
-    </SafeAreaView>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.inner}>
+          {validList.common.isValid ? (
+            <Text style={styles.invalidText}>
+              メールアドレスまたはパスワードが正しくありません
+            </Text>
+          ) : null}
+          <TextInput
+            style={styles.input}
+            value={email}
+            onChangeText={(text) => setEmail(text)}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            textContentType="emailAddress"
+            placeholder="メールアドレス"
+          />
+          <TextInput
+            style={styles.input}
+            value={password}
+            onChangeText={(text) => setPassword(text)}
+            autoCapitalize="none"
+            textContentType="password"
+            placeholder="パスワード"
+            secureTextEntry
+          />
+          <TextInput
+            style={styles.input}
+            value={confirmPw}
+            onChangeText={(text) => setConfirmPw(text)}
+            autoCapitalize="none"
+            textContentType="password"
+            placeholder="パスワード(確認用)"
+            secureTextEntry
+          />
+          <Button
+            onPress={signUp}
+            my="2"
+            bg="#00EB7D"
+            _text={{ color: '#fff' }}
+          >
+            アカウント作成
+          </Button>
+          <Link
+            alignSelf="flex-end"
+            onPress={() =>
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'SignIn' }],
+              })
+            }
+          >
+            アカウント作成済の方
+          </Link>
+        </View>
+      </SafeAreaView>
     </TouchableWithoutFeedback>
-
   );
 };
 

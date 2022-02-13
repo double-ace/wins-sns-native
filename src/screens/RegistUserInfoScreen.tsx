@@ -1,5 +1,5 @@
-import axios from 'axios';
 import React, { useState } from 'react';
+import { CommonActions } from '@react-navigation/native';
 import {
   SafeAreaView,
   TextInput,
@@ -103,8 +103,14 @@ export const RegistUserInfoScreen = ({ navigation }) => {
     };
     console.log(formItem);
     const res = await requestHttpPost('/api/v1/user/profile/', formItem, true);
+    console.log(res.result, res.data);
     if (res.result) {
-      navigation.navigate('Main', { userId: res.data[0].user });
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: 'Main', params: { userId: res.data.user } }],
+        })
+      );
     }
   };
 
@@ -231,7 +237,9 @@ export const RegistUserInfoScreen = ({ navigation }) => {
           </Button>
           <Link
             alignSelf="flex-end"
-            onPress={() => navigation.navigate('SignIn')}
+            onPress={() =>
+              navigation.reset({ index: 0, routes: [{ name: 'SignIn' }] })
+            }
           >
             ログイン画面へ戻る
           </Link>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { CommonActions } from '@react-navigation/native';
 import {
   TouchableWithoutFeedback,
   Keyboard,
@@ -65,8 +66,13 @@ export const SignInScreen = ({ navigation }) => {
       // プロフィール情報が取得できた場合はメイン画面へ、取得できない場合はユーザ情報登録画面へ遷移
       console.log('profile: ', res);
       res.data.length
-        ? navigation.navigate('Main', { userId: res.data[0].user })
-        : navigation.navigate('RegistUserInfo');
+        ? navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{ name: 'Main', params: { userId: res.data[0].user } }],
+            })
+          )
+        : navigation.reset({ index: 0, routes: [{ name: 'RegistUserInfo' }] });
     }
     await delData('access');
     setIsLoading(false);
@@ -113,7 +119,12 @@ export const SignInScreen = ({ navigation }) => {
               </Button>
               <Link
                 alignSelf="flex-end"
-                onPress={() => navigation.navigate('SignUp')}
+                onPress={() =>
+                  navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'SignUp' }],
+                  })
+                }
               >
                 アカウントをお持ちでない方
               </Link>
