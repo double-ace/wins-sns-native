@@ -1,22 +1,57 @@
-import { Flex, Button, Modal, HStack, Center, Text, Box } from 'native-base';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaView, View, FlatList } from 'react-native';
-import { pointData } from '../../assets/pointData.json';
+import {
+  Flex,
+  Button,
+  Modal,
+  HStack,
+  Center,
+  Text,
+  Box,
+  Spacer,
+} from 'native-base';
 import QRCode from 'react-native-qrcode-svg';
+import { format } from 'date-fns';
+import { requestHttpGet } from '../scripts/requestBase';
 
-type PointData = {
+type PointHistory = {
   id: string | number;
-  date: Date | string;
   point: string;
+  content: string;
+  date: Date | string;
 };
 
-const posts: PointData[] = pointData;
-const result = posts
-  .reduce((sum, item) => sum + Number(item.point), 0)
-  .toLocaleString();
-
 export const HomeScreen = ({ userId }) => {
+  const [point, setPoint] = useState(0);
+  const [pointHisList, setPointHisList] = useState<PointHistory[]>([]);
   const [showQRCode, setShowQRCode] = useState(false);
+
+  useEffect(() => {
+    getUserPoint();
+  }, []);
+
+  const getUserPoint = async () => {
+    const pointRes = await requestHttpGet('/api/v1/user/point/');
+    pointRes.data.length && setPoint(pointRes.data[0].point.toLocaleString());
+    const pointHisRes = await requestHttpGet('/api/v1/user/point-history/');
+    if (pointHisRes.data.length) {
+      // date_timeを降順に並び替え
+      pointHisRes.data.sort((a, b) => {
+        return a.date_time < b.date_time ? 1 : -1;
+      });
+      pointHisRes.data;
+      setPointHisList(
+        pointHisRes.data.map((item) => {
+          // 当日なら時刻表示しない　当年なら年表示しない
+          return {
+            ...item,
+            date_time: format(new Date(item.date_time), 'yyyy/MM/dd HH:mm'),
+          };
+        })
+      );
+    }
+  };
+
   const renderItem = ({ item }) => {
     return (
       <HStack
@@ -28,8 +63,14 @@ export const HomeScreen = ({ userId }) => {
         borderColor="blueGray.200"
         key={item.id}
       >
-        <Text>{item.date}</Text>
-        <Text>{item.point}pt</Text>
+        <Text mr={2} color="blueGray.600">
+          {item.date_time}
+        </Text>
+        <Text>{item.content}</Text>
+        <Spacer />
+        <Text color={item.point < 0 ? 'red.500' : 'info.500'}>
+          {item.point}pt
+        </Text>
       </HStack>
     );
   };
@@ -44,7 +85,7 @@ export const HomeScreen = ({ userId }) => {
           borderWidth={15}
           borderColor="#00EFF0"
         >
-          <Text fontSize={30}>{result}pt</Text>
+          <Text fontSize={30}>{point}pt</Text>
         </Center>
         <View>
           <Modal isOpen={showQRCode} onClose={() => setShowQRCode(false)}>
@@ -76,7 +117,7 @@ export const HomeScreen = ({ userId }) => {
       >
         ポイント履歴
       </Box>
-      <FlatList data={posts} renderItem={renderItem} scrollEnabled />
+      <FlatList data={pointHisList} renderItem={renderItem} scrollEnabled />
     </SafeAreaView>
   );
 };
