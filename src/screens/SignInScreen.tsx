@@ -73,9 +73,10 @@ export const SignInScreen = ({ navigation }) => {
             })
           )
         : navigation.reset({ index: 0, routes: [{ name: 'RegistUserInfo' }] });
+    } else {
+      await delData('access');
+      setIsLoading(false);
     }
-    await delData('access');
-    setIsLoading(false);
   };
 
   return (
