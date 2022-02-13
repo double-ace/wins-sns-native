@@ -21,7 +21,6 @@ import {
   KeyboardAvoidingView,
 } from 'native-base';
 import { requestHttpPost } from '../scripts/requestBase';
-import { setData, getData } from '../scripts/asyncStore';
 import { prefectures } from '../../assets/prefectures.json';
 
 export const RegistUserInfoScreen = ({ navigation }) => {
@@ -33,7 +32,6 @@ export const RegistUserInfoScreen = ({ navigation }) => {
   const [introduced, setIntroduced] = useState('');
   const [phoneNum, setPhoneNum] = useState('');
   const [hopeRate, setHopeRate] = useState('0.5');
-  const [password, setPassword] = useState('');
   const [invalid, setInvalid] = useState(false);
 
   const hearFromList: string[] = [
