@@ -44,12 +44,12 @@ const MyPageStackScreen = () => {
   );
 };
 
-export const MainTabNavigator = ({ route }) => {
+export const MainTabNavigator = () => {
   return (
     <Tab.Navigator>
       <Tab.Screen
         name="HomeStack"
-        children={() => <HomeScreen userId={route.params.userId} />}
+        component={HomeStackScreen}
         options={{
           headerShown: false,
           tabBarLabel: 'ホーム',

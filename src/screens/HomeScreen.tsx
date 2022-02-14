@@ -9,7 +9,9 @@ import {
   Text,
   Box,
   Spacer,
+  Pressable,
 } from 'native-base';
+import { Entypo } from '@expo/vector-icons';
 import QRCode from 'react-native-qrcode-svg';
 import { format } from 'date-fns';
 import { requestHttpGet } from '../scripts/requestBase';
@@ -21,8 +23,9 @@ type PointHistory = {
   date: Date | string;
 };
 
-export const HomeScreen = ({ userId }) => {
+export const HomeScreen = () => {
   const [point, setPoint] = useState(0);
+  const [userId, setUserId] = useState('');
   const [pointHisList, setPointHisList] = useState<PointHistory[]>([]);
   const [showQRCode, setShowQRCode] = useState(false);
 
@@ -32,7 +35,11 @@ export const HomeScreen = ({ userId }) => {
 
   const getUserPoint = async () => {
     const pointRes = await requestHttpGet('/api/v1/user/point/');
-    pointRes.data.length && setPoint(pointRes.data[0].point.toLocaleString());
+    if (pointRes.data.length) {
+      setPoint(pointRes.data[0].point.toLocaleString());
+      setUserId(pointRes.data[0].user);
+    }
+
     const pointHisRes = await requestHttpGet('/api/v1/user/point-history/');
     if (pointHisRes.data.length) {
       // date_timeを降順に並び替え
@@ -76,7 +83,18 @@ export const HomeScreen = ({ userId }) => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <Box style={{ flex: 1 }} bg="white">
+      <Flex
+        justifyContent="flex-end"
+        alignItems="flex-end"
+        p={2}
+        bg="green.400"
+        h={20}
+      >
+        <Pressable onPress={() => alert('bell')}>
+          <Entypo name="bell" size={24} color="white" />
+        </Pressable>
+      </Flex>
       <Flex justifyContent="center" alignItems="center" bg="white" py={10}>
         <Center
           h={190}
@@ -118,6 +136,6 @@ export const HomeScreen = ({ userId }) => {
         ポイント履歴
       </Box>
       <FlatList data={pointHisList} renderItem={renderItem} scrollEnabled />
-    </SafeAreaView>
+    </Box>
   );
 };
