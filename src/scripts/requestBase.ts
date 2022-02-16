@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from 'axios';
 import { getData } from './asyncStore';
 
 // const baseUrl = 'http://192.168.11.2:8080';
-const baseUrl = 'http://192.168.11.3:8000';
+const baseUrl = 'http://192.168.11.5:8000';
 
 export type ResponseData = {
   result: boolean;
