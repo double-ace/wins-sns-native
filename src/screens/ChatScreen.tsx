@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
   SafeAreaView,
@@ -17,36 +17,81 @@ import {
   KeyboardAvoidingView,
   Pressable,
 } from 'native-base';
-import { chatMessage } from '../../assets/chatMessage.json';
 import { FontAwesome } from '@expo/vector-icons';
+import { requestHttpGet, requestHttpPost } from '../scripts/requestBase';
+import { getData } from '../scripts/asyncStore';
 
 type ChatMessage = {
   id: string;
-  message: string;
+  content: string;
   sendFrom: string;
+  sendTo: string;
   date: string;
 };
 
+type Id = string | null;
+
 export const ChatScreen = () => {
-  const messages: ChatMessage[] = chatMessage;
   const [content, setContent] = useState('');
+  const [dmList, setDmList] = useState<any[]>([]);
+  // let userId: Id = null;
+  const [userId, setUserId] = useState<Id>(null);
+  let shopId: Id = null;
+
+  const getUserId = async () => {
+    // userId = await getData('userId');
+    setUserId(await getData('userId'));
+    console.log('getUser: ', userId);
+  };
+
+  const getDm = async () => {
+    !userId && (await getUserId());
+    const res = await requestHttpGet('/api/v1/sns/dm/');
+    console.log(userId, res);
+    if (userId && res.result) {
+      setDmList(
+        res.data.map((item) => {
+          return {
+            id: item.id,
+            content: item.content,
+            sendFrom: item.send_from,
+            sendTo: item.send_to,
+            date: item.created_at,
+          };
+        })
+      );
+    }
+  };
+
+  const sendDm = async (content: string) => {
+    const param = {
+      content,
+      send_to: '',
+    };
+    const res = await requestHttpPost('/api/v1/sns/dm/', param, true);
+  };
+
+  useEffect(() => {
+    getDm();
+  }, []);
 
   const renderItem = ({ item }: ListRenderItemInfo<ChatMessage>) => {
-    return item.sendFrom === 'shop' ? (
-      <View style={styles.messageContainerFromShop}>
+    console.log(userId);
+    return item.sendFrom !== userId ? (
+      <View style={styles.messageContainerFromShop} key={item.id}>
         <Avatar size="sm" />
         <View style={styles.msAndDateFromShop}>
           <View style={styles.messageFromShop}>
-            <Text style={styles.messageText}>{item.message}</Text>
+            <Text style={styles.messageText}>{item.content}</Text>
           </View>
           <Text style={styles.dateText}>{item.date}</Text>
         </View>
       </View>
     ) : (
-      <View style={styles.messageContainer}>
+      <View style={styles.messageContainer} key={item.id}>
         <View style={styles.msAndDate}>
           <View style={styles.message}>
-            <Text style={styles.messageText}>{item.message}</Text>
+            <Text style={styles.messageText}>{item.content}</Text>
           </View>
           <View style={styles.date}>
             <Text style={styles.dateText}>{item.date}</Text>
@@ -62,15 +107,15 @@ export const ChatScreen = () => {
       h={{ base: '765px', lg: 'auto' }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <SafeAreaView style={{ flex: 1, paddingTop: 12 }}>
-        <View style={styles.container}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <Box px={2} pt={6}>
           <FlatList
-            data={messages}
+            data={dmList}
             renderItem={renderItem}
             keyExtractor={(item) => item.id}
             scrollEnabled
           />
-        </View>
+        </Box>
         <HStack
           style={styles.inputContainer}
           px={2}
