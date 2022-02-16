@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, View, FlatList } from 'react-native';
+import { View, FlatList } from 'react-native';
 import {
   Flex,
   Button,
@@ -9,9 +9,7 @@ import {
   Text,
   Box,
   Spacer,
-  Pressable,
 } from 'native-base';
-import { Entypo } from '@expo/vector-icons';
 import QRCode from 'react-native-qrcode-svg';
 import { format } from 'date-fns';
 import { requestHttpGet } from '../scripts/requestBase';
@@ -84,17 +82,6 @@ export const HomeScreen = () => {
 
   return (
     <Box style={{ flex: 1 }} bg="white">
-      <Flex
-        justifyContent="flex-end"
-        alignItems="flex-end"
-        p={2}
-        bg="green.400"
-        h={20}
-      >
-        <Pressable onPress={() => alert('bell')}>
-          <Entypo name="bell" size={24} color="white" />
-        </Pressable>
-      </Flex>
       <Flex justifyContent="center" alignItems="center" bg="white" py={10}>
         <Center
           h={190}
