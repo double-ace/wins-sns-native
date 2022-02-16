@@ -1,7 +1,12 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createStackNavigator } from '@react-navigation/stack';
+import {
+  createStackNavigator,
+  StackNavigationProp,
+} from '@react-navigation/stack';
 import { HomeScreen } from '../screens/HomeScreen';
+import { NotificationScreen } from '../screens/NotificationScreen';
+import { NotificationFromShopScreen } from '../screens/NotificationFromShopScreen';
 import { SearchScreen } from '../screens/SearchScreen';
 import { ChatScreen } from '../screens/ChatScreen';
 import { FriendRequestScreen } from '../screens/FriendRequestScreen';
@@ -11,17 +16,59 @@ import { PointManageScreen } from '../screens/PointManageScreen';
 import { FollowScreen } from '../screens/FollowScreen';
 import { CreatePostScreen } from '../screens/CreatePostScreen';
 import { Entypo, Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { HeaderIcon } from '../components/HeaderIcon';
+
+type HomeStackParamList = {
+  Home: undefined;
+  Notification: undefined;
+  NotificationFromShop: undefined;
+};
+type HomeScreenProp = StackNavigationProp<HomeStackParamList, 'Home'>;
 
 const Tab = createBottomTabNavigator();
-
 const HomeStack = createStackNavigator();
 const MyPageStack = createStackNavigator();
 
 const HomeStackScreen = () => {
+  const navigation = useNavigation<HomeScreenProp>();
   return (
     <HomeStack.Navigator>
-      <HomeStack.Group screenOptions={{ headerShown: false }}>
-        <HomeStack.Screen name="Home" component={HomeScreen} />
+      <HomeStack.Group>
+        <HomeStack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{
+            title: '',
+            headerTintColor: '#fff',
+            headerStyle: {
+              backgroundColor: '#4ade80',
+            },
+            headerRight: () => <HeaderIcon navigation={navigation} />,
+          }}
+        />
+        <HomeStack.Screen
+          name="NotificationFromShop"
+          component={NotificationScreen}
+          options={{
+            title: '通知一覧',
+            headerTintColor: '#fff',
+            headerStyle: {
+              backgroundColor: '#4ade80',
+            },
+          }}
+        />
+        <HomeStack.Screen
+          name="Notification"
+          component={NotificationFromShopScreen}
+          options={{
+            title: '店舗からのお知らせ',
+            headerTintColor: '#fff',
+            headerStyle: {
+              backgroundColor: '#4ade80',
+            },
+          }}
+        />
       </HomeStack.Group>
       <HomeStack.Group
         screenOptions={{ presentation: 'modal', headerShown: false }}
@@ -44,12 +91,12 @@ const MyPageStackScreen = () => {
   );
 };
 
-export const MainTabNavigator = ({ route }) => {
+export const MainTabNavigator = () => {
   return (
     <Tab.Navigator>
       <Tab.Screen
         name="HomeStack"
-        children={() => <HomeScreen userId={route.params.userId} />}
+        component={HomeStackScreen}
         options={{
           headerShown: false,
           tabBarLabel: 'ホーム',
@@ -86,7 +133,7 @@ export const MainTabNavigator = ({ route }) => {
         component={ChatScreen}
         options={{
           headerShown: false,
-          tabBarLabel: 'チャット',
+          tabBarLabel: '店舗チャット',
           tabBarIcon: ({ size, color }) => (
             <Entypo name="message" size={size} color={color} />
           ),

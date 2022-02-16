@@ -7,9 +7,18 @@ import {
   Text,
   TextInput,
   ListRenderItemInfo,
+  Platform,
+  Keyboard,
 } from 'react-native';
-import { Avatar } from 'native-base';
+import {
+  Avatar,
+  Box,
+  HStack,
+  KeyboardAvoidingView,
+  Pressable,
+} from 'native-base';
 import { chatMessage } from '../../assets/chatMessage.json';
+import { FontAwesome } from '@expo/vector-icons';
 
 type ChatMessage = {
   id: string;
@@ -49,33 +58,47 @@ export const ChatScreen = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View style={styles.container}>
-        <FlatList
-          data={messages}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          scrollEnabled
-        />
-      </View>
-      <View style={styles.inputContainer}>
-        <TextInput
-          multiline
-          numberOfLines={4}
-          value={content}
-          onChangeText={(value) => setContent(value)}
-          editable
-          style={styles.textBox}
-          maxLength={150}
-        />
-      </View>
-    </SafeAreaView>
+    <KeyboardAvoidingView
+      h={{ base: '765px', lg: 'auto' }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <SafeAreaView style={{ flex: 1, paddingTop: 12 }}>
+        <View style={styles.container}>
+          <FlatList
+            data={messages}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            scrollEnabled
+          />
+        </View>
+        <HStack
+          style={styles.inputContainer}
+          px={2}
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <TextInput
+            multiline
+            numberOfLines={1}
+            value={content}
+            onChangeText={(value) => setContent(value)}
+            editable
+            style={styles.textBox}
+            maxLength={150}
+          />
+          <Pressable onPress={() => Keyboard.dismiss()}>
+            <Box>
+              <FontAwesome name="send" size={24} color="blue" />
+            </Box>
+          </Pressable>
+        </HStack>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     paddingHorizontal: 8,
     marginBottom: 40,
   },
@@ -119,17 +142,18 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     position: 'absolute',
-    justifyContent: 'center',
     paddingHorizontal: 4,
     paddingVertical: 4,
     bottom: 0,
     width: '100%',
-    height: 40,
+    minHeight: 40,
+    maxHeight: 80,
     backgroundColor: '#00EF80',
   },
   textBox: {
     backgroundColor: '#fff',
-    borderRadius: 40,
+    borderRadius: 20,
     paddingHorizontal: 8,
+    width: '91%',
   },
 });
