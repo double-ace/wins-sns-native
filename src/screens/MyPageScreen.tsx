@@ -64,11 +64,11 @@ export const MyPageScreen = ({ navigation }) => {
           <Spacer />
           <Box mr="2">
             <Text color="blueGray.600">通知送信</Text>
-            <Switch size="sm" />
+            <Switch size="sm" onTrackColor="green.400" />
           </Box>
           <Box>
             <Text color="blueGray.600">通知受取</Text>
-            <Switch size="sm" />
+            <Switch size="sm" onTrackColor="green.400" />
           </Box>
           <Spacer />
           <Box position="absolute" right={0}>
@@ -92,7 +92,7 @@ export const MyPageScreen = ({ navigation }) => {
           right="2"
           top="2"
           ml="4"
-          onPress={() => alert('settings')}
+          onPress={() => navigation.navigate('Settings')}
         >
           <Ionicons name="settings" size={28} color="gray" />
         </Pressable>
@@ -115,7 +115,7 @@ export const MyPageScreen = ({ navigation }) => {
             <Box flexDirection="row" justifyContent="space-between">
               <Pressable
                 alignItems="center"
-                onPress={() => navigation.navigate('friend')}
+                onPress={() => navigation.navigate('Friends')}
               >
                 <Text>友達</Text>
                 <Text>10</Text>
