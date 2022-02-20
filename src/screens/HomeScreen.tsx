@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, FlatList } from 'react-native';
+import { View, FlatList, ListRenderItemInfo } from 'react-native';
 import {
   Flex,
   Button,
@@ -21,10 +21,17 @@ type PointHistory = {
   date: Date | string;
 };
 
+type PointHistoryResponse = {
+  id: string | number;
+  point: number;
+  content: string;
+  date_time: Date | string;
+};
+
 export const HomeScreen = () => {
   const [point, setPoint] = useState(0);
   const [userId, setUserId] = useState('');
-  const [pointHisList, setPointHisList] = useState<PointHistory[]>([]);
+  const [pointHisList, setPointHisList] = useState<PointHistoryResponse[]>([]);
   const [showQRCode, setShowQRCode] = useState(false);
 
   useEffect(() => {
@@ -46,7 +53,7 @@ export const HomeScreen = () => {
       });
       pointHisRes.data;
       setPointHisList(
-        pointHisRes.data.map((item) => {
+        pointHisRes.data.map((item: PointHistoryResponse) => {
           // 当日なら時刻表示しない　当年なら年表示しない
           return {
             ...item,
@@ -57,7 +64,7 @@ export const HomeScreen = () => {
     }
   };
 
-  const renderItem = ({ item }) => {
+  const renderItem = ({ item }: ListRenderItemInfo<PointHistoryResponse>) => {
     return (
       <HStack
         justifyContent="space-between"
@@ -74,7 +81,7 @@ export const HomeScreen = () => {
         <Text>{item.content}</Text>
         <Spacer />
         <Text color={item.point < 0 ? 'red.500' : 'info.500'}>
-          {item.point}pt
+          {item.point.toLocaleString()}pt
         </Text>
       </HStack>
     );
