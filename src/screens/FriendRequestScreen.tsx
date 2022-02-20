@@ -12,10 +12,8 @@ import {
 } from 'react-native';
 import { TabView, SceneMap } from 'react-native-tab-view';
 import {
-  NativeBaseProvider,
   Box,
   Text,
-  Center,
   useColorModeValue,
   HStack,
   Link,
@@ -23,17 +21,15 @@ import {
   Spacer,
   Button,
 } from 'native-base';
-import Constants from 'expo-constants';
 import { postData } from '../../assets/postData.json';
 
-type PostData = {
+type RequestData = {
   id: string | number;
-  poster: string;
-  date: Date | string;
-  content: string;
+  name: string;
+  date_time: Date | string;
 };
 
-const posts: PostData[] = postData;
+const posts: RequestData[] = postData;
 
 const RequestRoute = () => {
   return <FlatList data={posts} renderItem={renderReqItem} scrollEnabled />;
@@ -51,7 +47,7 @@ const renderScene = SceneMap({
   approve: ApproveRoute,
 });
 
-const renderReqItem = ({ item }: ListRenderItemInfo<PostData>) => {
+const renderReqItem = ({ item }: ListRenderItemInfo<RequestData>) => {
   return (
     <Box py="3" style={styles.postContainer} key={item.id}>
       <HStack alignItems="center">
@@ -59,7 +55,7 @@ const renderReqItem = ({ item }: ListRenderItemInfo<PostData>) => {
           <Avatar size="md"></Avatar>
         </Link>
         <View style={styles.postHeaderTxtContainer}>
-          <Text style={styles.posterName}>{item.poster}</Text>
+          <Text style={styles.posterName}>{item.name}</Text>
         </View>
         <Spacer />
         <Button px="6" h="10" mr="2" colorScheme="error" variant="outline">
@@ -70,7 +66,7 @@ const renderReqItem = ({ item }: ListRenderItemInfo<PostData>) => {
   );
 };
 
-const renderAppItem = ({ item }: ListRenderItemInfo<PostData>) => {
+const renderAppItem = ({ item }: ListRenderItemInfo<RequestData>) => {
   return (
     <Box py="3" style={styles.postContainer} key={item.id}>
       <HStack alignItems="center">
@@ -78,13 +74,13 @@ const renderAppItem = ({ item }: ListRenderItemInfo<PostData>) => {
           <Avatar size="md"></Avatar>
         </Link>
         <View style={styles.postHeaderTxtContainer}>
-          <Text style={styles.posterName}>{item.poster}</Text>
+          <Text style={styles.posterName}>{item.name}</Text>
         </View>
         <Spacer />
         <Button px="6" h="10" mr="2" colorScheme="error" variant="outline">
           拒否
         </Button>
-        <Button px="6" h="10" bg="tertiary.400">
+        <Button px="6" h="10" bg="emerald.400" _text={{ fontWeight: 'bold' }}>
           許可
         </Button>
       </HStack>
@@ -124,7 +120,7 @@ export const FriendRequestScreen = () => {
               : useColorModeValue('#1f2937', '#a1a1aa');
           const borderColor =
             index === i
-              ? 'emerald.300'
+              ? 'green.300'
               : useColorModeValue('coolGray.200', 'gray.400');
           return (
             <Box
