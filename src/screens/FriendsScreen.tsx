@@ -17,8 +17,8 @@ type UserData = {
 
 const posts: UserData[] = userData;
 
-export const FollowScreen = () => {
-  const [follow, setFollow] = useState('フォロー中');
+export const FriendsScreen = () => {
+  const [follow, setFollow] = useState('削除');
 
   const renderItem = ({ item }) => {
     return (
@@ -52,14 +52,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FAFAFB',
-    paddingHorizontal: 8,
   },
   userContainer: {
     backgroundColor: '#fff',
     paddingHorizontal: 12,
     paddingVertical: 8,
-    marginBottom: 4,
-    borderWidth: 1,
+    borderBottomWidth: 1,
     borderColor: '#E9EAEB',
   },
   avatar: {
