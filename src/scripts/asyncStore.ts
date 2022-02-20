@@ -1,5 +1,4 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { convertRemToAbsolute } from 'native-base/lib/typescript/theme/tools';
 
 type StoreData = {
   key: string;
