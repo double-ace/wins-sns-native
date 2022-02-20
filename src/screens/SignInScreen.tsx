@@ -65,14 +65,17 @@ export const SignInScreen = ({ navigation }) => {
     if (res.result) {
       // プロフィール情報が取得できた場合はメイン画面へ、取得できない場合はユーザ情報登録画面へ遷移
       console.log('profile: ', res);
-      res.data.length
-        ? navigation.dispatch(
-            CommonActions.reset({
-              index: 0,
-              routes: [{ name: 'Main', params: { userId: res.data[0].user } }],
-            })
-          )
-        : navigation.reset({ index: 0, routes: [{ name: 'RegistUserInfo' }] });
+      if (res.data.length) {
+        await setData('userId', res.data[0].user);
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: 'Main', params: { userId: res.data[0].user } }],
+          })
+        );
+      } else {
+        navigation.reset({ index: 0, routes: [{ name: 'RegistUserInfo' }] });
+      }
     } else {
       await delData('access');
       setIsLoading(false);
