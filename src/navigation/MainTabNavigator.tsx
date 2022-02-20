@@ -12,8 +12,8 @@ import { ChatScreen } from '../screens/ChatScreen';
 import { FriendRequestScreen } from '../screens/FriendRequestScreen';
 import { MediaScreen } from '../screens/MediaScreen';
 import { MyPageScreen } from '../screens/MyPageScreen';
-import { PointManageScreen } from '../screens/PointManageScreen';
-import { FollowScreen } from '../screens/FollowScreen';
+import { SettingsScreen } from '../screens/SettingsScreen';
+import { FriendsScreen } from '../screens/FriendsScreen';
 import { CreatePostScreen } from '../screens/CreatePostScreen';
 import { Entypo, Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -82,10 +82,34 @@ const HomeStackScreen = () => {
 const MyPageStackScreen = () => {
   return (
     <MyPageStack.Navigator>
-      <MyPageStack.Group screenOptions={{ headerShown: false }}>
-        <MyPageStack.Screen name="MyPage" component={MyPageScreen} />
-        <MyPageStack.Screen name="PointManage" component={PointManageScreen} />
-        <MyPageStack.Screen name="Follow" component={FollowScreen} />
+      <MyPageStack.Group>
+        <MyPageStack.Screen
+          name="MyPage"
+          component={MyPageScreen}
+          options={{ headerShown: false }}
+        />
+        <MyPageStack.Screen
+          name="Settings"
+          component={SettingsScreen}
+          options={{
+            title: '設定',
+            headerTintColor: '#fff',
+            headerStyle: {
+              backgroundColor: '#4ade80',
+            },
+          }}
+        />
+        <MyPageStack.Screen
+          name="Friends"
+          component={FriendsScreen}
+          options={{
+            title: '友達一覧',
+            headerTintColor: '#fff',
+            headerStyle: {
+              backgroundColor: '#4ade80',
+            },
+          }}
+        />
       </MyPageStack.Group>
     </MyPageStack.Navigator>
   );
@@ -93,7 +117,7 @@ const MyPageStackScreen = () => {
 
 export const MainTabNavigator = () => {
   return (
-    <Tab.Navigator>
+    <Tab.Navigator screenOptions={{ tabBarActiveTintColor: '#4ade80' }}>
       <Tab.Screen
         name="HomeStack"
         component={HomeStackScreen}
@@ -106,7 +130,7 @@ export const MainTabNavigator = () => {
           ),
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Media"
         component={MediaScreen}
         options={{
@@ -116,7 +140,7 @@ export const MainTabNavigator = () => {
             <Entypo name="folder-images" size={size} color={color} />
           ),
         }}
-      />
+      /> */}
       <Tab.Screen
         name="Search"
         component={SearchScreen}
@@ -133,7 +157,7 @@ export const MainTabNavigator = () => {
         component={ChatScreen}
         options={{
           headerShown: false,
-          tabBarLabel: '店舗チャット',
+          tabBarLabel: '店舗DM',
           tabBarIcon: ({ size, color }) => (
             <Entypo name="message" size={size} color={color} />
           ),
