@@ -14,7 +14,6 @@ import { MediaScreen } from '../screens/MediaScreen';
 import { MyPageScreen } from '../screens/MyPageScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { FriendsScreen } from '../screens/FriendsScreen';
-import { CreatePostScreen } from '../screens/CreatePostScreen';
 import { Entypo, Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { HeaderIcon } from '../components/HeaderIcon';
@@ -34,7 +33,7 @@ const HomeStackScreen = () => {
   const navigation = useNavigation<HomeScreenProp>();
   return (
     <HomeStack.Navigator>
-      <HomeStack.Group>
+      <HomeStack.Group screenOptions={{ headerBackTitleVisible: false }}>
         <HomeStack.Screen
           name="Home"
           component={HomeScreen}
@@ -70,11 +69,6 @@ const HomeStackScreen = () => {
           }}
         />
       </HomeStack.Group>
-      <HomeStack.Group
-        screenOptions={{ presentation: 'modal', headerShown: false }}
-      >
-        <HomeStack.Screen name="PostCreateModal" component={CreatePostScreen} />
-      </HomeStack.Group>
     </HomeStack.Navigator>
   );
 };
@@ -82,22 +76,11 @@ const HomeStackScreen = () => {
 const MyPageStackScreen = () => {
   return (
     <MyPageStack.Navigator>
-      <MyPageStack.Group>
+      <MyPageStack.Group screenOptions={{ headerBackTitleVisible: false }}>
         <MyPageStack.Screen
           name="MyPage"
           component={MyPageScreen}
           options={{ headerShown: false }}
-        />
-        <MyPageStack.Screen
-          name="Settings"
-          component={SettingsScreen}
-          options={{
-            title: '設定',
-            headerTintColor: '#fff',
-            headerStyle: {
-              backgroundColor: '#4ade80',
-            },
-          }}
         />
         <MyPageStack.Screen
           name="Friends"
@@ -108,6 +91,18 @@ const MyPageStackScreen = () => {
             headerStyle: {
               backgroundColor: '#4ade80',
             },
+          }}
+        />
+      </MyPageStack.Group>
+      <MyPageStack.Group
+        screenOptions={{ presentation: 'modal', headerBackTitleVisible: false }}
+      >
+        <MyPageStack.Screen
+          name="Settings"
+          component={SettingsScreen}
+          options={{
+            title: '設定',
+            headerTintColor: '#404040',
           }}
         />
       </MyPageStack.Group>
