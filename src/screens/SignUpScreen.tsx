@@ -106,7 +106,8 @@ export const SignUpScreen = ({ navigation }) => {
           <Button
             onPress={signUp}
             my="2"
-            bg="#00EB7D"
+            bg="green.400"
+            _pressed={{ backgroundColor: 'green.500' }}
             _text={{ color: '#fff' }}
           >
             アカウント作成

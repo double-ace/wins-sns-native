@@ -230,7 +230,12 @@ export const RegistUserInfoScreen = ({ navigation }) => {
               </Stack>
             </Radio.Group>
           </Stack>
-          <Button onPress={regist} bg="#00EB7D" _text={{ color: '#fff' }}>
+          <Button
+            onPress={regist}
+            bg="green.400"
+            _pressed={{ backgroundColor: 'green.500' }}
+            _text={{ color: '#fff' }}
+          >
             登録
           </Button>
           <Link
@@ -252,17 +257,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
-  nameContainer: {},
   nameInputContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  birthContainer: {},
-  addressContainer: {},
-  hearFromContainer: {},
-  introducedContainer: {},
-  phoneContainer: {},
-  rateContainer: {},
   label: {
     marginBottom: 4,
   },

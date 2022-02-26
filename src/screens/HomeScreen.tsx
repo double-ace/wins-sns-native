@@ -113,6 +113,7 @@ export const HomeScreen = () => {
             h={45}
             borderRadius={100}
             bg="green.400"
+            _pressed={{ backgroundColor: 'green.500' }}
             my="6"
             _text={{ fontSize: 16, fontWeight: 'bold' }}
             onPress={() => setShowQRCode(true)}
