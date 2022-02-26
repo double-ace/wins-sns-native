@@ -1,6 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {
+  CardStyleInterpolators,
   createStackNavigator,
   StackNavigationProp,
 } from '@react-navigation/stack';
@@ -66,6 +67,8 @@ const HomeStackScreen = () => {
             headerStyle: {
               backgroundColor: '#4ade80',
             },
+            cardStyleInterpolator:
+              CardStyleInterpolators.forFadeFromBottomAndroid,
           }}
         />
       </HomeStack.Group>
