@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -9,6 +9,7 @@ import {
   Pressable,
   ListRenderItemInfo,
   FlatList,
+  GestureResponderEvent,
 } from 'react-native';
 import { TabView, SceneMap } from 'react-native-tab-view';
 import {
@@ -21,74 +22,42 @@ import {
   Spacer,
   Button,
 } from 'native-base';
-import { postData } from '../../assets/postData.json';
+import {
+  requestHttpGet,
+  requestHttpPost,
+  requestHttpDelete,
+} from '../scripts/requestBase';
 
+type RequestNestChild = {
+  id: string;
+  is_shop: boolean;
+  profile: {
+    id: number;
+    nickname: string;
+    imageUrl?: string;
+  };
+};
 type RequestData = {
   id: string | number;
-  name: string;
-  date_time: Date | string;
+  req_from: string;
+  req_to: RequestNestChild;
+  approved: boolean;
 };
 
-const posts: RequestData[] = postData;
-
-const RequestRoute = () => {
-  return <FlatList data={posts} renderItem={renderReqItem} scrollEnabled />;
-};
-
-const ApproveRoute = () => {
-  return <FlatList data={posts} renderItem={renderAppItem} scrollEnabled />;
+type NonAppdData = {
+  id: string | number;
+  req_from: RequestNestChild;
+  req_to: string;
+  approved: boolean;
 };
 
 const initialLayout = {
   width: Dimensions.get('window').width,
 };
-const renderScene = SceneMap({
-  request: RequestRoute,
-  approve: ApproveRoute,
-});
-
-const renderReqItem = ({ item }: ListRenderItemInfo<RequestData>) => {
-  return (
-    <Box py="3" style={styles.postContainer} key={item.id}>
-      <HStack alignItems="center">
-        <Link onPress={() => console.log('Works!')}>
-          <Avatar size="md"></Avatar>
-        </Link>
-        <View style={styles.postHeaderTxtContainer}>
-          <Text style={styles.posterName}>{item.name}</Text>
-        </View>
-        <Spacer />
-        <Button px="6" h="10" mr="2" colorScheme="error" variant="outline">
-          取消
-        </Button>
-      </HStack>
-    </Box>
-  );
-};
-
-const renderAppItem = ({ item }: ListRenderItemInfo<RequestData>) => {
-  return (
-    <Box py="3" style={styles.postContainer} key={item.id}>
-      <HStack alignItems="center">
-        <Link onPress={() => console.log('Works!')}>
-          <Avatar size="md"></Avatar>
-        </Link>
-        <View style={styles.postHeaderTxtContainer}>
-          <Text style={styles.posterName}>{item.name}</Text>
-        </View>
-        <Spacer />
-        <Button px="6" h="10" mr="2" colorScheme="error" variant="outline">
-          拒否
-        </Button>
-        <Button px="6" h="10" bg="emerald.400" _text={{ fontWeight: 'bold' }}>
-          許可
-        </Button>
-      </HStack>
-    </Box>
-  );
-};
 
 export const FriendRequestScreen = () => {
+  const [nonReqList, setNonReqList] = useState<any[]>([]);
+  const [nonAppdList, setNonAppdList] = useState<any[]>([]);
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
     {
@@ -96,10 +65,109 @@ export const FriendRequestScreen = () => {
       title: '申請中',
     },
     {
-      key: 'approve',
+      key: 'appd',
       title: '承認待ち',
     },
   ]);
+
+  useEffect(() => {
+    getReqList();
+    getAppdList();
+  }, []);
+
+  const getReqList = async () => {
+    const res = await requestHttpGet('/api/v1/sns/get-friend-request/');
+    setNonReqList(res.data);
+  };
+
+  const getAppdList = async () => {
+    const res = await requestHttpGet('/api/v1/sns/non-appd-request/');
+    setNonAppdList(res.data);
+  };
+
+  const handleDelete = async (
+    e: GestureResponderEvent,
+    id: string | number,
+    isReq: boolean
+  ) => {
+    await requestHttpDelete(`/api/v1/sns/friend-request/${id}/`);
+    isReq
+      ? setNonReqList((preList) => [
+          ...preList.filter((item) => item.id !== id),
+        ])
+      : setNonAppdList((preList) => [
+          ...preList.filter((item) => item.id !== id),
+        ]);
+  };
+
+  const renderReqItem = ({ item }: ListRenderItemInfo<RequestData>) => {
+    return (
+      <Box py="3" style={styles.postContainer} key={item.id.toString()}>
+        <HStack alignItems="center">
+          <Link onPress={() => console.log('Works!')}>
+            <Avatar size="md"></Avatar>
+          </Link>
+          <Box style={styles.postHeaderTxtContainer} maxWidth={150}>
+            <Text style={styles.posterName}>
+              {item.req_to.profile.nickname}
+            </Text>
+          </Box>
+          <Spacer />
+          <Button
+            px="6"
+            h="10"
+            mr="2"
+            colorScheme="error"
+            variant="outline"
+            onPress={(e) => handleDelete(e, item.id, true)}
+          >
+            取消
+          </Button>
+        </HStack>
+      </Box>
+    );
+  };
+
+  const renderAppdItem = ({ item }: ListRenderItemInfo<NonAppdData>) => {
+    return (
+      <Box py="3" style={styles.postContainer} key={item.id.toString()}>
+        <HStack alignItems="center">
+          <Link onPress={() => console.log('Works!')}>
+            <Avatar size="md"></Avatar>
+          </Link>
+          <View style={styles.postHeaderTxtContainer}>
+            <Text style={styles.posterName}>
+              {item.req_from.profile.nickname}
+            </Text>
+          </View>
+          <Spacer />
+          <Button px="6" h="10" mr="2" colorScheme="error" variant="outline">
+            拒否
+          </Button>
+          <Button px="6" h="10" bg="emerald.400" _text={{ fontWeight: 'bold' }}>
+            許可
+          </Button>
+        </HStack>
+      </Box>
+    );
+  };
+
+  const RequestRoute = () => {
+    return (
+      <FlatList data={nonReqList} renderItem={renderReqItem} scrollEnabled />
+    );
+  };
+
+  const NonAppdRoute = () => {
+    return (
+      <FlatList data={nonAppdList} renderItem={renderAppdItem} scrollEnabled />
+    );
+  };
+
+  const renderScene = SceneMap({
+    request: RequestRoute,
+    appd: NonAppdRoute,
+  });
 
   const renderTabBar = (props: any) => {
     const inputRange = props.navigationState.routes.map(
