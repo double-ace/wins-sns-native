@@ -1,49 +1,79 @@
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   StyleSheet,
   SafeAreaView,
   View,
   FlatList,
   Text,
-  TouchableOpacity,
+  Alert,
 } from 'react-native';
-import { Link, Avatar } from 'native-base';
-import { userData } from '../../assets/userData.json';
+import { Link, Avatar, Button, HStack, Spacer } from 'native-base';
+import { requestHttpDelete, requestHttpGet } from '../scripts/requestBase';
 
-type UserData = {
+type FriendData = {
   id: string | number;
-  name: string;
+  nickname: string;
 };
 
-const posts: UserData[] = userData;
-
 export const FriendsScreen = () => {
-  const [follow, setFollow] = useState('削除');
+  const [friendList, setFriendList] = useState<FriendData[]>([]);
+
+  useEffect(() => {
+    getFriend();
+  }, []);
+
+  const getFriend = async () => {
+    const res = await requestHttpGet('/api/v1/sns/friends/');
+    setFriendList(res.data);
+  };
+
+  const delFriend = async (id: string) => {
+    const res = await requestHttpGet(`/api/v1/sns/friend/?friend=${id}`);
+    console.log(res.data);
+    const FriendId = res.data[0].id;
+    const deleteRes = await requestHttpDelete(
+      `/api/v1/sns/del-friend/${FriendId}/`
+    );
+
+    if (deleteRes.result) {
+      setFriendList((pre) => [...pre.filter((item) => item.id !== id)]);
+    }
+  };
+
+  const handleDel = async (id: string) => {
+    Alert.alert('削除しますか？', '', [
+      { text: 'キャンセル' },
+      { text: '削除', onPress: () => delFriend(id) },
+    ]);
+  };
 
   const renderItem = ({ item }) => {
     return (
-      <View style={styles.userContainer} key={item.id}>
-        <View style={styles.userHeader}>
-          <Link onPress={() => console.log('Works!')}>
-            <Avatar size="md" />
-          </Link>
-          <View style={styles.userHeaderTxtContainer}>
-            <Text style={styles.userName}>{item.name}</Text>
-          </View>
-          <TouchableOpacity
-            style={styles.followContainer}
-            onPress={() => setFollow('フォローを解除する')}
-          >
-            <Text style={styles.followText}>{follow}</Text>
-          </TouchableOpacity>
+      <HStack style={styles.userContainer} alignItems="center" key={item.id}>
+        <Link onPress={() => console.log('Works!')}>
+          <Avatar size="md" />
+        </Link>
+        <View style={styles.userHeaderTxtContainer}>
+          <Text style={styles.userName}>{item.nickname}</Text>
         </View>
-      </View>
+        <Spacer />
+        <Button
+          px="6"
+          h="10"
+          mr="2"
+          colorScheme="error"
+          variant="outline"
+          onPress={() => handleDel(item.id)}
+        >
+          削除
+        </Button>
+      </HStack>
     );
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <FlatList data={posts} renderItem={renderItem} scrollEnabled />
+      <FlatList data={friendList} renderItem={renderItem} scrollEnabled />
     </SafeAreaView>
   );
 };
@@ -62,9 +92,6 @@ const styles = StyleSheet.create({
   },
   avatar: {
     backgroundColor: '#cccccc',
-  },
-  userHeader: {
-    flexDirection: 'row',
   },
   userHeaderTxtContainer: {
     justifyContent: 'space-evenly',
