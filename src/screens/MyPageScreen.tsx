@@ -102,16 +102,13 @@ export const MyPageScreen = ({ navigation }) => {
     );
   };
 
-  const NameEditModal = () => {
-    return (
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#f1f5f9' }}>
       <Modal isOpen={showEditModal}>
         <Modal.Content maxWidth="400px">
           <Modal.Body>
             <Center h={16}>
-              <Input
-                style={{ width: '100%' }}
-                onChangeText={(value) => setNewName(value)}
-              />
+              <Input w="100%" onChangeText={(value) => setNewName(value)} />
             </Center>
           </Modal.Body>
           <Modal.Footer>
@@ -130,12 +127,6 @@ export const MyPageScreen = ({ navigation }) => {
           </Modal.Footer>
         </Modal.Content>
       </Modal>
-    );
-  };
-
-  return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#f1f5f9' }}>
-      <NameEditModal />
       <Box p={2} position="relative">
         <Pressable
           position="absolute"
