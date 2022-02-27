@@ -9,7 +9,6 @@ import {
   Pressable,
   ListRenderItemInfo,
   FlatList,
-  GestureResponderEvent,
 } from 'react-native';
 import { TabView, SceneMap } from 'react-native-tab-view';
 import {
@@ -24,8 +23,8 @@ import {
 } from 'native-base';
 import {
   requestHttpGet,
-  requestHttpPost,
   requestHttpDelete,
+  requestHttpPatch,
 } from '../scripts/requestBase';
 
 type RequestNestChild = {
@@ -56,8 +55,8 @@ const initialLayout = {
 };
 
 export const FriendRequestScreen = () => {
-  const [nonReqList, setNonReqList] = useState<any[]>([]);
-  const [nonAppdList, setNonAppdList] = useState<any[]>([]);
+  const [nonReqList, setNonReqList] = useState<RequestData[]>([]);
+  const [nonAppdList, setNonAppdList] = useState<NonAppdData[]>([]);
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
     {
@@ -85,19 +84,24 @@ export const FriendRequestScreen = () => {
     setNonAppdList(res.data);
   };
 
-  const handleDelete = async (
-    e: GestureResponderEvent,
-    id: string | number,
-    isReq: boolean
-  ) => {
+  // 申請承認削除処理
+  const handleDelete = async (id: string | number, type: 'req' | 'appd') => {
     await requestHttpDelete(`/api/v1/sns/friend-request/${id}/`);
-    isReq
+    type === 'req'
       ? setNonReqList((preList) => [
           ...preList.filter((item) => item.id !== id),
         ])
       : setNonAppdList((preList) => [
           ...preList.filter((item) => item.id !== id),
         ]);
+  };
+
+  // 承認許可処理
+  const handleAllow = async (id: string | number) => {
+    await requestHttpPatch(`/api/v1/sns/non-appd-request/${id}/`, {
+      approved: true,
+    });
+    setNonAppdList((preList) => [...preList.filter((item) => item.id !== id)]);
   };
 
   const renderReqItem = ({ item }: ListRenderItemInfo<RequestData>) => {
@@ -119,7 +123,7 @@ export const FriendRequestScreen = () => {
             mr="2"
             colorScheme="error"
             variant="outline"
-            onPress={(e) => handleDelete(e, item.id, true)}
+            onPress={() => handleDelete(item.id, 'req')}
           >
             取消
           </Button>
@@ -141,10 +145,23 @@ export const FriendRequestScreen = () => {
             </Text>
           </View>
           <Spacer />
-          <Button px="6" h="10" mr="2" colorScheme="error" variant="outline">
+          <Button
+            px="6"
+            h="10"
+            mr="2"
+            colorScheme="error"
+            variant="outline"
+            onPress={() => handleDelete(item.id, 'appd')}
+          >
             拒否
           </Button>
-          <Button px="6" h="10" bg="emerald.400" _text={{ fontWeight: 'bold' }}>
+          <Button
+            px="6"
+            h="10"
+            bg="emerald.400"
+            _text={{ fontWeight: 'bold' }}
+            onPress={() => handleAllow(item.id)}
+          >
             許可
           </Button>
         </HStack>
