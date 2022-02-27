@@ -71,6 +71,64 @@ export const requestHttpPost = async (
   return ret;
 };
 
+export const requestHttpPatch = async (
+  endpoint: string,
+  param: { [key: string]: any }
+) => {
+  let ret: ResponseData = {
+    result: false,
+    data: '',
+  };
+
+  const headers = await createHeader();
+
+  try {
+    const res = await axios.patch(baseUrl + endpoint, param, headers);
+    if (res.data) {
+      ret = { ...ret, result: true, data: res.data };
+    }
+  } catch (e) {
+    console.log('requestHttpPostError========================');
+    console.log(e);
+  }
+
+  return ret;
+};
+
+export const requestHttpDelete = async (
+  endpoint: string,
+  param?: { [key: string]: string }
+) => {
+  let ret: ResponseData = {
+    result: false,
+    data: [],
+  };
+  let queryPath = '';
+  const queryList = [];
+
+  if (param) {
+    queryPath = '?';
+    for (const [key, value] of Object.entries(param)) {
+      queryList.push(key + '=' + value);
+    }
+    queryPath = queryList.join('&');
+    endpoint += queryPath;
+  }
+
+  const headers = await createHeader();
+  try {
+    const res = await axios.delete(baseUrl + endpoint, headers);
+    if (res.status === 204) {
+      ret = { ...ret, result: true, status: res.status, data: res.data };
+    }
+  } catch (e) {
+    console.log('requestHttpGetError========================');
+    console.log(e);
+  }
+
+  return ret;
+};
+
 const createHeader = async () => {
   let token = '';
   try {
