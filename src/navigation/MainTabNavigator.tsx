@@ -18,6 +18,7 @@ import { FriendsScreen } from '../screens/FriendsScreen';
 import { Entypo, Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { HeaderIcon } from '../components/HeaderIcon';
+import { Image, Box } from 'native-base';
 
 type HomeStackParamList = {
   Home: undefined;
@@ -31,6 +32,13 @@ const HomeStack = createStackNavigator();
 const MyPageStack = createStackNavigator();
 
 const HomeStackScreen = () => {
+  const LogoTitle = () => {
+    return (
+      <Box mb={2}>
+        <Image source={require('../../assets/wins.png')} />
+      </Box>
+    );
+  };
   const navigation = useNavigation<HomeScreenProp>();
   return (
     <HomeStack.Navigator>
@@ -40,6 +48,7 @@ const HomeStackScreen = () => {
           component={HomeScreen}
           options={{
             title: '',
+            headerTitle: () => <LogoTitle />,
             headerTintColor: '#fff',
             headerStyle: {
               backgroundColor: '#4ade80',
