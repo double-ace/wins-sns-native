@@ -25,18 +25,19 @@ import { requestHttpGet, requestHttpPost } from '../scripts/requestBase';
 import { getData } from '../scripts/asyncStore';
 
 type Id = string | null;
-type Dm = {
+type Message = {
   id: string;
+  room: string;
   content: string;
-  sendFrom: string;
-  sendTo: string;
-  date: string;
+  sender: string;
+  created_at: string;
 };
 
 export const ChatScreen = () => {
   const [content, setContent] = useState('');
-  const [dmList, setDmList] = useState<any[]>([]);
-  const [userId, setUserId] = useState<Id>(null);
+  const [dmList, setDmList] = useState<Message[]>([]);
+  const [userId, setUserId] = useState<Id>('');
+  const [roomId, setRoomId] = useState<Id>('');
 
   const getUserId = async () => {
     const id = await getData('userId');
@@ -47,27 +48,32 @@ export const ChatScreen = () => {
 
   const getDm = async () => {
     !userId && (await getUserId());
-    const res = await requestHttpGet('/api/v1/sns/dm/');
-    console.log(userId, res);
-    setDmList(
-      res.data.map((item) => {
-        return {
-          id: item.id,
-          content: item.content,
-          sendFrom: item.send_from,
-          sendTo: item.send_to,
-          date: item.created_at,
-        };
-      })
-    );
+    const roomRes = await requestHttpGet('/api/v1/chat/rooms/');
+    if (roomRes.data.length) {
+      const id = roomRes.data[0].id;
+      const messageRes = await requestHttpGet(
+        `/api/v1/chat/messages/?room_id=${id}`
+      );
+      setRoomId(id);
+      setDmList(
+        messageRes.data.map((item: Message) => {
+          return {
+            id: item.id,
+            content: item.content,
+            sender: item.sender,
+            created_at: item.created_at,
+          };
+        })
+      );
+    }
   };
 
   const sendDm = async (e: GestureResponderEvent) => {
     const param = {
       content,
-      send_to: 'aab52573-f435-47d4-ada1-daa89a9705bf',
+      room: roomId,
     };
-    const res = await requestHttpPost('/api/v1/sns/dm/', param, true);
+    const res = await requestHttpPost('/api/v1/chat/messages/', param, true);
     // setDmList((pre) => [...pre, res.data]);
     await getDm();
     setContent('');
@@ -78,9 +84,9 @@ export const ChatScreen = () => {
     getDm();
   }, []);
 
-  const renderItem = ({ item }: ListRenderItemInfo<Dm>) => {
+  const renderItem = ({ item }: ListRenderItemInfo<Message>) => {
     console.log('userId', userId);
-    return item.sendFrom !== userId ? (
+    return item.sender !== userId ? (
       <HStack mb={4} key={item.id}>
         <Avatar size="sm" bg="gray.300" />
         <Stack ml={1} alignItems="flex-start">
@@ -94,7 +100,7 @@ export const ChatScreen = () => {
             {item.content}
           </Box>
           <Text color="blueGray.500">
-            {format(new Date(item.date), 'yyyy/MM/dd HH:mm')}
+            {format(new Date(item.created_at), 'yyyy/MM/dd HH:mm')}
           </Text>
         </Stack>
       </HStack>
@@ -112,7 +118,7 @@ export const ChatScreen = () => {
           </Box>
           <HStack justifyContent="flex-end">
             <Text color="blueGray.500">
-              {format(new Date(item.date), 'yyyy/MM/dd HH:mm')}
+              {format(new Date(item.created_at), 'yyyy/MM/dd HH:mm')}
             </Text>
           </HStack>
         </Stack>
