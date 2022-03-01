@@ -214,6 +214,7 @@ export const FriendRequestScreen = () => {
               flex={1}
               alignItems="center"
               p="3"
+              key={i.toString()}
             >
               <Pressable
                 onPress={() => {

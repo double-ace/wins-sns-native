@@ -126,7 +126,12 @@ export const HomeScreen = () => {
         bg="white"
         borderBottomWidth={1}
         borderColor="#E9EAEB"
-        _text={{ fontSize: 16, paddingLeft: 2 }}
+        _text={{
+          fontSize: 16,
+          paddingLeft: 2,
+          color: 'blueGray.700',
+          fontWeight: 'bold',
+        }}
       >
         ポイント履歴
       </Box>
