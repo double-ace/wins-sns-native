@@ -1,18 +1,47 @@
-import React from 'react';
-import { StyleSheet, SafeAreaView, Text } from 'react-native';
+import { Center, Heading, Text, Box } from 'native-base';
+import { useEffect, useState } from 'react';
+import { StyleSheet, SafeAreaView } from 'react-native';
+import { requestHttpGet } from '../scripts/requestBase';
+import { format } from 'date-fns';
+
+type ShopPost = {
+  id: string;
+  title: string;
+  content: string;
+  created_at: Date;
+  updated_at: Date;
+};
 
 export const NotificationFromShopScreen = () => {
+  const [postList, setPostList] = useState<ShopPost[]>([]);
+
+  useEffect(() => {
+    getShopPosts();
+  }, []);
+
+  const getShopPosts = async () => {
+    const res = await requestHttpGet('/api/v1/sns/shop-posts/');
+    res.data.length && setPostList(res.data);
+  };
   return (
-    <SafeAreaView style={styles.container}>
-      <Text>Notification Screen From Shop</Text>
-    </SafeAreaView>
+    <Box flex="1" p={4} bg="teal.50">
+      {!postList.length ? (
+        <Center>本日のお知らせはありません。</Center>
+      ) : (
+        <Box>
+          <Text fontSize="xs" color="blueGray.500">
+            {format(new Date(postList[0]?.created_at), 'yyyy/mm/dd HH:mm')}
+          </Text>
+          <Heading mb={4}>{postList[0]?.title}</Heading>
+          <Text>{postList[0]?.content}</Text>
+        </Box>
+      )}
+    </Box>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { SafeAreaView, View, FlatList, TextInput } from 'react-native';
+import { SafeAreaView, View, ListRenderItemInfo } from 'react-native';
 import {
   Link,
   Avatar,
@@ -14,24 +14,28 @@ import {
   Center,
   Modal,
   Input,
-  FormControl,
+  FlatList,
 } from 'native-base';
 import { AntDesign, Ionicons, Feather } from '@expo/vector-icons';
 import { postData } from '../../assets/postData.json';
 import { delData } from '../scripts/asyncStore';
 import { requestHttpGet, requestHttpPatch } from '../scripts/requestBase';
-import { previousDay } from 'date-fns';
-
-type PostData = {
-  id: string;
-  poster: string;
-  date: Date | string;
-  content: string;
-};
+import { format } from 'date-fns';
 
 type Nickname = {
   id: string | number;
   nickname: string;
+};
+
+type VisitFriend = {
+  id: string;
+  profile: {
+    id: string | number;
+    user: string;
+    nickname: string;
+    imageUrl: string;
+  };
+  last_visit: Date;
 };
 
 const posts: any[] = postData;
@@ -40,9 +44,11 @@ export const MyPageScreen = ({ navigation }) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [newName, setNewName] = useState('');
   const [nickname, setNickname] = useState<Nickname>({ id: '', nickname: '' });
+  const [visitFriendList, setVisitFriendList] = useState<VisitFriend[]>([]);
 
   useEffect(() => {
     getMyProfile();
+    getTodayVisitFriends();
   }, []);
 
   const getMyProfile = async () => {
@@ -53,52 +59,63 @@ export const MyPageScreen = ({ navigation }) => {
     // const friendRes = await requestHttpGet('');
   };
 
-  const handleSaveName = async () => {
-    // nickname変更処理
-    const res = await requestHttpPatch(`/api/v1/sns/nickname/${nickname.id}/`, {
-      nickname: newName,
-    });
-    res.result && setNickname((pre) => ({ ...pre, nickname: newName }));
-    setShowEditModal(false);
+  const getTodayVisitFriends = async () => {
+    const res = await requestHttpGet('/api/v1/sns/today-visit-friends/');
+    setVisitFriendList(res.data);
   };
 
-  const renderItem = ({ item }) => {
+  const handleSaveName = async () => {
+    // nickname変更処理
+    if (newName) {
+      const res = await requestHttpPatch(
+        `/api/v1/sns/nickname/${nickname.id}/`,
+        {
+          nickname: newName,
+        }
+      );
+      res.result && setNickname((pre) => ({ ...pre, nickname: newName }));
+      setShowEditModal(false);
+    }
+  };
+
+  const renderItem = ({ item }: ListRenderItemInfo<VisitFriend>) => {
     return (
-      <Box
+      <HStack
+        alignItems="center"
         bg="white"
-        px={2}
-        py={2}
+        p={2}
         borderBottomWidth={1}
         borderColor="blueGray.200"
+        key={item.id}
+        w="100%"
       >
-        <HStack alignItems="center">
-          <Link onPress={() => console.log('Works!')}>
-            <Avatar size="md"></Avatar>
-          </Link>
-          <Box ml={2}>
-            <Text fontSize={16}>{item.poster}</Text>
-            <Text color="blueGray.500">来店時間{item.date}</Text>
-          </Box>
-          <Spacer />
-          <Box mr="2">
-            <Text color="blueGray.600">通知送信</Text>
-            <Switch size="sm" onTrackColor="green.400" />
-          </Box>
-          <Box>
-            <Text color="blueGray.600">通知受取</Text>
-            <Switch size="sm" onTrackColor="green.400" />
-          </Box>
-          <Spacer />
-          <Box position="absolute" right={0}>
-            <AntDesign
-              name="delete"
-              size={24}
-              color="red"
-              onPress={() => alert('削除しますか？')}
-            />
-          </Box>
-        </HStack>
-      </Box>
+        <Link onPress={() => console.log('Works!')}>
+          <Avatar size="md"></Avatar>
+        </Link>
+        <Box ml={2}>
+          <Text fontSize={16}>{item.profile.nickname}</Text>
+          <Text color="blueGray.500">
+            来店時間{format(new Date(item.last_visit), 'HH:mm')}
+          </Text>
+        </Box>
+        <Spacer />
+        <Box mr="2">
+          <Text color="blueGray.600">通知送信</Text>
+          <Switch size="sm" onTrackColor="green.400" />
+        </Box>
+        <Box>
+          <Text color="blueGray.600">通知受取</Text>
+          <Switch size="sm" onTrackColor="green.400" />
+        </Box>
+        <Box ml={4}>
+          <AntDesign
+            name="delete"
+            size={24}
+            color="red"
+            onPress={() => alert('削除しますか？')}
+          />
+        </Box>
+      </HStack>
     );
   };
 
@@ -120,7 +137,11 @@ export const MyPageScreen = ({ navigation }) => {
               >
                 キャンセル
               </Button>
-              <Button bg="green.400" onPress={handleSaveName}>
+              <Button
+                bg="green.400"
+                _pressed={{ backgroundColor: 'green.500' }}
+                onPress={handleSaveName}
+              >
                 変更
               </Button>
             </Button.Group>
@@ -187,10 +208,11 @@ export const MyPageScreen = ({ navigation }) => {
           本日来店した友達
         </Box>
         <FlatList
-          data={posts}
+          data={visitFriendList}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           scrollEnabled
+          minHeight="200"
         />
       </View>
     </SafeAreaView>
