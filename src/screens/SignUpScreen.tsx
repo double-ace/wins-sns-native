@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   TouchableWithoutFeedback,
   Keyboard,
@@ -12,8 +12,34 @@ import { Button, Link } from 'native-base';
 import { authLogin } from '../scripts/requestAuth';
 import { setData, getData } from '../scripts/asyncStore';
 import { createAccount } from '../scripts/requestAuth';
+import Constants from 'expo-constants';
+import * as Notifications from 'expo-notifications';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
+const regPushNotifications = async () => {
+  let token;
+  if (Constants.isDevice) {
+    const { status } = await Notifications.getPermissionsAsync();
+    if (status !== 'granted') {
+      // 許可がない場合
+      alert('Failed to get push token for push notification');
+      return;
+    }
+    token = (await Notifications.getExpoPushTokenAsync()).data;
+    console.log(token);
+  } else {
+  }
+};
 
 export const SignUpScreen = ({ navigation }) => {
+  const [pushToken, setPushToken] = useState(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPw, setConfirmPw] = useState('');
