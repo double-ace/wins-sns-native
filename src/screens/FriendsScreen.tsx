@@ -6,6 +6,8 @@ import {
   FlatList,
   Text,
   Alert,
+  RefreshControl,
+  ListRenderItemInfo,
 } from 'react-native';
 import { Link, Avatar, Button, HStack, Spacer } from 'native-base';
 import { requestHttpDelete, requestHttpGet } from '../scripts/requestBase';
@@ -17,6 +19,7 @@ type FriendData = {
 
 export const FriendsScreen = () => {
   const [friendList, setFriendList] = useState<FriendData[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     getFriend();
@@ -27,7 +30,7 @@ export const FriendsScreen = () => {
     setFriendList(res.data);
   };
 
-  const delFriend = async (id: string) => {
+  const delFriend = async (id: string | number) => {
     const res = await requestHttpGet(`/api/v1/sns/friend/?friend=${id}`);
     console.log(res.data);
     const FriendId = res.data[0].id;
@@ -40,14 +43,20 @@ export const FriendsScreen = () => {
     }
   };
 
-  const handleDel = async (id: string) => {
+  const handleDel = async (id: string | number) => {
     Alert.alert('削除しますか？', '', [
       { text: 'キャンセル' },
       { text: '削除', onPress: () => delFriend(id) },
     ]);
   };
 
-  const renderItem = ({ item }) => {
+  const refreshItem = async () => {
+    setRefreshing(true);
+    await getFriend();
+    setRefreshing(false);
+  };
+
+  const renderItem = ({ item }: ListRenderItemInfo<FriendData>) => {
     return (
       <HStack style={styles.userContainer} alignItems="center" key={item.id}>
         <Link onPress={() => console.log('Works!')}>
@@ -73,7 +82,18 @@ export const FriendsScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <FlatList data={friendList} renderItem={renderItem} scrollEnabled />
+      <FlatList
+        data={friendList}
+        renderItem={renderItem}
+        scrollEnabled
+        refreshControl={
+          <RefreshControl
+            onRefresh={refreshItem}
+            refreshing={refreshing}
+            tintColor="#6ee7b7"
+          />
+        }
+      />
     </SafeAreaView>
   );
 };

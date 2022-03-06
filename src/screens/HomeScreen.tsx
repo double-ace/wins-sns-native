@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, FlatList, ListRenderItemInfo } from 'react-native';
+import {
+  View,
+  FlatList,
+  ListRenderItemInfo,
+  RefreshControl,
+} from 'react-native';
 import {
   Flex,
   Button,
@@ -33,6 +38,7 @@ export const HomeScreen = () => {
   const [userId, setUserId] = useState('');
   const [pointHisList, setPointHisList] = useState<PointHistoryResponse[]>([]);
   const [showQRCode, setShowQRCode] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     getUserPoint();
@@ -48,9 +54,11 @@ export const HomeScreen = () => {
     const pointHisRes = await requestHttpGet('/api/v1/user/point-history/');
     if (pointHisRes.data.length) {
       // date_timeを降順に並び替え
-      pointHisRes.data.sort((a, b) => {
-        return a.date_time < b.date_time ? 1 : -1;
-      });
+      pointHisRes.data.sort(
+        (a: PointHistoryResponse, b: PointHistoryResponse) => {
+          return a.date_time < b.date_time ? 1 : -1;
+        }
+      );
       pointHisRes.data;
       setPointHisList(
         pointHisRes.data.map((item: PointHistoryResponse) => {
@@ -62,6 +70,12 @@ export const HomeScreen = () => {
         })
       );
     }
+  };
+
+  const refreshItem = async () => {
+    setRefreshing(true);
+    await getUserPoint();
+    setRefreshing(false);
   };
 
   const renderItem = ({ item }: ListRenderItemInfo<PointHistoryResponse>) => {
@@ -97,7 +111,9 @@ export const HomeScreen = () => {
           borderWidth={15}
           borderColor="#00EFF0"
         >
-          <Text fontSize={30}>{point}pt</Text>
+          <Text color="green.800" fontSize={30}>
+            {point}pt
+          </Text>
         </Center>
         <View>
           <Modal isOpen={showQRCode} onClose={() => setShowQRCode(false)}>
@@ -135,7 +151,18 @@ export const HomeScreen = () => {
       >
         ポイント履歴
       </Box>
-      <FlatList data={pointHisList} renderItem={renderItem} scrollEnabled />
+      <FlatList
+        data={pointHisList}
+        renderItem={renderItem}
+        refreshControl={
+          <RefreshControl
+            onRefresh={refreshItem}
+            refreshing={refreshing}
+            tintColor="#6ee7b7"
+          />
+        }
+        scrollEnabled
+      />
     </Box>
   );
 };

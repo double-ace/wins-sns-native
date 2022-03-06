@@ -1,5 +1,10 @@
 import { useEffect, useState } from 'react';
-import { SafeAreaView, View, ListRenderItemInfo } from 'react-native';
+import {
+  SafeAreaView,
+  View,
+  ListRenderItemInfo,
+  ImageSourcePropType,
+} from 'react-native';
 import {
   Link,
   Avatar,
@@ -15,16 +20,20 @@ import {
   Modal,
   Input,
   FlatList,
+  Spinner,
 } from 'native-base';
 import { AntDesign, Ionicons, Feather } from '@expo/vector-icons';
-import { postData } from '../../assets/postData.json';
+import Constants from 'expo-constants';
+import * as ImagePicker from 'expo-image-picker';
+// import * as Permissions from 'expo-permissions'
 import { delData } from '../scripts/asyncStore';
 import { requestHttpGet, requestHttpPatch } from '../scripts/requestBase';
 import { format } from 'date-fns';
 
-type Nickname = {
+type MyProfile = {
   id: string | number;
   nickname: string;
+  imageUrl: string;
 };
 
 type VisitFriend = {
@@ -38,13 +47,17 @@ type VisitFriend = {
   last_visit: Date;
 };
 
-const posts: any[] = postData;
-
 export const MyPageScreen = ({ navigation }) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [newName, setNewName] = useState('');
-  const [nickname, setNickname] = useState<Nickname>({ id: '', nickname: '' });
+  const [myProfile, setMyProfile] = useState<MyProfile>({
+    id: '',
+    nickname: '',
+    imageUrl: '',
+  });
+  const [blobImage, setBlobImage] = useState<Blob | null>(null);
   const [visitFriendList, setVisitFriendList] = useState<VisitFriend[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     getMyProfile();
@@ -53,10 +66,16 @@ export const MyPageScreen = ({ navigation }) => {
 
   const getMyProfile = async () => {
     // ユーザ名とプロフ画像取得
-    const nameRes = await requestHttpGet('/api/v1/sns/nickname/');
-    setNickname({ id: nameRes.data[0].id, nickname: nameRes.data[0].nickname });
-    // 友達一覧取得
-    // const friendRes = await requestHttpGet('');
+    const res = await requestHttpGet('/api/v1/sns/myprofile/');
+    console.log(res.data[0].profile_image);
+    if (res.data.length) {
+      const resData = res.data[0];
+      setMyProfile({
+        id: resData.id,
+        nickname: resData.nickname,
+        imageUrl: resData.profile_image,
+      });
+    }
   };
 
   const getTodayVisitFriends = async () => {
@@ -68,13 +87,51 @@ export const MyPageScreen = ({ navigation }) => {
     // nickname変更処理
     if (newName) {
       const res = await requestHttpPatch(
-        `/api/v1/sns/nickname/${nickname.id}/`,
+        `/api/v1/sns/myprofile/${myProfile.id}/`,
         {
           nickname: newName,
         }
       );
-      res.result && setNickname((pre) => ({ ...pre, nickname: newName }));
+      res.result && setMyProfile((pre) => ({ ...pre, nickname: newName }));
       setShowEditModal(false);
+    }
+  };
+
+  const refreshItem = async () => {
+    setRefreshing(true);
+    await getTodayVisitFriends();
+    setRefreshing(false);
+  };
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEfditing: true,
+      aspoct: [4, 3],
+      quality: 1,
+    });
+    if (!result.cancelled) {
+      const imageUri = await fetch(result.uri);
+      const blob = await imageUri.blob();
+      const res = await requestHttpPatch(
+        `/api/v1/sns/myprofile/${myProfile.id}/`,
+        {
+          profile_image: result.base64,
+        }
+      );
+      // const res = await fetch(`/api/v1/sns/myprofile/${myProfile.id}/`, {
+      //   method: 'POST',
+      //   headers: {
+      //     Accept: 'application/json',
+      //     'Content-Type': 'application/json',
+      //   },
+      //   // send our base64 string as POST request
+      //   body: JSON.stringify({
+      //     image_url: result.base64,
+      //   }),
+      // })
+      setMyProfile((pre) => ({ ...pre, imageUrl: imageUri.toString() }));
+      setBlobImage(blob);
     }
   };
 
@@ -159,9 +216,10 @@ export const MyPageScreen = ({ navigation }) => {
         >
           <Ionicons name="settings" size={28} color="gray" />
         </Pressable>
+        {myProfile.imageUrl}
         <HStack alignItems="center" mb={2}>
-          <Link position="relative" onPress={() => alert('Works!')}>
-            <Avatar size="xl"></Avatar>
+          <Link position="relative" onPress={pickImage}>
+            <Avatar size="xl" source={{ uri: myProfile.imageUrl }}></Avatar>
             <Center
               bg="blueGray.700"
               p={1}
@@ -177,7 +235,7 @@ export const MyPageScreen = ({ navigation }) => {
             <Stack flexDirection="row" alignItems="center">
               <Pressable onPress={() => setShowEditModal(true)}>
                 <Text fontSize="3xl">
-                  {nickname.nickname}
+                  {myProfile.nickname}
                   <Feather name="edit-2" size={15} color="gray" />
                 </Text>
               </Pressable>
@@ -194,27 +252,44 @@ export const MyPageScreen = ({ navigation }) => {
           </Box>
         </HStack>
       </Box>
-      <View>
-        <Box
-          m={2}
-          mb={1}
-          _text={{
-            fontSize: 16,
-            fontWeight: 'bold',
-            letterSpacing: 1,
-            color: 'emerald.500',
-          }}
-        >
-          本日来店した友達
-        </Box>
-        <FlatList
-          data={visitFriendList}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          scrollEnabled
-          minHeight="200"
-        />
-      </View>
+      <Box mt={4}>
+        <HStack m={2} mb={1} alignItems="center">
+          <Text
+            fontSize={16}
+            fontWeight="bold"
+            letterSpacing={1}
+            color="emerald.500"
+          >
+            本日来店した友達
+          </Text>
+          <Pressable ml={1} onPress={refreshItem}>
+            <AntDesign name="reload1" size={16} color="#22d3ee" />
+          </Pressable>
+        </HStack>
+        {refreshing && (
+          <HStack
+            position="absolute"
+            top={20}
+            zIndex={100}
+            w="100%"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Spinner size="lg" color="green.400" />
+          </HStack>
+        )}
+        {!visitFriendList.length ? (
+          <Center>本日来店した友達はいません</Center>
+        ) : (
+          <FlatList
+            data={visitFriendList}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id}
+            scrollEnabled
+            minHeight="200"
+          />
+        )}
+      </Box>
     </SafeAreaView>
   );
 };

@@ -9,6 +9,7 @@ import {
   Pressable,
   ListRenderItemInfo,
   FlatList,
+  RefreshControl,
 } from 'react-native';
 import { TabView, SceneMap } from 'react-native-tab-view';
 import {
@@ -57,6 +58,7 @@ const initialLayout = {
 export const FriendRequestScreen = () => {
   const [nonReqList, setNonReqList] = useState<RequestData[]>([]);
   const [nonAppdList, setNonAppdList] = useState<NonAppdData[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
     {
@@ -82,6 +84,18 @@ export const FriendRequestScreen = () => {
   const getAppdList = async () => {
     const res = await requestHttpGet('/api/v1/sns/non-appd-request/');
     setNonAppdList(res.data);
+  };
+
+  const refreshReqItem = async () => {
+    setRefreshing(true);
+    await getReqList();
+    setRefreshing(false);
+  };
+
+  const refreshAppdItem = async () => {
+    setRefreshing(true);
+    await getAppdList();
+    setRefreshing(false);
   };
 
   // 申請承認削除処理
@@ -171,13 +185,35 @@ export const FriendRequestScreen = () => {
 
   const RequestRoute = () => {
     return (
-      <FlatList data={nonReqList} renderItem={renderReqItem} scrollEnabled />
+      <FlatList
+        data={nonReqList}
+        renderItem={renderReqItem}
+        refreshControl={
+          <RefreshControl
+            onRefresh={refreshReqItem}
+            refreshing={refreshing}
+            tintColor="#6ee7b7"
+          />
+        }
+        scrollEnabled
+      />
     );
   };
 
   const NonAppdRoute = () => {
     return (
-      <FlatList data={nonAppdList} renderItem={renderAppdItem} scrollEnabled />
+      <FlatList
+        data={nonAppdList}
+        renderItem={renderAppdItem}
+        refreshControl={
+          <RefreshControl
+            onRefresh={refreshAppdItem}
+            refreshing={refreshing}
+            tintColor="#6ee7b7"
+          />
+        }
+        scrollEnabled
+      />
     );
   };
 
