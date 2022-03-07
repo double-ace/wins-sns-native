@@ -35,7 +35,7 @@ const HomeStackScreen = () => {
   const LogoTitle = () => {
     return (
       <Box mb={2}>
-        <Image source={require('../../assets/wins.png')} />
+        <Image source={require('../../assets/wins.png')} alt="header-logo" />
       </Box>
     );
   };
