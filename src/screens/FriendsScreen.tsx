@@ -9,12 +9,20 @@ import {
   RefreshControl,
   ListRenderItemInfo,
 } from 'react-native';
-import { Link, Avatar, Button, HStack, Spacer } from 'native-base';
+import { Avatar, Button, HStack, Spacer, Pressable } from 'native-base';
 import { requestHttpDelete, requestHttpGet } from '../scripts/requestBase';
+import { DefaultAvator } from '../components/DefaultAvator';
+
+type Profile = {
+  id: number;
+  user: string;
+  nickname: string;
+  profile_image: string | null;
+};
 
 type FriendData = {
   id: string | number;
-  nickname: string;
+  profile: Profile;
 };
 
 export const FriendsScreen = () => {
@@ -59,11 +67,18 @@ export const FriendsScreen = () => {
   const renderItem = ({ item }: ListRenderItemInfo<FriendData>) => {
     return (
       <HStack style={styles.userContainer} alignItems="center" key={item.id}>
-        <Link onPress={() => console.log('Works!')}>
-          <Avatar size="md" />
-        </Link>
+        <Pressable>
+          {!item.profile.profile_image ? (
+            <DefaultAvator />
+          ) : (
+            <Avatar
+              size="md"
+              source={{ uri: item.profile.profile_image }}
+            ></Avatar>
+          )}
+        </Pressable>
         <View style={styles.userHeaderTxtContainer}>
-          <Text style={styles.userName}>{item.nickname}</Text>
+          <Text style={styles.userName}>{item.profile.nickname}</Text>
         </View>
         <Spacer />
         <Button

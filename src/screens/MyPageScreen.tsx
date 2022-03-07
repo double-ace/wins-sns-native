@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
 import {
   SafeAreaView,
-  View,
   ListRenderItemInfo,
   ImageSourcePropType,
+  RefreshControl,
 } from 'react-native';
 import {
-  Link,
   Avatar,
   Button,
   Text,
@@ -21,6 +20,7 @@ import {
   Input,
   FlatList,
   Spinner,
+  ScrollView,
 } from 'native-base';
 import { AntDesign, Ionicons, Feather } from '@expo/vector-icons';
 import Constants from 'expo-constants';
@@ -29,11 +29,12 @@ import * as ImagePicker from 'expo-image-picker';
 import { delData } from '../scripts/asyncStore';
 import { requestHttpGet, requestHttpPatch } from '../scripts/requestBase';
 import { format } from 'date-fns';
+import { DefaultAvator } from '../components/DefaultAvator';
 
 type MyProfile = {
   id: string | number;
   nickname: string;
-  imageUrl: string;
+  imageUrl: string | undefined;
 };
 
 type VisitFriend = {
@@ -42,7 +43,7 @@ type VisitFriend = {
     id: string | number;
     user: string;
     nickname: string;
-    imageUrl: string;
+    profile_image: string;
   };
   last_visit: Date;
 };
@@ -53,7 +54,7 @@ export const MyPageScreen = ({ navigation }) => {
   const [myProfile, setMyProfile] = useState<MyProfile>({
     id: '',
     nickname: '',
-    imageUrl: '',
+    imageUrl: undefined,
   });
   const [blobImage, setBlobImage] = useState<Blob | null>(null);
   const [visitFriendList, setVisitFriendList] = useState<VisitFriend[]>([]);
@@ -70,11 +71,12 @@ export const MyPageScreen = ({ navigation }) => {
     console.log(res.data[0].profile_image);
     if (res.data.length) {
       const resData = res.data[0];
-      setMyProfile({
+      setMyProfile((pre) => ({
+        ...pre,
         id: resData.id,
         nickname: resData.nickname,
         imageUrl: resData.profile_image,
-      });
+      }));
     }
   };
 
@@ -146,9 +148,16 @@ export const MyPageScreen = ({ navigation }) => {
         key={item.id}
         w="100%"
       >
-        <Link onPress={() => console.log('Works!')}>
-          <Avatar size="md"></Avatar>
-        </Link>
+        <Pressable>
+          {!item.profile.profile_image ? (
+            <DefaultAvator />
+          ) : (
+            <Avatar
+              size="md"
+              source={{ uri: item.profile.profile_image }}
+            ></Avatar>
+          )}
+        </Pressable>
         <Box ml={2}>
           <Text fontSize={16}>{item.profile.nickname}</Text>
           <Text color="blueGray.500">
@@ -195,7 +204,7 @@ export const MyPageScreen = ({ navigation }) => {
                 キャンセル
               </Button>
               <Button
-                bg="green.400"
+                bg="green.500"
                 _pressed={{ backgroundColor: 'green.500' }}
                 onPress={handleSaveName}
               >
@@ -216,10 +225,13 @@ export const MyPageScreen = ({ navigation }) => {
         >
           <Ionicons name="settings" size={28} color="gray" />
         </Pressable>
-        {myProfile.imageUrl}
         <HStack alignItems="center" mb={2}>
-          <Link position="relative" onPress={pickImage}>
-            <Avatar size="xl" source={{ uri: myProfile.imageUrl }}></Avatar>
+          <Pressable position="relative" onPress={pickImage}>
+            {!myProfile.imageUrl ? (
+              <DefaultAvator objSize="xl" iconSize={58} />
+            ) : (
+              <Avatar size="xl" source={{ uri: myProfile.imageUrl }} />
+            )}
             <Center
               bg="blueGray.700"
               p={1}
@@ -230,7 +242,7 @@ export const MyPageScreen = ({ navigation }) => {
             >
               <Feather name="camera" size={18} color="#d4d4d4" />
             </Center>
-          </Link>
+          </Pressable>
           <Box ml={2}>
             <Stack flexDirection="row" alignItems="center">
               <Pressable onPress={() => setShowEditModal(true)}>
@@ -262,7 +274,7 @@ export const MyPageScreen = ({ navigation }) => {
           >
             本日来店した友達
           </Text>
-          <Pressable ml={1} onPress={refreshItem}>
+          <Pressable p={2} pl={1} onPress={refreshItem}>
             <AntDesign name="reload1" size={16} color="#22d3ee" />
           </Pressable>
         </HStack>
@@ -279,12 +291,30 @@ export const MyPageScreen = ({ navigation }) => {
           </HStack>
         )}
         {!visitFriendList.length ? (
-          <Center>本日来店した友達はいません</Center>
+          <ScrollView
+            height={300}
+            refreshControl={
+              <RefreshControl
+                onRefresh={refreshItem}
+                refreshing={refreshing}
+                tintColor="#6ee7b7"
+              />
+            }
+          >
+            <Center>本日来店した友達はいません</Center>
+          </ScrollView>
         ) : (
           <FlatList
             data={visitFriendList}
             renderItem={renderItem}
             keyExtractor={(item) => item.id}
+            refreshControl={
+              <RefreshControl
+                onRefresh={refreshItem}
+                refreshing={refreshing}
+                tintColor="#6ee7b7"
+              />
+            }
             scrollEnabled
             minHeight="200"
           />

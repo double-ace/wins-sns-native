@@ -27,6 +27,7 @@ import {
   requestHttpDelete,
   requestHttpPatch,
 } from '../scripts/requestBase';
+import { DefaultAvator } from '../components/DefaultAvator';
 
 type RequestNestChild = {
   id: string;
@@ -34,7 +35,7 @@ type RequestNestChild = {
   profile: {
     id: number;
     nickname: string;
-    imageUrl?: string;
+    profile_image: string | null;
   };
 };
 type RequestData = {
@@ -122,9 +123,16 @@ export const FriendRequestScreen = () => {
     return (
       <Box py="3" style={styles.postContainer} key={item.id.toString()}>
         <HStack alignItems="center">
-          <Link onPress={() => console.log('Works!')}>
-            <Avatar size="md"></Avatar>
-          </Link>
+          <Pressable>
+            {!item.req_to.profile.profile_image ? (
+              <DefaultAvator />
+            ) : (
+              <Avatar
+                size="md"
+                source={{ uri: item.req_to.profile.profile_image }}
+              ></Avatar>
+            )}
+          </Pressable>
           <Box style={styles.postHeaderTxtContainer} maxWidth={150}>
             <Text style={styles.posterName}>
               {item.req_to.profile.nickname}
@@ -150,9 +158,16 @@ export const FriendRequestScreen = () => {
     return (
       <Box py="3" style={styles.postContainer} key={item.id.toString()}>
         <HStack alignItems="center">
-          <Link onPress={() => console.log('Works!')}>
-            <Avatar size="md"></Avatar>
-          </Link>
+          <Pressable>
+            {!item.req_from.profile.profile_image ? (
+              <DefaultAvator />
+            ) : (
+              <Avatar
+                size="md"
+                source={{ uri: item.req_from.profile.profile_image }}
+              ></Avatar>
+            )}
+          </Pressable>
           <View style={styles.postHeaderTxtContainer}>
             <Text style={styles.posterName}>
               {item.req_from.profile.nickname}

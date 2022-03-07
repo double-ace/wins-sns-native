@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   StyleSheet,
   SafeAreaView,
@@ -8,7 +8,6 @@ import {
   ListRenderItemInfo,
 } from 'react-native';
 import {
-  Link,
   Avatar,
   Button,
   Input,
@@ -16,30 +15,29 @@ import {
   HStack,
   Spacer,
   Center,
+  Pressable,
 } from 'native-base';
 import { getData } from '../scripts/asyncStore';
 import { requestHttpGet, requestHttpPost } from '../scripts/requestBase';
 import { SkeletonItem } from '../components/SkeletonUserItem';
+import { DefaultAvator } from '../components/DefaultAvator';
+
+type Profile = {
+  id: number;
+  user: string;
+  nickname: string;
+  profile_image: string | null;
+};
 
 type UserList = {
   id: string;
-  nickname: string;
+  profile: Profile;
   imageUrl: string;
 };
 
 export const SearchScreen = ({ navigation }) => {
   const [userList, setUserList] = useState<UserList[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-
-  useEffect(() => {
-    getUserList();
-  }, []);
-
-  // ユーザ取得
-  const getUserList = async () => {
-    const res = await requestHttpGet('/api/v1/sns/users/');
-    setUserList(res.data);
-  };
 
   const onChangeKeyword = async (keyword: string) => {
     setIsSearching(true);
@@ -72,11 +70,18 @@ export const SearchScreen = ({ navigation }) => {
     return (
       <Box py="3" style={styles.postContainer} key={item.id}>
         <HStack alignItems="center">
-          <Link onPress={() => console.log('Works!')}>
-            <Avatar size="md"></Avatar>
-          </Link>
+          <Pressable>
+            {!item.profile.profile_image ? (
+              <DefaultAvator />
+            ) : (
+              <Avatar
+                size="md"
+                source={{ uri: item.profile.profile_image }}
+              ></Avatar>
+            )}
+          </Pressable>
           <View style={styles.postHeaderTxtContainer}>
-            <Text style={styles.posterName}>{item.nickname}</Text>
+            <Text style={styles.posterName}>{item.profile.nickname}</Text>
           </View>
           <Spacer />
           <Button
