@@ -1,10 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  FlatList,
-  ListRenderItemInfo,
-  RefreshControl,
-} from 'react-native';
+import { FlatList, ListRenderItemInfo, RefreshControl } from 'react-native';
 import {
   Flex,
   Button,
@@ -14,10 +9,15 @@ import {
   Text,
   Box,
   Spacer,
+  Divider,
+  Image,
+  Badge,
 } from 'native-base';
+import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
 import QRCode from 'react-native-qrcode-svg';
 import { format } from 'date-fns';
-import { requestHttpGet } from '../scripts/requestBase';
+import { requestHttpGet, requestHttpPost } from '../scripts/requestBase';
 
 type PointHistory = {
   id: string | number;
@@ -33,42 +33,91 @@ type PointHistoryResponse = {
   date_time: Date | string;
 };
 
-export const HomeScreen = () => {
+export const HomeScreen = ({ navigation }) => {
   const [point, setPoint] = useState(0);
+  const [continuousVisit, setContinuousVisit] = useState(0);
   const [userId, setUserId] = useState('');
   const [pointHisList, setPointHisList] = useState<PointHistoryResponse[]>([]);
   const [showQRCode, setShowQRCode] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: false,
+      shouldSetBadge: false,
+    }),
+  });
+
+  const regPushNotifications = async () => {
+    let token;
+    if (Device.isDevice) {
+      const { status: existingStatus } =
+        await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== 'granted') {
+        //②初回起動時は許可ダイアログを出してユーザからPush通知の許可を取得
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== 'granted') {
+        // 許可がない場合
+        alert('Failed to get push token for push notification');
+        return;
+      }
+      try {
+        const endpoint = '/api/v1/core/user-device/';
+        const tokenRes = await requestHttpGet(endpoint);
+        alert(tokenRes.data.length);
+        if (!tokenRes.data.length) {
+          token = (await Notifications.getExpoPushTokenAsync()).data;
+          alert(token);
+          console.log(token);
+          await requestHttpPost(endpoint, { device_token: token }, true);
+        }
+      } catch (e) {
+        alert(e);
+      }
+    } else {
+      alert('token');
+    }
+  };
+
   useEffect(() => {
+    regPushNotifications();
     getUserPoint();
   }, []);
 
   const getUserPoint = async () => {
     const pointRes = await requestHttpGet('/api/v1/user/point/');
-    if (pointRes.data.length) {
-      setPoint(pointRes.data[0].point.toLocaleString());
-      setUserId(pointRes.data[0].user);
-    }
-
     const pointHisRes = await requestHttpGet('/api/v1/user/point-history/');
-    if (pointHisRes.data.length) {
-      // date_timeを降順に並び替え
-      pointHisRes.data.sort(
-        (a: PointHistoryResponse, b: PointHistoryResponse) => {
-          return a.date_time < b.date_time ? 1 : -1;
-        }
-      );
-      pointHisRes.data;
-      setPointHisList(
-        pointHisRes.data.map((item: PointHistoryResponse) => {
-          // 当日なら時刻表示しない　当年なら年表示しない
-          return {
-            ...item,
-            date_time: format(new Date(item.date_time), 'yyyy/MM/dd HH:mm'),
-          };
-        })
-      );
+
+    if (pointRes.notLogin || pointHisRes.notLogin) {
+      navigation.reset({ index: 0, routes: [{ name: 'SignIn' }] });
+    } else {
+      if (pointRes.data.length) {
+        console.log(pointRes.data[0]);
+        setPoint(pointRes.data[0].point.toLocaleString());
+        setContinuousVisit(pointRes.data[0].continuous_visit_count);
+        setUserId(pointRes.data[0].user);
+      }
+      if (pointHisRes.data.length) {
+        // date_timeを降順に並び替え
+        pointHisRes.data.sort(
+          (a: PointHistoryResponse, b: PointHistoryResponse) => {
+            return a.date_time < b.date_time ? 1 : -1;
+          }
+        );
+        setPointHisList(
+          pointHisRes.data.map((item: PointHistoryResponse) => {
+            // 当日なら時刻表示しない　当年なら年表示しない
+            return {
+              ...item,
+              date_time: format(new Date(item.date_time), 'yyyy/MM/dd HH:mm'),
+            };
+          })
+        );
+      }
     }
   };
 
@@ -103,7 +152,17 @@ export const HomeScreen = () => {
 
   return (
     <Box style={{ flex: 1 }} bg="white">
-      <Flex justifyContent="center" alignItems="center" bg="white" py={10}>
+      <Badge
+        m={1}
+        maxWidth={40}
+        colorScheme="success"
+        alignSelf="flex-start"
+        borderRadius={4}
+        variant="outline"
+      >
+        {`連続来店回数: ${continuousVisit}`}
+      </Badge>
+      <Flex justifyContent="center" alignItems="center" bg="white" my={4}>
         <Center
           h={190}
           w={190}
@@ -111,18 +170,20 @@ export const HomeScreen = () => {
           borderWidth={15}
           borderColor="#00EFF0"
         >
-          <Text color="green.800" fontSize={30}>
+          <Text color="emerald.600" fontSize={30} fontWeight="bold">
             {point}pt
           </Text>
         </Center>
-        <View>
+        <Box>
           <Modal isOpen={showQRCode} onClose={() => setShowQRCode(false)}>
-            <Modal.CloseButton
-              onPress={() => setShowQRCode(false)}
-              position="absolute"
-              top="16"
-            />
-            <QRCode size={200} value={userId} />
+            <Center bg="white" p={12} borderRadius={24}>
+              <Modal.CloseButton
+                onPress={() => setShowQRCode(false)}
+                position="absolute"
+                top={3}
+              />
+              <QRCode size={200} value={userId} />
+            </Center>
           </Modal>
           <Button
             w={250}
@@ -131,17 +192,21 @@ export const HomeScreen = () => {
             bg="green.400"
             _pressed={{ backgroundColor: 'green.500' }}
             my="6"
-            _text={{ fontSize: 16, fontWeight: 'bold' }}
+            _text={{ fontSize: 20, fontWeight: 'bold' }}
             onPress={() => setShowQRCode(true)}
           >
             QRコード表示
           </Button>
-        </View>
+        </Box>
+        <Image
+          source={require('../../assets/hourses.png')}
+          alt="header-logo"
+          w={250}
+          h={60}
+        />
       </Flex>
       <Box
         bg="white"
-        borderBottomWidth={1}
-        borderColor="#E9EAEB"
         _text={{
           fontSize: 16,
           paddingLeft: 2,
@@ -151,6 +216,7 @@ export const HomeScreen = () => {
       >
         ポイント履歴
       </Box>
+      <Divider />
       <FlatList
         data={pointHisList}
         renderItem={renderItem}
