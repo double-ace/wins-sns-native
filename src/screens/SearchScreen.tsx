@@ -2,9 +2,7 @@ import { useState } from 'react';
 import {
   StyleSheet,
   SafeAreaView,
-  View,
   FlatList,
-  Text,
   ListRenderItemInfo,
 } from 'react-native';
 import {
@@ -15,9 +13,9 @@ import {
   HStack,
   Spacer,
   Center,
+  Text,
   Pressable,
 } from 'native-base';
-import { getData } from '../scripts/asyncStore';
 import { requestHttpGet, requestHttpPost } from '../scripts/requestBase';
 import { SkeletonItem } from '../components/SkeletonUserItem';
 import { DefaultAvator } from '../components/DefaultAvator';
@@ -68,7 +66,7 @@ export const SearchScreen = ({ navigation }) => {
 
   const renderItem = ({ item }: ListRenderItemInfo<UserList>) => {
     return (
-      <Box py="3" style={styles.postContainer} key={item.id}>
+      <Box p={3} borderBottomWidth={1} borderColor="blueGray.200" key={item.id}>
         <HStack alignItems="center">
           <Pressable>
             {!item.profile.profile_image ? (
@@ -80,9 +78,9 @@ export const SearchScreen = ({ navigation }) => {
               ></Avatar>
             )}
           </Pressable>
-          <View style={styles.postHeaderTxtContainer}>
-            <Text style={styles.posterName}>{item.profile.nickname}</Text>
-          </View>
+          <Box ml={3}>
+            <Text fontSize={16}>{item.profile.nickname}</Text>
+          </Box>
           <Spacer />
           <Button
             px="6"
@@ -102,7 +100,7 @@ export const SearchScreen = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       <Input
         variant="rounded"
-        mb="2"
+        my="2"
         mx="1"
         placeholder="ユーザ名入力"
         onChangeText={(value) => onChangeKeyword(value)}
@@ -124,31 +122,4 @@ const styles = StyleSheet.create({
     backgroundColor: '#FAFAFB',
     paddingVertical: 8,
   },
-  postContainer: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderColor: '#E9EAEB',
-  },
-  avatar: {
-    backgroundColor: '#cccccc',
-  },
-  postHeader: {
-    flexDirection: 'row',
-    marginBottom: 12,
-  },
-  postHeaderTxtContainer: {
-    justifyContent: 'space-evenly',
-    marginLeft: 8,
-  },
-  postContent: {},
-  posterName: {
-    // fontWeight: 'bold',
-    fontSize: 16,
-  },
-  postDate: {
-    color: '#A8A8A8',
-  },
-  fab: {},
 });
