@@ -2,7 +2,7 @@ import { Box, Button, Divider, HStack, Spacer, Switch } from 'native-base';
 import { useEffect, useState } from 'react';
 import { StyleSheet, SafeAreaView, Text, Alert } from 'react-native';
 import { requestHttpGet, requestHttpPatch } from '../scripts/requestBase';
-import { delData } from '../scripts/asyncStore';
+import { delToken } from '../scripts/requestAuth';
 
 type SettingObj = {
   id: string;
@@ -88,7 +88,7 @@ export const SettingsScreen = ({ navigation }) => {
   };
   const logout = async () => {
     try {
-      await delData('access');
+      await delToken();
       navigation.navigate('SignIn');
     } catch (e) {
       console.log('logoutError========');
