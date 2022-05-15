@@ -11,7 +11,6 @@ import { NotificationFromShopScreen } from '../screens/NotificationFromShopScree
 import { SearchScreen } from '../screens/SearchScreen';
 import { ChatScreen } from '../screens/ChatScreen';
 import { FriendRequestScreen } from '../screens/FriendRequestScreen';
-import { MediaScreen } from '../screens/MediaScreen';
 import { MyPageScreen } from '../screens/MyPageScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { FriendsScreen } from '../screens/FriendsScreen';
@@ -34,8 +33,13 @@ const MyPageStack = createStackNavigator();
 const HomeStackScreen = () => {
   const LogoTitle = () => {
     return (
-      <Box mb={2}>
-        <Image source={require('../../assets/wins.png')} alt="header-logo" />
+      <Box>
+        <Image
+          source={require('../../assets/header-logo.png')}
+          alt="header-logo"
+          w={146}
+          h={6}
+        />
       </Box>
     );
   };
@@ -137,17 +141,6 @@ export const MainTabNavigator = () => {
           ),
         }}
       />
-      {/* <Tab.Screen
-        name="Media"
-        component={MediaScreen}
-        options={{
-          headerShown: false,
-          tabBarLabel: "WIN'Sブログ",
-          tabBarIcon: ({ size, color }) => (
-            <Entypo name="folder-images" size={size} color={color} />
-          ),
-        }}
-      /> */}
       <Tab.Screen
         name="Search"
         component={SearchScreen}
