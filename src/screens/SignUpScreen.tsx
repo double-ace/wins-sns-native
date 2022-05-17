@@ -26,18 +26,19 @@ export const SignUpScreen = ({ navigation }) => {
     valid: false,
     msg: '',
   });
+  const [isSigningUp, setIsSigningUp] = useState(false);
 
-  const signUp = async () => {
-    // 入力チェック
+  const ValidCheckForConfirm = (): boolean => {
+    // 未入力チェック
     if (email === '') {
       setValidation({ valid: true, msg: ERR_MSG.empEmail });
-      return;
+      return false;
     } else if (password === '') {
       setValidation({ valid: true, msg: ERR_MSG.empPW });
-      return;
+      return false;
     } else if (confirmPw === '') {
       setValidation({ valid: true, msg: ERR_MSG.empConfirmPW });
-      return;
+      return false;
     }
 
     // メールアドレスの形式チェック
@@ -45,21 +46,30 @@ export const SignUpScreen = ({ navigation }) => {
       /^[a-zA-Z0-9_+-]+(\.[a-zA-Z0-9_+-]+)*@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/;
     if (!regex.test(email)) {
       setValidation({ valid: true, msg: ERR_MSG.invalidEmail });
-      return;
+      return false;
     }
 
     // パスワード一致チェック
     if (password !== confirmPw) {
       setValidation({ valid: true, msg: ERR_MSG.pwNoMatch });
-      return;
+      return false;
     }
 
-    const res = await createAccount({ email, password });
-    if (res) {
-      navigation.reset({ index: 0, routes: [{ name: 'RegistUserInfo' }] });
-    } else {
-      setValidation({ valid: true, msg: ERR_MSG.sameEmail });
+    return true;
+  };
+
+  const signUp = async () => {
+    setIsSigningUp(true);
+    const isValid = ValidCheckForConfirm();
+    if (isValid) {
+      const res = await createAccount({ email, password });
+      if (res) {
+        navigation.reset({ index: 0, routes: [{ name: 'RegistUserInfo' }] });
+      } else {
+        setValidation({ valid: true, msg: ERR_MSG.sameEmail });
+      }
     }
+    setIsSigningUp(false);
   };
 
   const onChangePw = (value: string) => {
@@ -119,6 +129,10 @@ export const SignUpScreen = ({ navigation }) => {
             secureTextEntry
           />
           <Button
+            isLoading={isSigningUp}
+            _loading={{
+              bg: 'green.500:alpha.90',
+            }}
             onPress={signUp}
             my={2}
             py={2}

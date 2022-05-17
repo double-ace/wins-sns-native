@@ -8,8 +8,8 @@ import {
 } from 'react-native';
 import { View, Button, Text, Input, Link } from 'native-base';
 import { Loading } from '../components/Loading';
-import { authLogin } from '../scripts/requestAuth';
-import { setData, getData, delData } from '../scripts/asyncStore';
+import { authLogin, delToken } from '../scripts/requestAuth';
+import { setData, getData } from '../scripts/asyncStore';
 import { requestHttpGet } from '../scripts/requestBase';
 
 export const SignInScreen = ({ navigation }) => {
@@ -17,50 +17,36 @@ export const SignInScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [invalid, setInvalid] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSigningIn, setIsSigningIn] = useState(false);
 
   useEffect(() => {
-    try {
-      initApp();
-    } catch (e) {
-      console.log(e);
-      setIsLoading(false);
-    }
-    return console.log('endSignIn');
+    initApp();
   }, []);
 
   const initApp = async () => {
-    console.log('=============================');
     const access = await getData('access');
     if (access) {
       await checkProfile();
     } else {
-      console.log('access: ', access);
       setIsLoading(false);
     }
   };
 
-  const login = async () => {
-    try {
-      const res = await authLogin({ email, password });
-      if (res) {
-        await checkProfile();
-      } else {
-        console.log('responce is faild');
-        setInvalid(true);
-      }
-    } catch (e) {
+  const signIn = async () => {
+    setIsSigningIn(true);
+    const res = await authLogin({ email, password });
+    if (res.result) {
+      await checkProfile();
+    } else {
       setInvalid(true);
-      alert(e);
     }
-    // 開発用
-    console.log('login error');
+    setIsSigningIn(false);
   };
 
   const checkProfile = async () => {
     const res = await requestHttpGet('/api/v1/user/profile/');
     if (res.result) {
       // プロフィール情報が取得できた場合はメイン画面へ、取得できない場合はユーザ情報登録画面へ遷移
-      console.log('profile: ', res);
       if (res.data.length) {
         await setData('userId', res.data[0].user);
         navigation.dispatch(
@@ -73,7 +59,7 @@ export const SignInScreen = ({ navigation }) => {
         navigation.reset({ index: 0, routes: [{ name: 'RegistUserInfo' }] });
       }
     } else {
-      await delData('access');
+      await delToken();
       setIsLoading(false);
     }
   };
@@ -116,7 +102,11 @@ export const SignInScreen = ({ navigation }) => {
                 secureTextEntry
               />
               <Button
-                onPress={login}
+                isLoading={isSigningIn}
+                _loading={{
+                  bg: 'green.500:alpha.90',
+                }}
+                onPress={signIn}
                 my={2}
                 py={2}
                 bg="green.400"
