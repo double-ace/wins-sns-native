@@ -3,12 +3,9 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   SafeAreaView,
-  TextInput,
-  View,
-  Text,
   StyleSheet,
 } from 'react-native';
-import { Button, Link } from 'native-base';
+import { View, Button, Text, Input, Link } from 'native-base';
 import { createAccount } from '../scripts/requestAuth';
 
 const ERR_MSG = {
@@ -79,32 +76,43 @@ export const SignUpScreen = ({ navigation }) => {
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <SafeAreaView style={styles.container}>
-        <View style={styles.inner}>
+        <View px={6}>
           {validation.valid ? (
-            <Text style={styles.invalidText}>{validation.msg}</Text>
+            <Text color="red.500" mb={2}>
+              {validation.msg}
+            </Text>
           ) : null}
-          <TextInput
-            style={styles.input}
+          <Input
             value={email}
             onChangeText={(text) => setEmail(text)}
+            py={3}
+            mb={4}
+            fontSize={16}
+            bg="white"
             autoCapitalize="none"
             keyboardType="email-address"
             textContentType="emailAddress"
             placeholder="メールアドレス"
           />
-          <TextInput
-            style={styles.input}
+          <Input
             value={password}
             onChangeText={(text) => onChangePw(text)}
+            py={3}
+            mb={4}
+            fontSize={16}
+            bg="white"
             autoCapitalize="none"
             textContentType="password"
             placeholder="パスワード"
             secureTextEntry
           />
-          <TextInput
-            style={styles.input}
+          <Input
             value={confirmPw}
             onChangeText={(text) => setConfirmPw(text)}
+            py={3}
+            mb={4}
+            fontSize={16}
+            bg="white"
             autoCapitalize="none"
             textContentType="password"
             placeholder="パスワード(確認用)"
@@ -112,10 +120,11 @@ export const SignUpScreen = ({ navigation }) => {
           />
           <Button
             onPress={signUp}
-            my="2"
+            my={2}
+            py={2}
             bg="green.400"
             _pressed={{ backgroundColor: 'green.500' }}
-            _text={{ color: '#fff' }}
+            _text={{ color: '#fff', fontSize: 16 }}
           >
             アカウント作成
           </Button>
@@ -141,31 +150,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-  },
-  inner: {
-    paddingHorizontal: 24,
-  },
-  input: {
-    backgroundColor: '#fff',
-    fontSize: 16,
-    height: 48,
-    paddingHorizontal: 8,
-    marginBottom: 16,
-  },
-  btn: {
-    backgroundColor: '#10B981',
-    height: 48,
-    lineHeight: 32,
-    borderRadius: 48,
-    alignItems: 'center',
-  },
-  btnTitle: {
-    fontSize: 16,
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  invalidText: {
-    color: 'red',
-    marginBottom: 8,
   },
 });
