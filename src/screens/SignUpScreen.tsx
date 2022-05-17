@@ -18,7 +18,7 @@ const ERR_MSG = {
   pwNoMatch: 'パスワードとパスワード(確認用)が一致しません',
 };
 
-export const SignUpScreen = ({ navigation }) => {
+export const SignUpScreen = ({ navigation }: any) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPw, setConfirmPw] = useState('');

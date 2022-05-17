@@ -12,7 +12,7 @@ import { authLogin, delToken } from '../scripts/requestAuth';
 import { setData, getData } from '../scripts/asyncStore';
 import { requestHttpGet } from '../scripts/requestBase';
 
-export const SignInScreen = ({ navigation }) => {
+export const SignInScreen = ({ navigation }: any) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [invalid, setInvalid] = useState(false);
