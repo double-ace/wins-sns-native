@@ -18,6 +18,7 @@ import * as Device from 'expo-device';
 import QRCode from 'react-native-qrcode-svg';
 import { format } from 'date-fns';
 import { requestHttpGet, requestHttpPost } from '../scripts/requestBase';
+import { formatDate } from '../scripts/date';
 
 type PointHistory = {
   id: string | number;
@@ -30,10 +31,10 @@ type PointHistoryResponse = {
   id: string | number;
   point: number;
   content: string;
-  date_time: Date | string;
+  date_time: string;
 };
 
-export const HomeScreen = ({ navigation }) => {
+export const HomeScreen = ({ navigation }: any) => {
   const [point, setPoint] = useState(0);
   const [continuousVisit, setContinuousVisit] = useState(0);
   const [userId, setUserId] = useState('');
@@ -113,7 +114,7 @@ export const HomeScreen = ({ navigation }) => {
             // 当日なら時刻表示しない　当年なら年表示しない
             return {
               ...item,
-              date_time: format(new Date(item.date_time), 'yyyy/MM/dd HH:mm'),
+              date_time: formatDate(item.date_time),
             };
           })
         );
@@ -170,8 +171,11 @@ export const HomeScreen = ({ navigation }) => {
           borderWidth={15}
           borderColor="#00EFF0"
         >
-          <Text color="emerald.600" fontSize={30} fontWeight="bold">
-            {point}pt
+          <Text color="amber.400" m={0} p={0} fontSize={40} fontWeight="bold">
+            {point}
+          </Text>
+          <Text color="amber.300" m={-4} p={0} fontSize={30} fontWeight="bold">
+            pt
           </Text>
         </Center>
         <Box>
