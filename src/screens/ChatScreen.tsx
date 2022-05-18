@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   StyleSheet,
   SafeAreaView,
@@ -20,34 +20,33 @@ import {
   Text,
 } from 'native-base';
 import { Ionicons } from '@expo/vector-icons';
-import { format } from 'date-fns';
 import { requestHttpGet, requestHttpPost } from '../scripts/requestBase';
-import { getData } from '../scripts/asyncStore';
+import { formatDate } from '../scripts/date';
 
-type Id = string | null;
+type Id = string;
+
 type Message = {
   id: string;
-  room: string;
   content: string;
-  sender: string;
+  sender: {
+    id: string;
+    profile_id: string;
+    family_name: string;
+    first_name: string;
+    nickname: string;
+    profile_image: string;
+  };
+  me: string;
+  room: string;
   created_at: string;
 };
 
 export const ChatScreen = () => {
   const [content, setContent] = useState('');
   const [dmList, setDmList] = useState<Message[]>([]);
-  const [userId, setUserId] = useState<Id>('');
   const [roomId, setRoomId] = useState<Id>('');
 
-  const getUserId = async () => {
-    const id = await getData('userId');
-    console.log('id', id);
-    setUserId(id);
-    console.log('getUser: ', userId);
-  };
-
   const getDm = async () => {
-    !userId && (await getUserId());
     const roomRes = await requestHttpGet('/api/v1/chat/rooms/');
     if (roomRes.data.length) {
       const id = roomRes.data[0].id;
@@ -55,16 +54,7 @@ export const ChatScreen = () => {
         `/api/v1/chat/messages/?room_id=${id}`
       );
       setRoomId(id);
-      setDmList(
-        messageRes.data.map((item: Message) => {
-          return {
-            id: item.id,
-            content: item.content,
-            sender: item.sender,
-            created_at: item.created_at,
-          };
-        })
-      );
+      setDmList([...messageRes.data]);
     }
   };
 
@@ -74,9 +64,10 @@ export const ChatScreen = () => {
       room: roomId,
     };
     const res = await requestHttpPost('/api/v1/chat/messages/', param, true);
-    // setDmList((pre) => [...pre, res.data]);
-    await getDm();
-    setContent('');
+    if (res.data) {
+      await getDm();
+      setContent('');
+    }
     Keyboard.dismiss();
   };
 
@@ -85,10 +76,12 @@ export const ChatScreen = () => {
   }, []);
 
   const renderItem = ({ item }: ListRenderItemInfo<Message>) => {
-    console.log('userId', userId);
-    return item.sender !== userId ? (
+    return item.sender.id !== item.me ? (
       <HStack mb={4} key={item.id}>
-        <Avatar size="sm" bg="gray.300" />
+        <Avatar
+          size="sm"
+          source={require('../../assets/wins-avator-icon.jpg')}
+        />
         <Stack ml={1} alignItems="flex-start">
           <Box
             bg="blueGray.200"
@@ -99,9 +92,7 @@ export const ChatScreen = () => {
           >
             {item.content}
           </Box>
-          <Text color="blueGray.500">
-            {format(new Date(item.created_at), 'yyyy/MM/dd HH:mm')}
-          </Text>
+          <Text color="blueGray.500">{formatDate(item.created_at)}</Text>
         </Stack>
       </HStack>
     ) : (
@@ -117,12 +108,9 @@ export const ChatScreen = () => {
             {item.content}
           </Box>
           <HStack justifyContent="flex-end">
-            <Text color="blueGray.500">
-              {format(new Date(item.created_at), 'yyyy/MM/dd HH:mm')}
-            </Text>
+            <Text color="blueGray.500">{formatDate(item.created_at)}</Text>
           </HStack>
         </Stack>
-        <Avatar size="sm" bg="gray.300" />
       </HStack>
     );
   };
@@ -133,10 +121,10 @@ export const ChatScreen = () => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
-        {!userId || !dmList.length ? (
+        {!dmList.length ? (
           <Center>お店とチャットができます。</Center>
         ) : (
-          <Box px={2} pt={6}>
+          <Box px={2} pt={6} pb={12}>
             <FlatList data={dmList} renderItem={renderItem} scrollEnabled />
           </Box>
         )}
@@ -144,6 +132,7 @@ export const ChatScreen = () => {
           position="absolute"
           bottom={0}
           p={2}
+          pb={6}
           w="100%"
           minHeight={10}
           maxHeight={80}
@@ -182,6 +171,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 20,
     paddingHorizontal: 8,
+    paddingVertical: 8,
     width: '91%',
   },
 });
