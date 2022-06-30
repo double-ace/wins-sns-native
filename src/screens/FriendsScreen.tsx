@@ -4,25 +4,25 @@ import {
   SafeAreaView,
   View,
   FlatList,
-  Text,
   Alert,
   RefreshControl,
   ListRenderItemInfo,
 } from 'react-native';
-import { Avatar, Button, HStack, Spacer, Pressable } from 'native-base';
+import { Avatar, Button, HStack, Spacer, Pressable, Text } from 'native-base';
 import { requestHttpDelete, requestHttpGet } from '../scripts/requestBase';
 import { DefaultAvator } from '../components/DefaultAvator';
+import { formatDate } from '../scripts/date';
 
 type Profile = {
-  id: number;
   user: string;
   nickname: string;
   profile_image: string | null;
 };
 
 type FriendData = {
-  id: string | number;
+  id: string;
   profile: Profile;
+  last_visit: string;
 };
 
 export const FriendsScreen = () => {
@@ -35,7 +35,7 @@ export const FriendsScreen = () => {
 
   const getFriend = async () => {
     const res = await requestHttpGet('/api/v1/sns/friends/');
-    setFriendList(res.data);
+    setFriendList([...res.data]);
   };
 
   const delFriend = async (id: string | number) => {
@@ -79,12 +79,16 @@ export const FriendsScreen = () => {
         </Pressable>
         <View style={styles.userHeaderTxtContainer}>
           <Text style={styles.userName}>{item.profile.nickname}</Text>
+          <Text color="blueGray.500" fontSize="xs">
+            最終来店 {item.last_visit ? formatDate(item.last_visit) : '-'}
+          </Text>
         </View>
         <Spacer />
         <Button
-          px="6"
+          px="8"
           h="10"
           mr="2"
+          rounded="full"
           colorScheme="error"
           variant="outline"
           onPress={() => handleDel(item.id)}
