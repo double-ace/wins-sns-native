@@ -16,7 +16,6 @@ import {
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import QRCode from 'react-native-qrcode-svg';
-import { format } from 'date-fns';
 import { requestHttpGet, requestHttpPost } from '../scripts/requestBase';
 import { formatDate } from '../scripts/date';
 
