@@ -4,6 +4,8 @@ import {
   SafeAreaView,
   FlatList,
   ListRenderItemInfo,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import {
   Avatar,
@@ -21,7 +23,6 @@ import { SkeletonItem } from '../components/SkeletonUserItem';
 import { DefaultAvator } from '../components/DefaultAvator';
 
 type Profile = {
-  id: number;
   user: string;
   nickname: string;
   profile_image: string | null;
@@ -30,7 +31,6 @@ type Profile = {
 type UserList = {
   id: string;
   profile: Profile;
-  imageUrl: string;
 };
 
 export const SearchScreen = ({ navigation }) => {
@@ -86,6 +86,7 @@ export const SearchScreen = ({ navigation }) => {
             px="6"
             h="10"
             bg="emerald.400"
+            rounded="full"
             _text={{ fontWeight: 'bold' }}
             onPress={() => handleReq(item.id)}
           >
@@ -97,22 +98,25 @@ export const SearchScreen = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Input
-        variant="rounded"
-        my="2"
-        mx="1"
-        placeholder="ユーザ名入力"
-        onChangeText={(value) => onChangeKeyword(value)}
-      />
-      {isSearching ? (
-        <SkeletonItem />
-      ) : !userList.length ? (
-        <Center>一致するユーザが見つかりません</Center>
-      ) : (
-        <FlatList data={userList} renderItem={renderItem} scrollEnabled />
-      )}
-    </SafeAreaView>
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <SafeAreaView style={styles.container}>
+        <Input
+          variant="rounded"
+          my="2"
+          mx="1"
+          placeholder="ユーザ名入力"
+          autoFocus
+          onChangeText={(value) => onChangeKeyword(value)}
+        />
+        {isSearching ? (
+          <SkeletonItem />
+        ) : !userList.length ? (
+          <Center>一致するユーザが見つかりません</Center>
+        ) : (
+          <FlatList data={userList} renderItem={renderItem} scrollEnabled />
+        )}
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 };
 
