@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useIsFocused } from '@react-navigation/native';
 import {
   View,
   StyleSheet,
@@ -11,17 +12,16 @@ import {
   FlatList,
   RefreshControl,
 } from 'react-native';
-import { TabView, SceneMap } from 'react-native-tab-view';
 import {
   Box,
   Text,
   useColorModeValue,
   HStack,
-  Link,
   Avatar,
   Spacer,
   Button,
 } from 'native-base';
+import { TabView, SceneMap } from 'react-native-tab-view';
 import {
   requestHttpGet,
   requestHttpDelete,
@@ -33,20 +33,20 @@ type RequestNestChild = {
   id: string;
   is_shop: boolean;
   profile: {
-    id: number;
+    user: string;
     nickname: string;
     profile_image: string | null;
   };
 };
 type RequestData = {
-  id: string | number;
+  id: string;
   req_from: string;
   req_to: RequestNestChild;
   approved: boolean;
 };
 
 type NonAppdData = {
-  id: string | number;
+  id: string;
   req_from: RequestNestChild;
   req_to: string;
   approved: boolean;
@@ -61,6 +61,8 @@ export const FriendRequestScreen = () => {
   const [nonAppdList, setNonAppdList] = useState<NonAppdData[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [index, setIndex] = React.useState(0);
+  const isFocused = useIsFocused();
+
   const [routes] = React.useState([
     {
       key: 'request',
@@ -73,9 +75,11 @@ export const FriendRequestScreen = () => {
   ]);
 
   useEffect(() => {
-    getReqList();
-    getAppdList();
-  }, []);
+    if (isFocused) {
+      getReqList();
+      getAppdList();
+    }
+  }, [isFocused]);
 
   const getReqList = async () => {
     const res = await requestHttpGet('/api/v1/sns/get-friend-request/');
@@ -145,6 +149,7 @@ export const FriendRequestScreen = () => {
             mr="2"
             colorScheme="error"
             variant="outline"
+            rounded="full"
             onPress={() => handleDelete(item.id, 'req')}
           >
             取消
@@ -180,6 +185,7 @@ export const FriendRequestScreen = () => {
             mr="2"
             colorScheme="error"
             variant="outline"
+            rounded="full"
             onPress={() => handleDelete(item.id, 'appd')}
           >
             拒否
@@ -188,6 +194,8 @@ export const FriendRequestScreen = () => {
             px="6"
             h="10"
             bg="emerald.400"
+            rounded="full"
+            _pressed={{ backgroundColor: 'green.500' }}
             _text={{ fontWeight: 'bold' }}
             onPress={() => handleAllow(item.id)}
           >
