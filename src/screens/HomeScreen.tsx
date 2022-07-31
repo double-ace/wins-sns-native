@@ -63,7 +63,7 @@ export const HomeScreen = ({ navigation }: any) => {
         const tokenRes = await requestHttpGet(endpoint);
         if (!tokenRes.data.length) {
           token = (await Notifications.getExpoPushTokenAsync()).data;
-          await requestHttpPost(endpoint, { device_token: token }, true);
+          await requestHttpPost(endpoint, { deviceToken: token }, true);
         }
       } catch (e) {
         alert(e);
@@ -88,11 +88,11 @@ export const HomeScreen = ({ navigation }: any) => {
       if (pointRes.data.length) {
         console.log(pointRes.data[0]);
         setPoint(pointRes.data[0].point.toLocaleString());
-        setContinuousVisit(pointRes.data[0].continuous_visit_count);
+        setContinuousVisit(pointRes.data[0].continuousVisitCount);
         setUserId(pointRes.data[0].user);
       }
       if (pointHisRes.data.length) {
-        // date_timeを降順に並び替え
+        // datetimeを降順に並び替え
         pointHisRes.data.sort(
           (a: PointHistoryResponse, b: PointHistoryResponse) => {
             return a.datetime < b.datetime ? 1 : -1;
@@ -103,7 +103,7 @@ export const HomeScreen = ({ navigation }: any) => {
             // 当日なら時刻表示しない　当年なら年表示しない
             return {
               ...item,
-              date_time: formatDate(item.datetime),
+              datetime: formatDate(item.datetime),
             };
           })
         );
