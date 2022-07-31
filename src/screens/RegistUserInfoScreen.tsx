@@ -3,15 +3,14 @@ import { CommonActions } from '@react-navigation/native';
 import {
   SafeAreaView,
   TextInput,
-  View,
-  Text,
   StyleSheet,
   Keyboard,
   TouchableWithoutFeedback,
   Platform,
+  Alert,
 } from 'react-native';
 import {
-  Text as NBText,
+  Text,
   Stack,
   Button,
   Select,
@@ -20,11 +19,13 @@ import {
   KeyboardAvoidingView,
   Box,
   Center,
+  HStack,
 } from 'native-base';
 import { requestHttpPost } from '../scripts/requestBase';
 import { prefectures } from '../../assets/prefectures.json';
+import { delToken } from '../scripts/requestAuth';
 
-export const RegistUserInfoScreen = ({ navigation }) => {
+export const RegistUserInfoScreen = ({ navigation }: any) => {
   const [familyName, setfamilyName] = useState('');
   const [firstName, setFirstName] = useState('');
   const [birthDate, setBirthDate] = useState('');
@@ -46,23 +47,23 @@ export const RegistUserInfoScreen = ({ navigation }) => {
   const hopeRateList: string[] = ['0.5', '1.0', 'どちらでも'];
 
   // 都道府県選択リスト
-  const prefectureItem = prefectures.map(({ name }) => {
-    return <Select.Item label={name} key={name} value={name} />;
+  const prefectureItem = prefectures.map(({ name, code }) => {
+    return <Select.Item label={name} key={code.toString()} value={name} />;
   });
 
   // 来店きっかけ選択リスト
-  const hearFromItem = hearFromList.map((item) => {
+  const hearFromItem = hearFromList.map((item, index) => {
     return (
-      <Radio value={item} key={item} mr="2">
+      <Radio value={item} key={index.toString()} mr="2" colorScheme="green">
         {item}
       </Radio>
     );
   });
 
   // 希望レート選択リスト
-  const hopeRateItem = hopeRateList.map((item) => {
+  const hopeRateItem = hopeRateList.map((item, index) => {
     return (
-      <Radio value={item} key={item} mr="2">
+      <Radio value={item} key={index.toString()} mr="2" colorScheme="green">
         {item}
       </Radio>
     );
@@ -111,7 +112,14 @@ export const RegistUserInfoScreen = ({ navigation }) => {
       true
     );
     if (ProfRes.result) {
-      await requestHttpPost('/api/v1/core/user-info/', formItem, true);
+      const settingParam = {
+        receive_visit_notice: true,
+        receive_shop_notice: true,
+        push_visit_notice: true,
+      };
+
+      await requestHttpPost('/api/v1/core/user-info/', {}, true);
+      await requestHttpPost('/api/v1/sns/setting/', settingParam, true);
     }
     console.log(ProfRes.result, ProfRes.data);
     if (ProfRes.result) {
@@ -122,6 +130,19 @@ export const RegistUserInfoScreen = ({ navigation }) => {
         })
       );
     }
+  };
+
+  const handleBackLogin = () => {
+    Alert.alert('ログイン画面へ戻りますか？', '', [
+      { text: 'キャンセル' },
+      {
+        text: 'ログイン画面',
+        onPress: async () => {
+          await delToken();
+          navigation.reset({ index: 0, routes: [{ name: 'SignIn' }] });
+        },
+      },
+    ]);
   };
 
   return (
@@ -135,14 +156,14 @@ export const RegistUserInfoScreen = ({ navigation }) => {
       >
         <SafeAreaView style={styles.container}>
           {invalid ? (
-            <Text style={styles.invalidText}>
+            <Text mb={8} color="red.500">
               メールアドレスまたはパスワードが正しくありません
             </Text>
           ) : null}
           <Stack px={2}>
             <Box>
-              <Text style={styles.label}>お名前</Text>
-              <View style={styles.nameInputContainer}>
+              <Text mb={1}>お名前</Text>
+              <HStack justifyContent="space-between">
                 <TextInput
                   style={[styles.input, styles.nameInput]}
                   value={familyName}
@@ -157,26 +178,28 @@ export const RegistUserInfoScreen = ({ navigation }) => {
                   textContentType="givenName"
                   placeholder="名"
                 />
-              </View>
+              </HStack>
             </Box>
             <Box>
-              <Text>生年月日</Text>
+              <Text mb={1}>生年月日</Text>
               <TextInput
                 style={styles.input}
                 value={birthDate}
                 onChangeText={(text) => setBirthDate(text)}
                 keyboardType="phone-pad"
                 textContentType="telephoneNumber"
-                placeholder="YYYY/MM/DD"
+                placeholder="19920304"
                 onBlur={formatBirthDate}
               />
             </Box>
             <Box>
-              <Text style={styles.label}>お住まい</Text>
-              <Stack direction={{ base: 'row' }}>
+              <Text mb={1}>お住まい</Text>
+              <HStack justifyContent="space-between">
                 <Select
                   selectedValue={address.prefecture}
                   minWidth="100"
+                  borderWidth={0}
+                  bg="white"
                   onValueChange={(val) =>
                     setAddress({ ...address, prefecture: val })
                   }
@@ -188,14 +211,12 @@ export const RegistUserInfoScreen = ({ navigation }) => {
                   value={address.city}
                   onChangeText={(val) => setAddress({ ...address, city: val })}
                   textContentType="givenName"
-                  placeholder="名"
+                  placeholder="市区町村"
                 />
-              </Stack>
+              </HStack>
             </Box>
             <Stack my="4">
-              <NBText fontSize="md" mb="2">
-                ご来店のきっかけ
-              </NBText>
+              <Text mb={1}>ご来店のきっかけ</Text>
               <Radio.Group
                 name="hearFromRadioGroup"
                 value={hearFrom}
@@ -208,7 +229,7 @@ export const RegistUserInfoScreen = ({ navigation }) => {
             </Stack>
             {hearFrom === '紹介' ? (
               <Box>
-                <Text style={styles.label}>ご紹介者様</Text>
+                <Text mb={1}>ご紹介者様</Text>
                 <TextInput
                   style={styles.input}
                   value={introduced}
@@ -220,7 +241,7 @@ export const RegistUserInfoScreen = ({ navigation }) => {
             ) : null}
 
             <Box>
-              <Text style={styles.label}>お電話番号</Text>
+              <Text mb={1}>お電話番号</Text>
               <TextInput
                 style={styles.input}
                 value={phoneNum}
@@ -231,9 +252,7 @@ export const RegistUserInfoScreen = ({ navigation }) => {
               />
             </Box>
             <Stack my="4">
-              <NBText fontSize="md" mb="2">
-                ご希望レート
-              </NBText>
+              <Text mb={1}>ご希望レート</Text>
               <Radio.Group
                 name="hopeRateRadioGroup"
                 value={hopeRate}
@@ -254,12 +273,7 @@ export const RegistUserInfoScreen = ({ navigation }) => {
               登録
             </Button>
             <Center>
-              <Link
-                onPress={() =>
-                  navigation.reset({ index: 0, routes: [{ name: 'SignIn' }] })
-                }
-                _text={{ color: 'primary.600' }}
-              >
+              <Link onPress={handleBackLogin} _text={{ color: 'primary.600' }}>
                 ログイン画面へ戻る
               </Link>
             </Center>
@@ -276,13 +290,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 4,
   },
-  nameInputContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  label: {
-    marginBottom: 4,
-  },
   inner: {
     paddingHorizontal: 24,
   },
@@ -296,20 +303,7 @@ const styles = StyleSheet.create({
   nameInput: {
     width: '49%',
   },
-  btn: {
-    backgroundColor: '#10B981',
-    height: 48,
-    lineHeight: 32,
-    borderRadius: 48,
-    alignItems: 'center',
-  },
-  btnTitle: {
-    fontSize: 16,
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  invalidText: {
-    color: 'red',
-    marginBottom: 8,
+  cityInput: {
+    width: '50%',
   },
 });
