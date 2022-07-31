@@ -8,8 +8,8 @@ type ShopPost = {
   id: string;
   title: string;
   content: string;
-  created_at: Date;
-  updated_at: Date;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 export const NotificationFromShopScreen = () => {
@@ -23,6 +23,7 @@ export const NotificationFromShopScreen = () => {
     const res = await requestHttpGet('/api/v1/sns/shop-posts/');
     res.data.length && setPostList(res.data);
   };
+
   return (
     <Box flex="1" p={4} bg="teal.50">
       {!postList.length ? (
@@ -30,7 +31,7 @@ export const NotificationFromShopScreen = () => {
       ) : (
         <Box>
           <Text fontSize="xs" color="blueGray.500">
-            {format(new Date(postList[0]?.created_at), 'yyyy/mm/dd HH:mm')}
+            {format(new Date(postList[0]?.createdAt), 'yyyy/mm/dd HH:mm')}
           </Text>
           <Heading mb={4}>{postList[0]?.title}</Heading>
           <Text>{postList[0]?.content}</Text>
