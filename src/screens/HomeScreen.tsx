@@ -19,18 +19,11 @@ import QRCode from 'react-native-qrcode-svg';
 import { requestHttpGet, requestHttpPost } from '../scripts/requestBase';
 import { formatDate } from '../scripts/date';
 
-type PointHistory = {
-  id: string | number;
-  point: string;
-  content: string;
-  date: Date | string;
-};
-
 type PointHistoryResponse = {
   id: string | number;
   point: number;
   content: string;
-  date_time: string;
+  datetime: string;
 };
 
 export const HomeScreen = ({ navigation }: any) => {
@@ -68,11 +61,8 @@ export const HomeScreen = ({ navigation }: any) => {
       try {
         const endpoint = '/api/v1/core/user-device/';
         const tokenRes = await requestHttpGet(endpoint);
-        alert(tokenRes.data.length);
         if (!tokenRes.data.length) {
           token = (await Notifications.getExpoPushTokenAsync()).data;
-          alert(token);
-          console.log(token);
           await requestHttpPost(endpoint, { device_token: token }, true);
         }
       } catch (e) {
@@ -105,7 +95,7 @@ export const HomeScreen = ({ navigation }: any) => {
         // date_timeを降順に並び替え
         pointHisRes.data.sort(
           (a: PointHistoryResponse, b: PointHistoryResponse) => {
-            return a.date_time < b.date_time ? 1 : -1;
+            return a.datetime < b.datetime ? 1 : -1;
           }
         );
         setPointHisList(
@@ -113,7 +103,7 @@ export const HomeScreen = ({ navigation }: any) => {
             // 当日なら時刻表示しない　当年なら年表示しない
             return {
               ...item,
-              date_time: formatDate(item.date_time),
+              date_time: formatDate(item.datetime),
             };
           })
         );
@@ -139,7 +129,7 @@ export const HomeScreen = ({ navigation }: any) => {
         key={item.id}
       >
         <Text mr={2} color="blueGray.600">
-          {item.date_time}
+          {item.datetime}
         </Text>
         <Text>{item.content}</Text>
         <Spacer />
