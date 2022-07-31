@@ -120,6 +120,7 @@ export const RegistUserInfoScreen = ({ navigation }: any) => {
 
       await requestHttpPost('/api/v1/core/user-info/', {}, true);
       await requestHttpPost('/api/v1/sns/setting/', settingParam, true);
+      await requestHttpPost('/api/v1/sns/sns-profiles/', {}, true);
     }
     console.log(ProfRes.result, ProfRes.data);
     if (ProfRes.result) {
