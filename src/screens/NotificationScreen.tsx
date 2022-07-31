@@ -8,9 +8,9 @@ type Message = {
   id: string;
   title: string;
   content: string;
-  created_at: string;
+  createdAt: string;
   user: string;
-  msg_type: string;
+  msgType: string;
 };
 
 export const NotificationScreen = () => {
@@ -37,7 +37,7 @@ export const NotificationScreen = () => {
         key={item.id}
       >
         <Text mr={2} color="blueGray.500">
-          {formatDate(item.created_at)}
+          {formatDate(item.createdAt)}
         </Text>
         <Text>{item.content}</Text>
         <Spacer />

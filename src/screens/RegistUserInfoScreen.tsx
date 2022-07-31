@@ -94,16 +94,16 @@ export const RegistUserInfoScreen = ({ navigation }: any) => {
 
   const regist = async () => {
     const formItem = {
-      family_name: familyName,
-      first_name: firstName,
+      familyName: familyName,
+      firstName: firstName,
       nickname: familyName + ' ' + firstName,
-      birth_date: birthDate.split('/').join('-'),
-      address_prefecture: address.prefecture,
-      address_city: address.city,
-      hear_from: hearFrom,
+      birthDate: birthDate.split('/').join('-'),
+      addressPrefecture: address.prefecture,
+      addressCity: address.city,
+      hearFrom: hearFrom,
       introduced: hearFrom === '紹介' ? introduced : null,
-      phone_number: phoneNum,
-      hope_rate: hopeRate,
+      phoneNumber: phoneNum,
+      hopeRate: hopeRate,
     };
     console.log(formItem);
     const ProfRes = await requestHttpPost(
@@ -113,9 +113,9 @@ export const RegistUserInfoScreen = ({ navigation }: any) => {
     );
     if (ProfRes.result) {
       const settingParam = {
-        receive_visit_notice: true,
-        receive_shop_notice: true,
-        push_visit_notice: true,
+        receiveVisitNotice: true,
+        receiveShopNotice: true,
+        pushVisitNotice: true,
       };
 
       await requestHttpPost('/api/v1/core/user-info/', {}, true);

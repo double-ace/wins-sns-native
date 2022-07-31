@@ -30,15 +30,15 @@ type Message = {
   content: string;
   sender: {
     id: string;
-    profile_id: string;
-    family_name: string;
-    first_name: string;
+    profileId: string;
+    familyName: string;
+    firstName: string;
     nickname: string;
-    profile_image: string;
+    profileImage: string;
   };
   me: string;
   room: string;
-  created_at: string;
+  createdAt: string;
 };
 
 export const ChatScreen = () => {
@@ -92,7 +92,7 @@ export const ChatScreen = () => {
           >
             {item.content}
           </Box>
-          <Text color="blueGray.500">{formatDate(item.created_at)}</Text>
+          <Text color="blueGray.500">{formatDate(item.createdAt)}</Text>
         </Stack>
       </HStack>
     ) : (
@@ -108,7 +108,7 @@ export const ChatScreen = () => {
             {item.content}
           </Box>
           <HStack justifyContent="flex-end">
-            <Text color="blueGray.500">{formatDate(item.created_at)}</Text>
+            <Text color="blueGray.500">{formatDate(item.createdAt)}</Text>
           </HStack>
         </Stack>
       </HStack>

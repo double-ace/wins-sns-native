@@ -16,13 +16,13 @@ import { formatDate } from '../scripts/date';
 type Profile = {
   user: string;
   nickname: string;
-  profile_image: string | null;
+  profileImage: string | null;
 };
 
 type FriendData = {
   id: string;
   profile: Profile;
-  last_visit: string;
+  lastVisit: string;
 };
 
 export const FriendsScreen = () => {
@@ -68,19 +68,19 @@ export const FriendsScreen = () => {
     return (
       <HStack style={styles.userContainer} alignItems="center" key={item.id}>
         <Pressable>
-          {!item.profile.profile_image ? (
+          {!item.profile.profileImage ? (
             <DefaultAvator />
           ) : (
             <Avatar
               size="md"
-              source={{ uri: item.profile.profile_image }}
+              source={{ uri: item.profile.profileImage }}
             ></Avatar>
           )}
         </Pressable>
         <View style={styles.userHeaderTxtContainer}>
           <Text style={styles.userName}>{item.profile.nickname}</Text>
           <Text color="blueGray.500" fontSize="xs">
-            最終来店 {item.last_visit ? formatDate(item.last_visit) : '-'}
+            最終来店 {item.lastVisit ? formatDate(item.lastVisit) : '-'}
           </Text>
         </View>
         <Spacer />

@@ -31,24 +31,24 @@ import { DefaultAvator } from '../components/DefaultAvator';
 
 type RequestNestChild = {
   id: string;
-  is_shop: boolean;
+  isShop: boolean;
   profile: {
     user: string;
     nickname: string;
-    profile_image: string | null;
+    profileImage: string | null;
   };
 };
 type RequestData = {
   id: string;
-  req_from: string;
-  req_to: RequestNestChild;
+  reqFrom: string;
+  reqTo: RequestNestChild;
   approved: boolean;
 };
 
 type NonAppdData = {
   id: string;
-  req_from: RequestNestChild;
-  req_to: string;
+  reqFrom: RequestNestChild;
+  reqTo: string;
   approved: boolean;
 };
 
@@ -128,19 +128,17 @@ export const FriendRequestScreen = () => {
       <Box py="3" style={styles.postContainer} key={item.id.toString()}>
         <HStack alignItems="center">
           <Pressable>
-            {!item.req_to.profile.profile_image ? (
+            {!item.reqTo.profile.profileImage ? (
               <DefaultAvator />
             ) : (
               <Avatar
                 size="md"
-                source={{ uri: item.req_to.profile.profile_image }}
+                source={{ uri: item.reqTo.profile.profileImage }}
               ></Avatar>
             )}
           </Pressable>
           <Box style={styles.postHeaderTxtContainer} maxWidth={150}>
-            <Text style={styles.posterName}>
-              {item.req_to.profile.nickname}
-            </Text>
+            <Text style={styles.posterName}>{item.reqTo.profile.nickname}</Text>
           </Box>
           <Spacer />
           <Button
@@ -164,18 +162,18 @@ export const FriendRequestScreen = () => {
       <Box py="3" style={styles.postContainer} key={item.id.toString()}>
         <HStack alignItems="center">
           <Pressable>
-            {!item.req_from.profile.profile_image ? (
+            {!item.reqFrom.profile.profileImage ? (
               <DefaultAvator />
             ) : (
               <Avatar
                 size="md"
-                source={{ uri: item.req_from.profile.profile_image }}
+                source={{ uri: item.reqFrom.profile.profileImage }}
               ></Avatar>
             )}
           </Pressable>
           <View style={styles.postHeaderTxtContainer}>
             <Text style={styles.posterName}>
-              {item.req_from.profile.nickname}
+              {item.reqFrom.profile.nickname}
             </Text>
           </View>
           <Spacer />

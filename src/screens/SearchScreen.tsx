@@ -25,7 +25,7 @@ import { DefaultAvator } from '../components/DefaultAvator';
 type Profile = {
   user: string;
   nickname: string;
-  profile_image: string | null;
+  profileImage: string | null;
 };
 
 type UserList = {
@@ -52,16 +52,14 @@ export const SearchScreen = ({ navigation }) => {
   const handleReq = async (id: string) => {
     // const res = await requestHttpPost
     const param = {
-      req_to: id,
+      reqTo: id,
     };
     const res = await requestHttpPost(
       '/api/v1/sns/friend-request/',
       param,
       true
     );
-    setUserList((pre) => [
-      ...pre.filter((item) => item.id !== res.data.req_to),
-    ]);
+    setUserList((pre) => [...pre.filter((item) => item.id !== res.data.reqTo)]);
   };
 
   const renderItem = ({ item }: ListRenderItemInfo<UserList>) => {
@@ -69,12 +67,12 @@ export const SearchScreen = ({ navigation }) => {
       <Box p={3} borderBottomWidth={1} borderColor="blueGray.200" key={item.id}>
         <HStack alignItems="center">
           <Pressable>
-            {!item.profile.profile_image ? (
+            {!item.profile.profileImage ? (
               <DefaultAvator />
             ) : (
               <Avatar
                 size="md"
-                source={{ uri: item.profile.profile_image }}
+                source={{ uri: item.profile.profileImage }}
               ></Avatar>
             )}
           </Pressable>
