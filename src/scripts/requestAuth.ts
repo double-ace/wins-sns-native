@@ -1,25 +1,35 @@
 import axios, { AxiosResponse } from 'axios';
 import { delData, getData, setData } from './asyncStore';
-import { requestHttpPost } from './requestBase';
+
+const baseUrl = 'http://192.168.11.2:8000';
 
 type AuthParams = {
   email: string;
   password: string;
 };
 
-export const authLogin = async (params: AuthParams): Promise<any> => {
+type AuthResponse = {
+  access: string;
+  refresh: string;
+};
+
+type Response = {
+  result: boolean;
+  status: number | undefined;
+};
+
+export const authLogin = async (params: AuthParams): Promise<Response> => {
   // let ret = false;
-  const ret: { result: boolean; status: number | undefined } = {
+  const ret: Response = {
     result: false,
     status: 0,
   };
   try {
-    const res = await requestHttpPost(
-      '/api/v1/auth/jwt/create/',
-      params,
-      false
+    const res: AxiosResponse<AuthResponse> = await axios.post(
+      baseUrl + '/api/v1/auth/jwt/create/',
+      params
     );
-    if (res.result) {
+    if (res.status === 200) {
       await setData('access', res.data.access);
       await setData('refresh', res.data.refresh);
       ret.result = true;
@@ -28,7 +38,6 @@ export const authLogin = async (params: AuthParams): Promise<any> => {
     }
   } catch (e) {
     console.log('authLoginError=========');
-    alert(e);
   }
 
   return ret;
@@ -37,25 +46,15 @@ export const authLogin = async (params: AuthParams): Promise<any> => {
 export const createAccount = async (params: AuthParams): Promise<boolean> => {
   let ret = false;
   try {
-    const createRes = await requestHttpPost(
-      '/api/v1/user/create/',
-      params,
-      false
+    const createRes: AxiosResponse<AuthResponse> = await axios.post(
+      baseUrl + '/api/v1/user/create/',
+      params
     );
-    // if (createRes.status === 201) {
-    if (true) {
-      const tokenRes = await requestHttpPost(
-        '/api/v1/auth/jwt/create/',
-        params,
-        false
-      );
-      await setData('access', tokenRes.data.access);
-      await setData('refresh', tokenRes.data.refresh);
+    if (createRes.status === 201) {
+      authLogin(params);
       ret = true;
     }
-  } catch (e) {
-    alert(e);
-  }
+  } catch (e) {}
 
   return ret;
 };
