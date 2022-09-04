@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { StyleSheet, View, Text, TextInput } from 'react-native'
+import { StyleSheet, View, TextInput } from 'react-native'
 import { Button } from 'native-base'
 import { requestHttpPost } from '../scripts/requestBase'
 
