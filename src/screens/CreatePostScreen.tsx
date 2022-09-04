@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, Text, TextInput } from 'react-native';
-import { Button } from 'native-base';
-import { requestHttpPost } from '../scripts/requestBase';
+import React, { useState } from 'react'
+import { StyleSheet, View, Text, TextInput } from 'react-native'
+import { Button } from 'native-base'
+import { requestHttpPost } from '../scripts/requestBase'
 
 export const CreatePostScreen = ({ navigation }) => {
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState('')
 
   const handlePost = async () => {
     try {
       const res = await requestHttpPost('/api/v1/sns/post/', {
         shop: '',
         post: content,
-      });
-      navigation.goBack();
+      })
+      navigation.goBack()
     } catch {
-      console.log('create post error');
+      console.log('create post error')
     }
-  };
+  }
 
   return (
     <View style={styles.container}>
@@ -36,8 +36,8 @@ export const CreatePostScreen = ({ navigation }) => {
         maxLength={150}
       />
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -59,4 +59,4 @@ const styles = StyleSheet.create({
     width: 96,
     borderRadius: 40,
   },
-});
+})

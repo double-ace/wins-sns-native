@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react'
 import {
   SafeAreaView,
   ListRenderItemInfo,
   RefreshControl,
   Platform,
-} from 'react-native';
-import { useIsFocused } from '@react-navigation/native';
+} from 'react-native'
+import { useIsFocused } from '@react-navigation/native'
 import {
   Avatar,
   Button,
@@ -25,47 +25,47 @@ import {
   Spinner,
   ScrollView,
   Divider,
-} from 'native-base';
-import { AntDesign, Ionicons, Feather } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
+} from 'native-base'
+import { AntDesign, Ionicons, Feather } from '@expo/vector-icons'
+import * as ImagePicker from 'expo-image-picker'
 import {
   requestHttpGet,
   requestHttpPatch,
   requestHttpPatchMultiPartFormData,
-} from '../scripts/requestBase';
-import { format } from 'date-fns';
-import { DefaultAvator } from '../components/DefaultAvator';
+} from '../scripts/requestBase'
+import { format } from 'date-fns'
+import { DefaultAvator } from '../components/DefaultAvator'
 
 type SnsProfile = {
-  id: string;
-  snsId: string;
-  profile: string | null;
-};
+  id: string
+  snsId: string
+  profile: string | null
+}
 
 type MyProfile = {
-  id: string;
-  nickname: string;
-  imageUrl: string | undefined;
-  snsProfile: SnsProfile;
-};
+  id: string
+  nickname: string
+  imageUrl: string | undefined
+  snsProfile: SnsProfile
+}
 
 type VisitFriend = {
-  id: string;
+  id: string
   profile: {
-    id: string | number;
-    user: string;
-    nickname: string;
-    profileImage: string;
-  };
-  lastVisit: Date;
-};
+    id: string | number
+    user: string
+    nickname: string
+    profileImage: string
+  }
+  lastVisit: Date
+}
 
 export const MyPageScreen = ({ navigation }) => {
-  const [showNameEditModal, setShowNameEditModal] = useState(false);
-  const [showSnsIdEditModal, setShowSnsIdEditModal] = useState(false);
-  const [newName, setNewName] = useState('');
-  const [newSnsId, setNewSnsId] = useState('');
-  const [existedId, setExistedId] = useState(false);
+  const [showNameEditModal, setShowNameEditModal] = useState(false)
+  const [showSnsIdEditModal, setShowSnsIdEditModal] = useState(false)
+  const [newName, setNewName] = useState('')
+  const [newSnsId, setNewSnsId] = useState('')
+  const [existedId, setExistedId] = useState(false)
   const [myProfile, setMyProfile] = useState<MyProfile>({
     id: '',
     nickname: '',
@@ -75,57 +75,57 @@ export const MyPageScreen = ({ navigation }) => {
       snsId: '',
       profile: '',
     },
-  });
-  const [friendNum, setFriendNum] = useState(0);
-  const [blobImage, setBlobImage] = useState<Blob | null>(null);
-  const [visitFriendList, setVisitFriendList] = useState<VisitFriend[]>([]);
-  const [refreshing, setRefreshing] = useState(false);
-  const [refreshingForPress, setRefreshingForPress] = useState(false);
-  const isFocused = useIsFocused();
+  })
+  const [friendNum, setFriendNum] = useState(0)
+  const [blobImage, setBlobImage] = useState<Blob | null>(null)
+  const [visitFriendList, setVisitFriendList] = useState<VisitFriend[]>([])
+  const [refreshing, setRefreshing] = useState(false)
+  const [refreshingForPress, setRefreshingForPress] = useState(false)
+  const isFocused = useIsFocused()
 
   useEffect(() => {
-    getMyProfile();
-    getNumOfFriends();
-    getTodayVisitFriends();
-  }, []);
+    getMyProfile()
+    getNumOfFriends()
+    getTodayVisitFriends()
+  }, [])
 
   useEffect(() => {
-    isFocused && getNumOfFriends();
-  }, [isFocused]);
+    isFocused && getNumOfFriends()
+  }, [isFocused])
 
   const getMyProfile = async () => {
     // ユーザ名とプロフ画像取得
-    const res = await requestHttpGet('/api/v1/sns/myprofile/');
-    console.log(res.data[0].profileImage);
+    const res = await requestHttpGet('/api/v1/sns/myprofile/')
+    console.log(res.data[0].profileImage)
     if (res.data.length) {
-      const resData = res.data[0];
+      const resData = res.data[0]
       setMyProfile((pre) => ({
         ...pre,
         id: resData.user,
         nickname: resData.nickname,
         imageUrl: resData.profileImage,
         snsProfile: resData.snsProfile,
-      }));
+      }))
     }
-  };
+  }
 
   const getNumOfFriends = async () => {
     // 友達数取得
-    const res = await requestHttpGet('/api/v1/sns/num-of-friends/');
-    res.data?.numOfFrineds && setFriendNum(res.data.numOfFrineds);
-  };
+    const res = await requestHttpGet('/api/v1/sns/num-of-friends/')
+    res.data?.numOfFrineds && setFriendNum(res.data.numOfFrineds)
+  }
 
   const getTodayVisitFriends = async () => {
-    const res = await requestHttpGet('/api/v1/sns/today-visit-friends/');
-    setVisitFriendList(res.data);
-  };
+    const res = await requestHttpGet('/api/v1/sns/today-visit-friends/')
+    setVisitFriendList(res.data)
+  }
 
   const handleSaveNickname = async (
     value: string,
     target: 'nickname' | 'snsId'
   ) => {
     if (!value) {
-      return;
+      return
     }
 
     if (target === 'nickname') {
@@ -135,9 +135,9 @@ export const MyPageScreen = ({ navigation }) => {
         {
           nickname: value,
         }
-      );
-      res.result && setMyProfile((pre) => ({ ...pre, nickname: value }));
-      setShowNameEditModal(false);
+      )
+      res.result && setMyProfile((pre) => ({ ...pre, nickname: value }))
+      setShowNameEditModal(false)
     } else {
       // snsID変更処理
       const res = await requestHttpPatch(
@@ -145,7 +145,7 @@ export const MyPageScreen = ({ navigation }) => {
         {
           snsId: value,
         }
-      );
+      )
       res.result &&
         setMyProfile((pre) => ({
           ...pre,
@@ -154,26 +154,25 @@ export const MyPageScreen = ({ navigation }) => {
             snsId: value,
             profile: pre.snsProfile.profile,
           },
-        }));
-      setShowSnsIdEditModal(false);
+        }))
+      setShowSnsIdEditModal(false)
     }
-  };
+  }
 
   const refreshItem = async (
     setState: React.Dispatch<React.SetStateAction<boolean>>
   ) => {
-    setState(true);
-    await getTodayVisitFriends();
-    setState(false);
-  };
+    setState(true)
+    await getTodayVisitFriends()
+    setState(false)
+  }
 
   const pickImage = async () => {
     if (Platform.OS !== 'web') {
-      const { status } =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
       if (status !== 'granted') {
-        alert('no permission');
-        return;
+        alert('no permission')
+        return
       }
     }
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -183,27 +182,27 @@ export const MyPageScreen = ({ navigation }) => {
       aspoct: [4, 3],
       quality: 1,
       base64: true,
-    });
+    })
     if (!result.cancelled) {
-      const imageUri = await fetch(result.uri);
-      console.log('imageUri: ', imageUri);
+      const imageUri = await fetch(result.uri)
+      console.log('imageUri: ', imageUri)
 
       // Blob
-      const blob = await imageUri.blob();
-      const ext = blob.type.split('/')[1];
-      console.log('blobType: ', blob.type);
-      console.log('blobSize: ', blob.size);
-      console.log('keys: ', Object.keys(blob));
+      const blob = await imageUri.blob()
+      const ext = blob.type.split('/')[1]
+      console.log('blobType: ', blob.type)
+      console.log('blobSize: ', blob.size)
+      console.log('keys: ', Object.keys(blob))
 
       // File
       const imageFile = new File([blob], `sample.jpg`, {
         type: blob.type,
-      });
-      console.log('fileSize: ', imageFile.size);
+      })
+      console.log('fileSize: ', imageFile.size)
 
       // FormData
-      const formData = new FormData();
-      formData.append('profileImage', blob, `sample.jpg`);
+      const formData = new FormData()
+      formData.append('profileImage', blob, `sample.jpg`)
       // formData.append('profileImage', {
       //   name: 'filename.jpg',
       //   type: 'jpg',
@@ -217,7 +216,7 @@ export const MyPageScreen = ({ navigation }) => {
         // blob,
         // imageFile,
         blob.type
-      );
+      )
 
       // const res = await fetch(`/api/v1/sns/myprofile/${myProfile.id}/`, {
       //   method: 'POST',
@@ -230,35 +229,35 @@ export const MyPageScreen = ({ navigation }) => {
       //     imageUrl: result.base64,
       //   }),
       // })
-      setMyProfile((pre) => ({ ...pre, imageUrl: result.uri.toString() }));
+      setMyProfile((pre) => ({ ...pre, imageUrl: result.uri.toString() }))
       // setBlobImage(blob);
     }
-  };
+  }
 
   const openSnsIdModal = () => {
-    setNewSnsId(myProfile.snsProfile.snsId);
-    setShowSnsIdEditModal(true);
-  };
+    setNewSnsId(myProfile.snsProfile.snsId)
+    setShowSnsIdEditModal(true)
+  }
 
   const changeSnsId = async (value: string) => {
     // SNSIDの重複チェック
     if (!value) {
-      setNewSnsId(value);
-      return;
+      setNewSnsId(value)
+      return
     }
     const res = await requestHttpGet(
       `/api/v1/sns/snsid/search/?sns_id=${value}`
-    );
-    console.log(res.data);
+    )
+    console.log(res.data)
     if (res.data) {
       if (res.data.exist === true) {
-        setExistedId(true);
+        setExistedId(true)
       } else {
-        existedId === true && setExistedId(false);
+        existedId === true && setExistedId(false)
       }
     }
-    setNewSnsId(value);
-  };
+    setNewSnsId(value)
+  }
 
   const renderItem = ({ item }: ListRenderItemInfo<VisitFriend>) => {
     return (
@@ -305,8 +304,8 @@ export const MyPageScreen = ({ navigation }) => {
           />
         </Box>
       </HStack>
-    );
-  };
+    )
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
@@ -508,5 +507,5 @@ export const MyPageScreen = ({ navigation }) => {
         )}
       </Box>
     </SafeAreaView>
-  );
-};
+  )
+}

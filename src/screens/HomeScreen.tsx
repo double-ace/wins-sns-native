@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { FlatList, ListRenderItemInfo, RefreshControl } from 'react-native';
+import React, { useEffect, useState } from 'react'
+import { FlatList, ListRenderItemInfo, RefreshControl } from 'react-native'
 import {
   Flex,
   Button,
@@ -12,27 +12,27 @@ import {
   Divider,
   Image,
   Badge,
-} from 'native-base';
-import * as Notifications from 'expo-notifications';
-import * as Device from 'expo-device';
-import QRCode from 'react-native-qrcode-svg';
-import { requestHttpGet, requestHttpPost } from '../scripts/requestBase';
-import { formatDate } from '../scripts/date';
+} from 'native-base'
+import * as Notifications from 'expo-notifications'
+import * as Device from 'expo-device'
+import QRCode from 'react-native-qrcode-svg'
+import { requestHttpGet, requestHttpPost } from '../scripts/requestBase'
+import { formatDate } from '../scripts/date'
 
 type PointHistoryResponse = {
-  id: string | number;
-  point: number;
-  content: string;
-  datetime: string;
-};
+  id: string | number
+  point: number
+  content: string
+  datetime: string
+}
 
 export const HomeScreen = ({ navigation }: any) => {
-  const [point, setPoint] = useState(0);
-  const [continuousVisit, setContinuousVisit] = useState(0);
-  const [userId, setUserId] = useState('');
-  const [pointHisList, setPointHisList] = useState<PointHistoryResponse[]>([]);
-  const [showQRCode, setShowQRCode] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+  const [point, setPoint] = useState(0)
+  const [continuousVisit, setContinuousVisit] = useState(0)
+  const [userId, setUserId] = useState('')
+  const [pointHisList, setPointHisList] = useState<PointHistoryResponse[]>([])
+  const [showQRCode, setShowQRCode] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
 
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -40,82 +40,81 @@ export const HomeScreen = ({ navigation }: any) => {
       shouldPlaySound: false,
       shouldSetBadge: false,
     }),
-  });
+  })
 
   const regPushNotifications = async () => {
-    let token;
+    let token
     if (Device.isDevice) {
       const { status: existingStatus } =
-        await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
+        await Notifications.getPermissionsAsync()
+      let finalStatus = existingStatus
       if (existingStatus !== 'granted') {
         //②初回起動時は許可ダイアログを出してユーザからPush通知の許可を取得
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
+        const { status } = await Notifications.requestPermissionsAsync()
+        finalStatus = status
       }
       if (finalStatus !== 'granted') {
         // 許可がない場合
-        alert('Failed to get push token for push notification');
-        return;
+        alert('Failed to get push token for push notification')
+        return
       }
       try {
-        const endpoint = '/api/v1/core/user-device/';
-        const tokenRes = await requestHttpGet(endpoint);
+        const endpoint = '/api/v1/core/user-device/'
+        const tokenRes = await requestHttpGet(endpoint)
         if (!tokenRes.data.length) {
-          token = (await Notifications.getExpoPushTokenAsync()).data;
-          await requestHttpPost(endpoint, { deviceToken: token }, true);
+          token = (await Notifications.getExpoPushTokenAsync()).data
+          await requestHttpPost(endpoint, { deviceToken: token }, true)
         }
       } catch (e) {
-        alert(e);
+        alert(e)
       }
     } else {
-      alert('token');
+      alert('token')
     }
-  };
+  }
 
   useEffect(() => {
-    regPushNotifications();
-    getUserPoint();
-  }, []);
+    regPushNotifications()
+    getUserPoint()
+  }, [])
 
   const getUserPoint = async () => {
-    const pointRes = await requestHttpGet('/api/v1/user/point/');
-    const pointHisRes = await requestHttpGet('/api/v1/user/point-history/');
+    const pointRes = await requestHttpGet('/api/v1/user/point/')
+    const pointHisRes = await requestHttpGet('/api/v1/user/point-history/')
 
     if (pointRes.notLogin || pointHisRes.notLogin) {
-      navigation.reset({ index: 0, routes: [{ name: 'SignIn' }] });
+      navigation.reset({ index: 0, routes: [{ name: 'SignIn' }] })
     } else {
       if (pointRes.data.length) {
-        console.log(pointRes.data[0]);
-        setPoint(pointRes.data[0].point.toLocaleString());
-        setContinuousVisit(pointRes.data[0].continuousVisitCount);
-        setUserId(pointRes.data[0].user);
+        console.log(pointRes.data[0])
+        setPoint(pointRes.data[0].point.toLocaleString())
+        setContinuousVisit(pointRes.data[0].continuousVisitCount)
+        setUserId(pointRes.data[0].user)
       }
       if (pointHisRes.data.length) {
         // datetimeを降順に並び替え
         pointHisRes.data.sort(
           (a: PointHistoryResponse, b: PointHistoryResponse) => {
-            return a.datetime < b.datetime ? 1 : -1;
+            return a.datetime < b.datetime ? 1 : -1
           }
-        );
+        )
         setPointHisList(
           pointHisRes.data.map((item: PointHistoryResponse) => {
-            // 当日なら時刻表示しない　当年なら年表示しない
             return {
               ...item,
               datetime: formatDate(item.datetime),
-            };
+            }
           })
-        );
+        )
       }
     }
-  };
+  }
 
   const refreshItem = async () => {
-    setRefreshing(true);
-    await getUserPoint();
-    setRefreshing(false);
-  };
+    setRefreshing(true)
+    await getUserPoint()
+    setRefreshing(false)
+  }
 
   const renderItem = ({ item }: ListRenderItemInfo<PointHistoryResponse>) => {
     return (
@@ -137,8 +136,8 @@ export const HomeScreen = ({ navigation }: any) => {
           {item.point.toLocaleString()}pt
         </Text>
       </HStack>
-    );
-  };
+    )
+  }
 
   return (
     <Box style={{ flex: 1 }} bg="white">
@@ -223,5 +222,5 @@ export const HomeScreen = ({ navigation }: any) => {
         scrollEnabled
       />
     </Box>
-  );
-};
+  )
+}

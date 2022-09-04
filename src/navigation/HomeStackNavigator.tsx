@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import {
   CardStyleInterpolators,
   createStackNavigator,
-} from '@react-navigation/stack';
-import { SignInScreen } from '../screens/SignInScreen';
-import { SignUpScreen } from '../screens/SignUpScreen';
-import { RegistUserInfoScreen } from '../screens/RegistUserInfoScreen';
-import { MainTabNavigator } from './MainTabNavigator';
-import { getData, setAccess } from '../scripts/asyncStore';
-import { requestHttpGet } from '../scripts/requestBase';
+} from '@react-navigation/stack'
+import { SignInScreen } from '../screens/SignInScreen'
+import { SignUpScreen } from '../screens/SignUpScreen'
+import { RegistUserInfoScreen } from '../screens/RegistUserInfoScreen'
+import { MainTabNavigator } from './MainTabNavigator'
+import { getData, setAccess } from '../scripts/asyncStore'
+import { requestHttpGet } from '../scripts/requestBase'
 
-const RootStack = createStackNavigator();
+const RootStack = createStackNavigator()
 
 export const RootStackScreen = () => {
   // const [access, setAccess] = useState('');
@@ -54,5 +54,5 @@ export const RootStackScreen = () => {
         <RootStack.Screen name="Main" component={MainTabNavigator} />
       </RootStack.Group>
     </RootStack.Navigator>
-  );
-};
+  )
+}

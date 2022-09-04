@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useIsFocused } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react'
+import { useIsFocused } from '@react-navigation/native'
 import {
   View,
   StyleSheet,
@@ -11,7 +11,7 @@ import {
   ListRenderItemInfo,
   FlatList,
   RefreshControl,
-} from 'react-native';
+} from 'react-native'
 import {
   Box,
   Text,
@@ -20,48 +20,48 @@ import {
   Avatar,
   Spacer,
   Button,
-} from 'native-base';
-import { TabView, SceneMap } from 'react-native-tab-view';
+} from 'native-base'
+import { TabView, SceneMap } from 'react-native-tab-view'
 import {
   requestHttpGet,
   requestHttpDelete,
   requestHttpPatch,
-} from '../scripts/requestBase';
-import { DefaultAvator } from '../components/DefaultAvator';
+} from '../scripts/requestBase'
+import { DefaultAvator } from '../components/DefaultAvator'
 
 type RequestNestChild = {
-  id: string;
-  isShop: boolean;
+  id: string
+  isShop: boolean
   profile: {
-    user: string;
-    nickname: string;
-    profileImage: string | null;
-  };
-};
+    user: string
+    nickname: string
+    profileImage: string | null
+  }
+}
 type RequestData = {
-  id: string;
-  reqFrom: string;
-  reqTo: RequestNestChild;
-  approved: boolean;
-};
+  id: string
+  reqFrom: string
+  reqTo: RequestNestChild
+  approved: boolean
+}
 
 type NonAppdData = {
-  id: string;
-  reqFrom: RequestNestChild;
-  reqTo: string;
-  approved: boolean;
-};
+  id: string
+  reqFrom: RequestNestChild
+  reqTo: string
+  approved: boolean
+}
 
 const initialLayout = {
   width: Dimensions.get('window').width,
-};
+}
 
 export const FriendRequestScreen = () => {
-  const [nonReqList, setNonReqList] = useState<RequestData[]>([]);
-  const [nonAppdList, setNonAppdList] = useState<NonAppdData[]>([]);
-  const [refreshing, setRefreshing] = useState(false);
-  const [index, setIndex] = React.useState(0);
-  const isFocused = useIsFocused();
+  const [nonReqList, setNonReqList] = useState<RequestData[]>([])
+  const [nonAppdList, setNonAppdList] = useState<NonAppdData[]>([])
+  const [refreshing, setRefreshing] = useState(false)
+  const [index, setIndex] = React.useState(0)
+  const isFocused = useIsFocused()
 
   const [routes] = React.useState([
     {
@@ -72,56 +72,56 @@ export const FriendRequestScreen = () => {
       key: 'appd',
       title: '承認待ち',
     },
-  ]);
+  ])
 
   useEffect(() => {
     if (isFocused) {
-      getReqList();
-      getAppdList();
+      getReqList()
+      getAppdList()
     }
-  }, [isFocused]);
+  }, [isFocused])
 
   const getReqList = async () => {
-    const res = await requestHttpGet('/api/v1/sns/get-friend-request/');
-    setNonReqList(res.data);
-  };
+    const res = await requestHttpGet('/api/v1/sns/get-friend-request/')
+    setNonReqList(res.data)
+  }
 
   const getAppdList = async () => {
-    const res = await requestHttpGet('/api/v1/sns/non-appd-request/');
-    setNonAppdList(res.data);
-  };
+    const res = await requestHttpGet('/api/v1/sns/non-appd-request/')
+    setNonAppdList(res.data)
+  }
 
   const refreshReqItem = async () => {
-    setRefreshing(true);
-    await getReqList();
-    setRefreshing(false);
-  };
+    setRefreshing(true)
+    await getReqList()
+    setRefreshing(false)
+  }
 
   const refreshAppdItem = async () => {
-    setRefreshing(true);
-    await getAppdList();
-    setRefreshing(false);
-  };
+    setRefreshing(true)
+    await getAppdList()
+    setRefreshing(false)
+  }
 
   // 申請承認削除処理
   const handleDelete = async (id: string | number, type: 'req' | 'appd') => {
-    await requestHttpDelete(`/api/v1/sns/friend-request/${id}/`);
+    await requestHttpDelete(`/api/v1/sns/friend-request/${id}/`)
     type === 'req'
       ? setNonReqList((preList) => [
           ...preList.filter((item) => item.id !== id),
         ])
       : setNonAppdList((preList) => [
           ...preList.filter((item) => item.id !== id),
-        ]);
-  };
+        ])
+  }
 
   // 承認許可処理
   const handleAllow = async (id: string | number) => {
     await requestHttpPatch(`/api/v1/sns/non-appd-request/${id}/`, {
       approved: true,
-    });
-    setNonAppdList((preList) => [...preList.filter((item) => item.id !== id)]);
-  };
+    })
+    setNonAppdList((preList) => [...preList.filter((item) => item.id !== id)])
+  }
 
   const renderReqItem = ({ item }: ListRenderItemInfo<RequestData>) => {
     return (
@@ -154,8 +154,8 @@ export const FriendRequestScreen = () => {
           </Button>
         </HStack>
       </Box>
-    );
-  };
+    )
+  }
 
   const renderAppdItem = ({ item }: ListRenderItemInfo<NonAppdData>) => {
     return (
@@ -201,8 +201,8 @@ export const FriendRequestScreen = () => {
           </Button>
         </HStack>
       </Box>
-    );
-  };
+    )
+  }
 
   const RequestRoute = () => {
     return (
@@ -218,8 +218,8 @@ export const FriendRequestScreen = () => {
         }
         scrollEnabled
       />
-    );
-  };
+    )
+  }
 
   const NonAppdRoute = () => {
     return (
@@ -235,18 +235,18 @@ export const FriendRequestScreen = () => {
         }
         scrollEnabled
       />
-    );
-  };
+    )
+  }
 
   const renderScene = SceneMap({
     request: RequestRoute,
     appd: NonAppdRoute,
-  });
+  })
 
   const renderTabBar = (props: any) => {
     const inputRange = props.navigationState.routes.map(
       (x: any, i: number) => i
-    );
+    )
     return (
       <Box flexDirection="row" bg="white">
         {props.navigationState.routes.map((route: any, i: number) => {
@@ -255,15 +255,15 @@ export const FriendRequestScreen = () => {
             outputRange: inputRange.map((inputIndex: number) =>
               inputIndex === i ? 1 : 0.5
             ),
-          });
+          })
           const color =
             index === i
               ? useColorModeValue('#000', '#e5e5e5')
-              : useColorModeValue('#1f2937', '#a1a1aa');
+              : useColorModeValue('#1f2937', '#a1a1aa')
           const borderColor =
             index === i
               ? 'green.300'
-              : useColorModeValue('coolGray.200', 'gray.400');
+              : useColorModeValue('coolGray.200', 'gray.400')
           return (
             <Box
               borderBottomWidth="3"
@@ -275,8 +275,8 @@ export const FriendRequestScreen = () => {
             >
               <Pressable
                 onPress={() => {
-                  console.log(i);
-                  setIndex(i);
+                  console.log(i)
+                  setIndex(i)
                 }}
               >
                 <Animated.Text
@@ -288,11 +288,11 @@ export const FriendRequestScreen = () => {
                 </Animated.Text>
               </Pressable>
             </Box>
-          );
+          )
         })}
       </Box>
-    );
-  };
+    )
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -310,8 +310,8 @@ export const FriendRequestScreen = () => {
         }}
       />
     </SafeAreaView>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -341,4 +341,4 @@ const styles = StyleSheet.create({
     color: '#A8A8A8',
   },
   fab: {},
-});
+})

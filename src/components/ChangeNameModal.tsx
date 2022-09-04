@@ -1,18 +1,18 @@
-import { useState, useEffect } from 'react';
-import { Button, Center, Input, Modal, Text } from 'native-base';
+import { useState, useEffect } from 'react'
+import { Button, Center, Input, Modal, Text } from 'native-base'
 
 type Props = {
-  name: string;
+  name: string
   modalState: {
-    showModal: boolean;
-    setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
-  };
+    showModal: boolean
+    setShowModal: React.Dispatch<React.SetStateAction<boolean>>
+  }
   // inputState: {
   //   value: string;
   //   setValue: React.Dispatch<React.SetStateAction<string>>;
   // };
-  confirmFunc: (value: string) => Promise<void>;
-};
+  confirmFunc: (value: string) => Promise<void>
+}
 
 export const ChangeNameModal = ({
   name,
@@ -20,9 +20,9 @@ export const ChangeNameModal = ({
   // inputState,
   confirmFunc,
 }: Props) => {
-  const { showModal, setShowModal } = modalState;
+  const { showModal, setShowModal } = modalState
   // const { value, setValue } = inputState;
-  const [value, setValue] = useState(name);
+  const [value, setValue] = useState(name)
 
   // useEffect(() => {
   //   setValue(name);
@@ -61,5 +61,5 @@ export const ChangeNameModal = ({
         </Modal.Footer>
       </Modal.Content>
     </Modal>
-  );
-};
+  )
+}

@@ -1,43 +1,43 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 type StoreData = {
-  key: string;
-  value: string;
-};
+  key: string
+  value: string
+}
 
 export const setData = async (key: string, value: string): Promise<boolean> => {
   try {
-    await AsyncStorage.setItem(key, value);
-    return true;
+    await AsyncStorage.setItem(key, value)
+    return true
   } catch (e) {
-    console.log(e);
-    return false;
+    console.log(e)
+    return false
   }
-};
+}
 
 export const getData = async (key: string): Promise<string | null> => {
-  let value: string | null = '';
+  let value: string | null = ''
   try {
-    value = await AsyncStorage.getItem(key);
+    value = await AsyncStorage.getItem(key)
     if (!value) {
-      console.log(`${key}が存在しません`);
+      console.log(`${key}が存在しません`)
     }
 
-    return value;
+    return value
   } catch (e) {
-    console.log(e);
-    return value;
+    console.log(e)
+    return value
   }
-};
+}
 
 export const delData = async (key: string): Promise<boolean> => {
   try {
     await AsyncStorage.removeItem(key, (error) =>
       console.log('removeItem: ', error)
-    );
-    return true;
+    )
+    return true
   } catch (e) {
-    console.log('delData: ', e);
-    return false;
+    console.log('delData: ', e)
+    return false
   }
-};
+}

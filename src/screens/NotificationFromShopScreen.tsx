@@ -1,28 +1,28 @@
-import { Center, Heading, Text, Box } from 'native-base';
-import { useEffect, useState } from 'react';
-import { StyleSheet, SafeAreaView } from 'react-native';
-import { requestHttpGet } from '../scripts/requestBase';
-import { format } from 'date-fns';
+import { Center, Heading, Text, Box } from 'native-base'
+import { useEffect, useState } from 'react'
+import { StyleSheet, SafeAreaView } from 'react-native'
+import { requestHttpGet } from '../scripts/requestBase'
+import { format } from 'date-fns'
 
 type ShopPost = {
-  id: string;
-  title: string;
-  content: string;
-  createdAt: Date;
-  updatedAt: Date;
-};
+  id: string
+  title: string
+  content: string
+  createdAt: Date
+  updatedAt: Date
+}
 
 export const NotificationFromShopScreen = () => {
-  const [postList, setPostList] = useState<ShopPost[]>([]);
+  const [postList, setPostList] = useState<ShopPost[]>([])
 
   useEffect(() => {
-    getShopPosts();
-  }, []);
+    getShopPosts()
+  }, [])
 
   const getShopPosts = async () => {
-    const res = await requestHttpGet('/api/v1/sns/shop-posts/');
-    res.data.length && setPostList(res.data);
-  };
+    const res = await requestHttpGet('/api/v1/sns/shop-posts/')
+    res.data.length && setPostList(res.data)
+  }
 
   return (
     <Box flex="1" p={4} bg="teal.50">
@@ -38,11 +38,11 @@ export const NotificationFromShopScreen = () => {
         </Box>
       )}
     </Box>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-});
+})

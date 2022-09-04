@@ -1,4 +1,4 @@
-import { Box, HStack, Skeleton } from 'native-base';
+import { Box, HStack, Skeleton } from 'native-base'
 
 export const SkeletonItem = () => {
   return (
@@ -14,5 +14,5 @@ export const SkeletonItem = () => {
         <Skeleton.Text w="70%" ml={2} />
       </HStack>
     </Box>
-  );
-};
+  )
+}

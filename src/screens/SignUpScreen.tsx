@@ -1,12 +1,12 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import {
   TouchableWithoutFeedback,
   Keyboard,
   SafeAreaView,
   StyleSheet,
-} from 'react-native';
-import { View, Button, Text, Input, Link } from 'native-base';
-import { createAccount } from '../scripts/requestAuth';
+} from 'react-native'
+import { View, Button, Text, Input, Link } from 'native-base'
+import { createAccount } from '../scripts/requestAuth'
 
 const ERR_MSG = {
   empEmail: 'メールアドレスを入力してください',
@@ -16,72 +16,72 @@ const ERR_MSG = {
   invalidEmail: 'メールアドレスの形式が正しくありません',
   pwTooShort: '8文字以上の半角英数字で設定してください',
   pwNoMatch: 'パスワードとパスワード(確認用)が一致しません',
-};
+}
 
 export const SignUpScreen = ({ navigation }: any) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPw, setConfirmPw] = useState('');
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPw, setConfirmPw] = useState('')
   const [validation, setValidation] = useState({
     valid: false,
     msg: '',
-  });
-  const [isSigningUp, setIsSigningUp] = useState(false);
+  })
+  const [isSigningUp, setIsSigningUp] = useState(false)
 
   const ValidCheckForConfirm = (): boolean => {
     // 未入力チェック
     if (email === '') {
-      setValidation({ valid: true, msg: ERR_MSG.empEmail });
-      return false;
+      setValidation({ valid: true, msg: ERR_MSG.empEmail })
+      return false
     } else if (password === '') {
-      setValidation({ valid: true, msg: ERR_MSG.empPW });
-      return false;
+      setValidation({ valid: true, msg: ERR_MSG.empPW })
+      return false
     } else if (confirmPw === '') {
-      setValidation({ valid: true, msg: ERR_MSG.empConfirmPW });
-      return false;
+      setValidation({ valid: true, msg: ERR_MSG.empConfirmPW })
+      return false
     }
 
     // メールアドレスの形式チェック
     const regex =
-      /^[a-zA-Z0-9_+-]+(\.[a-zA-Z0-9_+-]+)*@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/;
+      /^[a-zA-Z0-9_+-]+(\.[a-zA-Z0-9_+-]+)*@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/
     if (!regex.test(email)) {
-      setValidation({ valid: true, msg: ERR_MSG.invalidEmail });
-      return false;
+      setValidation({ valid: true, msg: ERR_MSG.invalidEmail })
+      return false
     }
 
     // パスワード一致チェック
     if (password !== confirmPw) {
-      setValidation({ valid: true, msg: ERR_MSG.pwNoMatch });
-      return false;
+      setValidation({ valid: true, msg: ERR_MSG.pwNoMatch })
+      return false
     }
 
-    return true;
-  };
+    return true
+  }
 
   const signUp = async () => {
-    setIsSigningUp(true);
-    const isValid = ValidCheckForConfirm();
+    setIsSigningUp(true)
+    const isValid = ValidCheckForConfirm()
     if (isValid) {
-      const res = await createAccount({ email, password });
+      const res = await createAccount({ email, password })
       if (res) {
-        navigation.reset({ index: 0, routes: [{ name: 'RegistUserInfo' }] });
+        navigation.reset({ index: 0, routes: [{ name: 'RegistUserInfo' }] })
       } else {
-        setValidation({ valid: true, msg: ERR_MSG.sameEmail });
+        setValidation({ valid: true, msg: ERR_MSG.sameEmail })
       }
     }
-    setIsSigningUp(false);
-  };
+    setIsSigningUp(false)
+  }
 
   const onChangePw = (value: string) => {
-    const regex = /^[0-9a-zA-Z]*$/;
+    const regex = /^[0-9a-zA-Z]*$/
     // パスワード文字数&半角英数字チェック
     if (!regex.test(value) || password.length < 8) {
-      setValidation({ valid: true, msg: ERR_MSG.pwTooShort });
+      setValidation({ valid: true, msg: ERR_MSG.pwTooShort })
     } else {
-      setValidation({ valid: false, msg: '' });
+      setValidation({ valid: false, msg: '' })
     }
-    setPassword(value);
-  };
+    setPassword(value)
+  }
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -157,12 +157,12 @@ export const SignUpScreen = ({ navigation }: any) => {
         </View>
       </SafeAreaView>
     </TouchableWithoutFeedback>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
   },
-});
+})

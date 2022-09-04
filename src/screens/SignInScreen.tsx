@@ -1,68 +1,68 @@
-import React, { useEffect, useState } from 'react';
-import { CommonActions } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react'
+import { CommonActions } from '@react-navigation/native'
 import {
   TouchableWithoutFeedback,
   Keyboard,
   SafeAreaView,
   StyleSheet,
-} from 'react-native';
-import { View, Button, Text, Input, Link } from 'native-base';
-import { Loading } from '../components/Loading';
-import { authLogin, delToken } from '../scripts/requestAuth';
-import { setData, getData } from '../scripts/asyncStore';
-import { requestHttpGet } from '../scripts/requestBase';
+} from 'react-native'
+import { View, Button, Text, Input, Link } from 'native-base'
+import { Loading } from '../components/Loading'
+import { authLogin, delToken } from '../scripts/requestAuth'
+import { setData, getData } from '../scripts/asyncStore'
+import { requestHttpGet } from '../scripts/requestBase'
 
 export const SignInScreen = ({ navigation }: any) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [invalid, setInvalid] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSigningIn, setIsSigningIn] = useState(false);
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [invalid, setInvalid] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSigningIn, setIsSigningIn] = useState(false)
 
   useEffect(() => {
-    initApp();
-  }, []);
+    initApp()
+  }, [])
 
   const initApp = async () => {
-    const access = await getData('access');
+    const access = await getData('access')
     if (access) {
-      await checkProfile();
+      await checkProfile()
     } else {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const signIn = async () => {
-    setIsSigningIn(true);
-    const res = await authLogin({ email, password });
+    setIsSigningIn(true)
+    const res = await authLogin({ email, password })
     if (res.result) {
-      await checkProfile();
+      await checkProfile()
     } else {
-      setInvalid(true);
+      setInvalid(true)
     }
-    setIsSigningIn(false);
-  };
+    setIsSigningIn(false)
+  }
 
   const checkProfile = async () => {
-    const res = await requestHttpGet('/api/v1/user/profile/');
+    const res = await requestHttpGet('/api/v1/user/profile/')
     if (res.result) {
       // プロフィール情報が取得できた場合はメイン画面へ、取得できない場合はユーザ情報登録画面へ遷移
       if (res.data.length) {
-        await setData('userId', res.data[0].user);
+        await setData('userId', res.data[0].user)
         navigation.dispatch(
           CommonActions.reset({
             index: 0,
             routes: [{ name: 'Main', params: { userId: res.data[0].user } }],
           })
-        );
+        )
       } else {
-        navigation.reset({ index: 0, routes: [{ name: 'RegistUserInfo' }] });
+        navigation.reset({ index: 0, routes: [{ name: 'RegistUserInfo' }] })
       }
     } else {
-      await delToken();
-      setIsLoading(false);
+      await delToken()
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
     <>
@@ -132,12 +132,12 @@ export const SignInScreen = ({ navigation }: any) => {
         </TouchableWithoutFeedback>
       )}
     </>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
   },
-});
+})

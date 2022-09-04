@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react'
 import {
   StyleSheet,
   SafeAreaView,
@@ -7,7 +7,7 @@ import {
   Platform,
   Keyboard,
   GestureResponderEvent,
-} from 'react-native';
+} from 'react-native'
 import {
   FlatList,
   Avatar,
@@ -18,62 +18,62 @@ import {
   KeyboardAvoidingView,
   Pressable,
   Text,
-} from 'native-base';
-import { Ionicons } from '@expo/vector-icons';
-import { requestHttpGet, requestHttpPost } from '../scripts/requestBase';
-import { formatDate } from '../scripts/date';
+} from 'native-base'
+import { Ionicons } from '@expo/vector-icons'
+import { requestHttpGet, requestHttpPost } from '../scripts/requestBase'
+import { formatDate } from '../scripts/date'
 
-type Id = string;
+type Id = string
 
 type Message = {
-  id: string;
-  content: string;
+  id: string
+  content: string
   sender: {
-    id: string;
-    profileId: string;
-    familyName: string;
-    firstName: string;
-    nickname: string;
-    profileImage: string;
-  };
-  me: string;
-  room: string;
-  createdAt: string;
-};
+    id: string
+    profileId: string
+    familyName: string
+    firstName: string
+    nickname: string
+    profileImage: string
+  }
+  me: string
+  room: string
+  createdAt: string
+}
 
 export const ChatScreen = () => {
-  const [content, setContent] = useState('');
-  const [dmList, setDmList] = useState<Message[]>([]);
-  const [roomId, setRoomId] = useState<Id>('');
+  const [content, setContent] = useState('')
+  const [dmList, setDmList] = useState<Message[]>([])
+  const [roomId, setRoomId] = useState<Id>('')
 
   const getDm = async () => {
-    const roomRes = await requestHttpGet('/api/v1/chat/rooms/');
+    const roomRes = await requestHttpGet('/api/v1/chat/rooms/')
     if (roomRes.data.length) {
-      const id = roomRes.data[0].id;
+      const id = roomRes.data[0].id
       const messageRes = await requestHttpGet(
         `/api/v1/chat/messages/?room_id=${id}`
-      );
-      setRoomId(id);
-      setDmList([...messageRes.data]);
+      )
+      setRoomId(id)
+      setDmList([...messageRes.data])
     }
-  };
+  }
 
   const sendDm = async (e: GestureResponderEvent) => {
     const param = {
       content,
       room: roomId,
-    };
-    const res = await requestHttpPost('/api/v1/chat/messages/', param, true);
-    if (res.data) {
-      await getDm();
-      setContent('');
     }
-    Keyboard.dismiss();
-  };
+    const res = await requestHttpPost('/api/v1/chat/messages/', param, true)
+    if (res.data) {
+      await getDm()
+      setContent('')
+    }
+    Keyboard.dismiss()
+  }
 
   useEffect(() => {
-    getDm();
-  }, []);
+    getDm()
+  }, [])
 
   const renderItem = ({ item }: ListRenderItemInfo<Message>) => {
     return item.sender.id !== item.me ? (
@@ -112,8 +112,8 @@ export const ChatScreen = () => {
           </HStack>
         </Stack>
       </HStack>
-    );
-  };
+    )
+  }
 
   return (
     <KeyboardAvoidingView
@@ -163,8 +163,8 @@ export const ChatScreen = () => {
         </HStack>
       </SafeAreaView>
     </KeyboardAvoidingView>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   textBox: {
@@ -174,4 +174,4 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     width: '91%',
   },
-});
+})

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import {
   StyleSheet,
   SafeAreaView,
@@ -6,7 +6,7 @@ import {
   ListRenderItemInfo,
   TouchableWithoutFeedback,
   Keyboard,
-} from 'react-native';
+} from 'react-native'
 import {
   Avatar,
   Button,
@@ -17,50 +17,50 @@ import {
   Center,
   Text,
   Pressable,
-} from 'native-base';
-import { requestHttpGet, requestHttpPost } from '../scripts/requestBase';
-import { SkeletonItem } from '../components/SkeletonUserItem';
-import { DefaultAvator } from '../components/DefaultAvator';
+} from 'native-base'
+import { requestHttpGet, requestHttpPost } from '../scripts/requestBase'
+import { SkeletonItem } from '../components/SkeletonUserItem'
+import { DefaultAvator } from '../components/DefaultAvator'
 
 type Profile = {
-  user: string;
-  nickname: string;
-  profileImage: string | null;
-};
+  user: string
+  nickname: string
+  profileImage: string | null
+}
 
 type UserList = {
-  id: string;
-  profile: Profile;
-};
+  id: string
+  profile: Profile
+}
 
 export const SearchScreen = ({ navigation }) => {
-  const [userList, setUserList] = useState<UserList[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
+  const [userList, setUserList] = useState<UserList[]>([])
+  const [isSearching, setIsSearching] = useState(false)
 
   const onChangeKeyword = async (keyword: string) => {
-    setIsSearching(true);
+    setIsSearching(true)
     // 入力値でユーザをフィルター
-    console.log('keyword: ', keyword);
+    console.log('keyword: ', keyword)
     if (keyword) {
-      const res = await requestHttpGet(`/api/v1/sns/users/?keyword=${keyword}`);
-      setUserList(res.data);
+      const res = await requestHttpGet(`/api/v1/sns/users/?keyword=${keyword}`)
+      setUserList(res.data)
     }
-    setIsSearching(false);
-  };
+    setIsSearching(false)
+  }
 
   // 友達申請
   const handleReq = async (id: string) => {
     // const res = await requestHttpPost
     const param = {
       reqTo: id,
-    };
+    }
     const res = await requestHttpPost(
       '/api/v1/sns/friend-request/',
       param,
       true
-    );
-    setUserList((pre) => [...pre.filter((item) => item.id !== res.data.reqTo)]);
-  };
+    )
+    setUserList((pre) => [...pre.filter((item) => item.id !== res.data.reqTo)])
+  }
 
   const renderItem = ({ item }: ListRenderItemInfo<UserList>) => {
     return (
@@ -92,8 +92,8 @@ export const SearchScreen = ({ navigation }) => {
           </Button>
         </HStack>
       </Box>
-    );
-  };
+    )
+  }
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -115,8 +115,8 @@ export const SearchScreen = ({ navigation }) => {
         )}
       </SafeAreaView>
     </TouchableWithoutFeedback>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -124,4 +124,4 @@ const styles = StyleSheet.create({
     backgroundColor: '#FAFAFB',
     paddingVertical: 8,
   },
-});
+})

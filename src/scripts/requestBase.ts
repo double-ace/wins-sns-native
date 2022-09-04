@@ -1,15 +1,15 @@
-import axios from 'axios';
-import { getData, delData } from './asyncStore';
-import { postRefresh } from './requestAuth';
+import axios from 'axios'
+import { getData, delData } from './asyncStore'
+import { postRefresh } from './requestAuth'
 
-const baseUrl = 'http://192.168.11.2:8000';
+const baseUrl = 'http://192.168.11.3:8000'
 
 export type ResponseData = {
-  result: boolean;
-  status?: number;
-  data: any;
-  notLogin?: boolean;
-};
+  result: boolean
+  status?: number
+  data: any
+  notLogin?: boolean
+}
 
 export const requestHttpGet = async (
   endpoint: string,
@@ -18,50 +18,50 @@ export const requestHttpGet = async (
   let ret: ResponseData = {
     result: false,
     data: [],
-  };
-  let queryPath = '';
-  const queryList = [];
+  }
+  let queryPath = ''
+  const queryList = []
 
   if (param) {
-    queryPath = '?';
+    queryPath = '?'
     for (const [key, value] of Object.entries(param)) {
-      queryList.push(key + '=' + value);
+      queryList.push(key + '=' + value)
     }
-    queryPath = queryList.join('&');
+    queryPath = queryList.join('&')
   }
 
-  const headers = await createHeader();
+  const headers = await createHeader()
   try {
-    const res = await axios.get(baseUrl + endpoint, headers);
-    ret.result = true;
-    ret.data = res.data;
+    const res = await axios.get(baseUrl + endpoint, headers)
+    ret.result = true
+    ret.data = res.data
   } catch (e: any) {
-    console.log('requestHttpGetError========================');
-    console.log('>>');
-    console.log(e);
+    console.log('requestHttpGetError========================')
+    console.log('>>')
+    console.log(e)
     // 認証エラーの場合はトークンを取り直し再リクエスト
     if (e?.response?.status === 401) {
       try {
-        await postRefresh(baseUrl);
+        await postRefresh(baseUrl)
         try {
-          const retakeHeaders = await createHeader();
-          const res = await axios.get(baseUrl + endpoint, retakeHeaders);
-          ret.result = true;
-          ret.data = res.data;
+          const retakeHeaders = await createHeader()
+          const res = await axios.get(baseUrl + endpoint, retakeHeaders)
+          ret.result = true
+          ret.data = res.data
         } catch {
           // 正しいトークンでのリクエストエラー
         }
       } catch {
         // リフレッシュトークンが期限切れ->ログイン画面
-        await delData('access');
-        await delData('refresh');
-        ret.notLogin = true;
+        await delData('access')
+        await delData('refresh')
+        ret.notLogin = true
       }
     }
   }
 
-  return ret;
-};
+  return ret
+}
 
 export const requestHttpPost = async (
   endpoint: string,
@@ -71,43 +71,43 @@ export const requestHttpPost = async (
   let ret: ResponseData = {
     result: false,
     data: '',
-  };
-  console.log(requiredHeader);
+  }
+  console.log(requiredHeader)
 
-  const headers = requiredHeader ? await createHeader() : null;
+  const headers = requiredHeader ? await createHeader() : null
 
   try {
     const res = headers
       ? await axios.post(baseUrl + endpoint, param, headers)
-      : await axios.post(baseUrl + endpoint, param);
-    ret = { ...ret, result: true, data: res.data };
+      : await axios.post(baseUrl + endpoint, param)
+    ret = { ...ret, result: true, data: res.data }
   } catch (e: any) {
-    console.log('requestHttpPostError========================');
+    console.log('requestHttpPostError========================')
     // 認証エラーの場合はトークンを取り直し再リクエスト
     if (e?.response?.status === 401) {
       try {
-        await postRefresh(baseUrl);
+        await postRefresh(baseUrl)
         try {
-          const retakeHeaders = requiredHeader ? await createHeader() : null;
+          const retakeHeaders = requiredHeader ? await createHeader() : null
           const res = retakeHeaders
             ? await axios.post(baseUrl + endpoint, param, retakeHeaders)
-            : await axios.post(baseUrl + endpoint, param);
-          ret.result = true;
-          ret.data = res.data;
+            : await axios.post(baseUrl + endpoint, param)
+          ret.result = true
+          ret.data = res.data
         } catch {
           // 正しいトークンでのリクエストエラー
         }
       } catch {
         // リフレッシュトークンが期限切れ->ログイン画面
-        await delData('access');
-        await delData('refresh');
-        ret.notLogin = true;
+        await delData('access')
+        await delData('refresh')
+        ret.notLogin = true
       }
     }
   }
 
-  return ret;
-};
+  return ret
+}
 
 export const requestHttpPatch = async (
   endpoint: string,
@@ -116,42 +116,42 @@ export const requestHttpPatch = async (
   let ret: ResponseData = {
     result: false,
     data: '',
-  };
+  }
 
-  const headers = await createHeader();
+  const headers = await createHeader()
 
   try {
-    const res = await axios.patch(baseUrl + endpoint, param, headers);
-    ret = { ...ret, result: true, data: res.data };
+    const res = await axios.patch(baseUrl + endpoint, param, headers)
+    ret = { ...ret, result: true, data: res.data }
   } catch (e: any) {
-    console.log('requestHttpPatchError========================');
+    console.log('requestHttpPatchError========================')
     // 認証エラーの場合はトークンを取り直し再リクエスト
     if (e?.response?.status === 401) {
       try {
-        await postRefresh(baseUrl);
+        await postRefresh(baseUrl)
         try {
-          const retakeHeaders = await createHeader();
+          const retakeHeaders = await createHeader()
           const res = await axios.patch(
             baseUrl + endpoint,
             param,
             retakeHeaders
-          );
-          ret.result = true;
-          ret.data = res.data;
+          )
+          ret.result = true
+          ret.data = res.data
         } catch {
           // 正しいトークンでのリクエストエラー
         }
       } catch {
         // リフレッシュトークンが期限切れ->ログイン画面
-        await delData('access');
-        await delData('refresh');
-        ret.notLogin = true;
+        await delData('access')
+        await delData('refresh')
+        ret.notLogin = true
       }
     }
   }
 
-  return ret;
-};
+  return ret
+}
 
 export const requestHttpPatchMultiPartFormData = async (
   endpoint: string,
@@ -162,9 +162,9 @@ export const requestHttpPatchMultiPartFormData = async (
   let ret: ResponseData = {
     result: false,
     data: '',
-  };
+  }
 
-  const { headers } = await createHeader();
+  const { headers } = await createHeader()
   const headersAppend = {
     headers: {
       ...headers,
@@ -172,7 +172,7 @@ export const requestHttpPatchMultiPartFormData = async (
       // 'content-type': 'multipart/form-data',
       'X-Requested-With': 'XMLHttpRequest',
     },
-  };
+  }
 
   try {
     // Fetch
@@ -190,7 +190,7 @@ export const requestHttpPatchMultiPartFormData = async (
     //   .catch((e) => console.error(e));
 
     // Axios
-    const res = await axios.patch(baseUrl + endpoint, param, headersAppend);
+    const res = await axios.patch(baseUrl + endpoint, param, headersAppend)
 
     // XMLHttpRequest
     // const xhr = new XMLHttpRequest();
@@ -202,23 +202,23 @@ export const requestHttpPatchMultiPartFormData = async (
     // xhr.send({ profile_image: param });
 
     // console.log('res: ');
-    console.log('res: ', res.data);
+    console.log('res: ', res.data)
     // console.log(res.data);
     // if (res.data) {
     //   ret = { ...ret, result: true, data: res.data };
     // }
   } catch (e: any) {
-    console.log('requestHttpPostError========================');
-    const errMsg = e.response.request || e.message;
-    console.log(errMsg);
-    console.log('Request========================');
-    console.log(e.request);
-    console.log('Data========================');
-    console.log(e.response.data);
+    console.log('requestHttpPostError========================')
+    const errMsg = e.response.request || e.message
+    console.log(errMsg)
+    console.log('Request========================')
+    console.log(e.request)
+    console.log('Data========================')
+    console.log(e.response.data)
   }
 
-  return ret;
-};
+  return ret
+}
 
 export const requestHttpDelete = async (
   endpoint: string,
@@ -227,68 +227,68 @@ export const requestHttpDelete = async (
   let ret: ResponseData = {
     result: false,
     data: [],
-  };
-  let queryPath = '';
-  const queryList = [];
+  }
+  let queryPath = ''
+  const queryList = []
 
   if (param) {
-    queryPath = '?';
+    queryPath = '?'
     for (const [key, value] of Object.entries(param)) {
-      queryList.push(key + '=' + value);
+      queryList.push(key + '=' + value)
     }
-    queryPath = queryList.join('&');
-    endpoint += queryPath;
+    queryPath = queryList.join('&')
+    endpoint += queryPath
   }
 
-  const headers = await createHeader();
+  const headers = await createHeader()
   try {
-    const res = await axios.delete(baseUrl + endpoint, headers);
+    const res = await axios.delete(baseUrl + endpoint, headers)
     if (res.status === 204) {
-      ret = { ...ret, result: true, status: res.status, data: res.data };
+      ret = { ...ret, result: true, status: res.status, data: res.data }
     }
   } catch (e: any) {
-    console.log('requestHttpDeleteError========================');
+    console.log('requestHttpDeleteError========================')
     // 認証エラーの場合はトークンを取り直し再リクエスト
     if (e?.response?.status === 401) {
       try {
-        await postRefresh(baseUrl);
+        await postRefresh(baseUrl)
         try {
-          const retakeHeaders = await createHeader();
-          const res = await axios.delete(baseUrl + endpoint, retakeHeaders);
-          ret.result = true;
-          ret.data = res.data;
+          const retakeHeaders = await createHeader()
+          const res = await axios.delete(baseUrl + endpoint, retakeHeaders)
+          ret.result = true
+          ret.data = res.data
         } catch {
           // 正しいトークンでのリクエストエラー
         }
       } catch {
         // リフレッシュトークンが期限切れ->ログイン画面
-        await delData('access');
-        await delData('refresh');
-        ret.notLogin = true;
+        await delData('access')
+        await delData('refresh')
+        ret.notLogin = true
       }
     }
   }
 
-  return ret;
-};
+  return ret
+}
 
 const createHeader = async () => {
-  let token = '';
+  let token = ''
   try {
-    const res = await getData('access');
+    const res = await getData('access')
 
     if (res) {
-      token = res;
+      token = res
     } else {
-      console.log('アクセストークンが存在しません');
+      console.log('アクセストークンが存在しません')
     }
   } catch (e) {
-    console.log(e);
+    console.log(e)
   }
 
   return {
     headers: {
       Authorization: `JWT ${token}`,
     },
-  };
-};
+  }
+}
