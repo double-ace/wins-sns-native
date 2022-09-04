@@ -51,7 +51,7 @@ export const ChatScreen = () => {
     if (roomRes.data.length) {
       const id = roomRes.data[0].id;
       const messageRes = await requestHttpGet(
-        `/api/v1/chat/messages/?roomId=${id}`
+        `/api/v1/chat/messages/?room_id=${id}`
       );
       setRoomId(id);
       setDmList([...messageRes.data]);
