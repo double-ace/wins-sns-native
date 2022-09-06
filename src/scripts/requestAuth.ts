@@ -1,67 +1,73 @@
-import { getData, setData } from './asyncStore';
-import { requestHttpPost, ResponseData } from './requestBase';
+import axios, { AxiosResponse } from 'axios'
+import { delData, getData, setData } from './asyncStore'
+
+const baseUrl = 'http://192.168.11.3:8000'
 
 type AuthParams = {
-  email: string;
-  password: string;
-};
+  email: string
+  password: string
+}
 
-export const authLogin = async (params: AuthParams): Promise<any> => {
+type AuthResponse = {
+  access: string
+  refresh: string
+}
+
+type Response = {
+  result: boolean
+  status: number | undefined
+}
+
+export const authLogin = async (params: AuthParams): Promise<Response> => {
   // let ret = false;
-  const ret: {result: boolean; status: number | undefined} = {
+  const ret: Response = {
     result: false,
     status: 0,
   }
   try {
-    const res = await requestHttpPost(
-      '/api/v1/auth/jwt/create/',
-      params,
-      false,
-    );
-    if (res.result) {
-      await setData('access', res.data.access);
-      await setData('refresh', res.data.refresh);
+    const res: AxiosResponse<AuthResponse> = await axios.post(
+      baseUrl + '/api/v1/auth/jwt/create/',
+      params
+    )
+    if (res.status === 200) {
+      await setData('access', res.data.access)
+      await setData('refresh', res.data.refresh)
       ret.result = true
       ret.status = res.status
       console.log('ret: ', ret)
     }
   } catch (e) {
     console.log('authLoginError=========')
-    alert(e);
-  }
-
-  return ret;
-};
-
-export const createAccount = async (params: AuthParams): Promise<boolean> => {
-  let ret = false;
-  try {
-    const createRes = await requestHttpPost(
-      '/api/v1/user/create/',
-      params,
-      false,
-    );
-    // if (createRes.status === 201) {
-    if (true) {
-      const tokenRes = await requestHttpPost(
-        '/api/v1/auth/jwt/create/',
-        params,
-        false,
-      );
-      await setData('access', tokenRes.data.access);
-      await setData('refresh', tokenRes.data.refresh);
-      ret = true;
-    }
-  } catch (e) {
-    alert(e);
   }
 
   return ret
 }
 
-export const useRefreshToken = async () => {
-  const refresh = await getData('refresh');
-  if (refresh) {
-    await requestHttpPost('/api/v1/auth/jwt/refresh/', { refresh }, false);
-  }
-};
+export const createAccount = async (params: AuthParams): Promise<boolean> => {
+  let ret = false
+  try {
+    const createRes: AxiosResponse<AuthResponse> = await axios.post(
+      baseUrl + '/api/v1/user/create/',
+      params
+    )
+    if (createRes.status === 201) {
+      authLogin(params)
+      ret = true
+    }
+  } catch (e) {}
+
+  return ret
+}
+
+export const postRefresh = async (baseUrl: string) => {
+  const refresh = await getData('refresh')
+  const { data }: AxiosResponse<{ access: string; refresh: string }> =
+    await axios.post(baseUrl + '/api/v1/auth/jwt/refresh/', { refresh })
+  await setData('access', data.access)
+  await setData('refresh', data.refresh)
+}
+
+export const delToken = async (): Promise<void> => {
+  await delData('access')
+  await delData('refresh')
+}

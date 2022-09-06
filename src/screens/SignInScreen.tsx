@@ -1,86 +1,68 @@
-import React, { useEffect, useState } from 'react';
-import { CommonActions } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react'
+import { CommonActions } from '@react-navigation/native'
 import {
   TouchableWithoutFeedback,
   Keyboard,
   SafeAreaView,
-  TextInput,
-  View,
-  Text,
   StyleSheet,
-} from 'react-native';
-import { Button, Link } from 'native-base';
-import { Loading } from '../components/Loading';
-import { authLogin } from '../scripts/requestAuth';
-import { setData, getData, delData } from '../scripts/asyncStore';
-import { requestHttpGet } from '../scripts/requestBase';
+} from 'react-native'
+import { View, Button, Text, Input, Link } from 'native-base'
+import { Loading } from '../components/Loading'
+import { authLogin, delToken } from '../scripts/requestAuth'
+import { setData, getData } from '../scripts/asyncStore'
+import { requestHttpGet } from '../scripts/requestBase'
 
-export const SignInScreen = ({ navigation }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [invalid, setInvalid] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+export const SignInScreen = ({ navigation }: any) => {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [invalid, setInvalid] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSigningIn, setIsSigningIn] = useState(false)
 
   useEffect(() => {
-    try {
-      initApp();
-    } catch (e) {
-      console.log(e);
-      setIsLoading(false);
-    }
-    return console.log('endSignIn');
-  }, []);
+    initApp()
+  }, [])
 
   const initApp = async () => {
-    console.log('=============================');
-    const access = await getData('access');
+    const access = await getData('access')
     if (access) {
-      await checkProfile();
+      await checkProfile()
     } else {
-      console.log('access: ', access);
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
-  const login = async () => {
-    const param = { email, password };
-    try {
-      const res = await authLogin({ email, password });
-      if (res) {
-        await checkProfile();
-      } else {
-        console.log('responce is faild');
-        setInvalid(true);
-      }
-    } catch (e) {
-      setInvalid(true);
-      alert(e);
+  const signIn = async () => {
+    setIsSigningIn(true)
+    const res = await authLogin({ email, password })
+    if (res.result) {
+      await checkProfile()
+    } else {
+      setInvalid(true)
     }
-    // 開発用
-    console.log('login error');
-  };
+    setIsSigningIn(false)
+  }
 
   const checkProfile = async () => {
-    const res = await requestHttpGet('/api/v1/user/profile/');
+    const res = await requestHttpGet('/api/v1/user/profile/')
     if (res.result) {
       // プロフィール情報が取得できた場合はメイン画面へ、取得できない場合はユーザ情報登録画面へ遷移
-      console.log('profile: ', res);
       if (res.data.length) {
-        await setData('userId', res.data[0].user);
+        await setData('userId', res.data[0].user)
         navigation.dispatch(
           CommonActions.reset({
             index: 0,
             routes: [{ name: 'Main', params: { userId: res.data[0].user } }],
           })
-        );
+        )
       } else {
-        navigation.reset({ index: 0, routes: [{ name: 'RegistUserInfo' }] });
+        navigation.reset({ index: 0, routes: [{ name: 'RegistUserInfo' }] })
       }
     } else {
-      await delData('access');
-      setIsLoading(false);
+      await delToken()
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
     <>
@@ -89,41 +71,53 @@ export const SignInScreen = ({ navigation }) => {
       ) : (
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
           <SafeAreaView style={styles.container}>
-            <View style={styles.inner}>
+            <View px={6}>
               {invalid ? (
-                <Text style={styles.invalidText}>
+                <Text color="red.500" mb={2}>
                   メールアドレスまたはパスワードが正しくありません
                 </Text>
               ) : null}
-              <TextInput
-                style={styles.input}
+              <Input
                 value={email}
                 onChangeText={(text) => setEmail(text)}
+                py={3}
+                mb={4}
+                fontSize={16}
+                bg="white"
                 autoCapitalize="none"
                 keyboardType="email-address"
                 textContentType="emailAddress"
                 placeholder="メールアドレス"
               />
-              <TextInput
-                style={styles.input}
+              <Input
                 value={password}
                 onChangeText={(text) => setPassword(text)}
+                py={3}
+                mb={4}
+                fontSize={16}
+                bg="white"
                 autoCapitalize="none"
                 textContentType="password"
                 placeholder="パスワード"
                 secureTextEntry
               />
               <Button
-                onPress={login}
-                my="2"
+                isLoading={isSigningIn}
+                _loading={{
+                  bg: 'green.500:alpha.90',
+                }}
+                onPress={signIn}
+                my={2}
+                py={2}
                 bg="green.400"
                 _pressed={{ backgroundColor: 'green.500' }}
-                _text={{ color: '#fff' }}
+                _text={{ color: '#fff', fontSize: 16 }}
               >
                 ログイン
               </Button>
               <Link
                 alignSelf="flex-end"
+                _text={{ color: 'primary.600' }}
                 onPress={() =>
                   navigation.reset({
                     index: 0,
@@ -138,38 +132,12 @@ export const SignInScreen = ({ navigation }) => {
         </TouchableWithoutFeedback>
       )}
     </>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
   },
-  inner: {
-    paddingHorizontal: 24,
-  },
-  input: {
-    backgroundColor: '#fff',
-    fontSize: 16,
-    height: 48,
-    paddingHorizontal: 8,
-    marginBottom: 16,
-  },
-  btn: {
-    backgroundColor: '#10B981',
-    height: 48,
-    lineHeight: 32,
-    borderRadius: 48,
-    alignItems: 'center',
-  },
-  btnTitle: {
-    fontSize: 16,
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  invalidText: {
-    color: 'red',
-    marginBottom: 8,
-  },
-});
+})

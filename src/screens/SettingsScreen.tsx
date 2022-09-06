@@ -1,100 +1,96 @@
-import { Box, Button, Divider, HStack, Spacer, Switch } from 'native-base';
-import { useEffect, useState } from 'react';
-import { StyleSheet, SafeAreaView, Text, Alert } from 'react-native';
-import { requestHttpGet, requestHttpPatch } from '../scripts/requestBase';
-import { delData } from '../scripts/asyncStore';
+import { Box, Button, Divider, HStack, Spacer, Switch } from 'native-base'
+import { useEffect, useState } from 'react'
+import { StyleSheet, SafeAreaView, Text, Alert } from 'react-native'
+import { requestHttpGet, requestHttpPatch } from '../scripts/requestBase'
+import { delToken } from '../scripts/requestAuth'
 
 type SettingObj = {
-  id: string;
-  receive_visit_notice: boolean;
-  receive_shop_notice: boolean;
-  push_visit_notice: boolean;
-};
+  id: string
+  receiveVisitNotice: boolean
+  receiveShopNotice: boolean
+  pushVisitNotice: boolean
+}
 
 export const SettingsScreen = ({ navigation }) => {
-  const [notice, setNotice] = useState(true);
+  const [notice, setNotice] = useState(true)
   const [settingObj, setSettingObj] = useState<SettingObj>({
     id: '',
-    receive_visit_notice: true,
-    receive_shop_notice: true,
-    push_visit_notice: true,
-  });
+    receiveVisitNotice: true,
+    receiveShopNotice: true,
+    pushVisitNotice: true,
+  })
 
   useEffect(() => {
-    getSettings();
-  }, []);
+    getSettings()
+  }, [])
 
   const getSettings = async () => {
-    const res = await requestHttpGet('/api/v1/sns/setting/');
-    console.log('getSettings', res.data[0]);
+    const res = await requestHttpGet('/api/v1/sns/setting/')
+    console.log('getSettings', res.data[0])
     if (res.data.length) {
-      const {
-        id,
-        receive_visit_notice,
-        receive_shop_notice,
-        push_visit_notice,
-      } = res.data[0];
+      const { id, receiveVisitNotice, receiveShopNotice, pushVisitNotice } =
+        res.data[0]
       setSettingObj((pre) => ({
         ...pre,
         id,
-        receive_visit_notice,
-        receive_shop_notice,
-        push_visit_notice,
-      }));
+        receiveVisitNotice,
+        receiveShopNotice,
+        pushVisitNotice,
+      }))
     }
-  };
+  }
 
   const handleChange = async (type: 'rcvShop' | 'rcvVisit' | 'pshVisit') => {
-    console.log(settingObj);
+    console.log(settingObj)
     const param =
       type === 'rcvShop'
         ? {
-            receive_shop_notice: !settingObj.receive_shop_notice,
+            receiveShopNotice: !settingObj.receiveShopNotice,
           }
         : type === 'rcvVisit'
         ? {
-            receive_visit_notice: !settingObj.receive_visit_notice,
+            receiveVisitNotice: !settingObj.receiveVisitNotice,
           }
         : {
-            push_visit_notice: !settingObj.push_visit_notice,
-          };
-    console.log(`/api/v1/sns/setting/${settingObj.id}/`);
+            pushVisitNotice: !settingObj.pushVisitNotice,
+          }
+    console.log(`/api/v1/sns/setting/${settingObj.id}/`)
     const res = await requestHttpPatch(
       `/api/v1/sns/setting/${settingObj.id}/`,
       param
-    );
+    )
 
     const setParam =
       type === 'rcvShop'
         ? {
-            receive_shop_notice: res.data.receive_shop_notice,
+            receiveShopNotice: res.data.receiveShopNotice,
           }
         : type === 'rcvVisit'
         ? {
-            receive_visit_notice: res.data.receive_visit_notice,
+            receiveVisitNotice: res.data.receiveVisitNotice,
           }
         : {
-            push_visit_notice: res.data.push_visit_notice,
-          };
+            pushVisitNotice: res.data.pushVisitNotice,
+          }
 
-    setSettingObj((prev) => ({ ...prev, ...setParam }));
-  };
+    setSettingObj((prev) => ({ ...prev, ...setParam }))
+  }
 
   const handleAlertLogout = () => {
     Alert.alert('ログアウトしますか？', '', [
       { text: 'キャンセル' },
       { text: 'ログアウト', onPress: logout },
-    ]);
-  };
+    ])
+  }
   const logout = async () => {
     try {
-      await delData('access');
-      navigation.navigate('SignIn');
+      await delToken()
+      navigation.navigate('SignIn')
     } catch (e) {
-      console.log('logoutError========');
-      console.log(e);
+      console.log('logoutError========')
+      console.log(e)
     }
-  };
+  }
   return (
     <SafeAreaView style={styles.container}>
       <Box bg="white" borderBottomWidth={1} borderColor="gray.100">
@@ -113,7 +109,7 @@ export const SettingsScreen = ({ navigation }) => {
             size="sm"
             onTrackColor="green.400"
             onToggle={() => handleChange('rcvShop')}
-            value={settingObj.receive_shop_notice}
+            value={settingObj.receiveShopNotice}
           />
         </HStack>
         <HStack alignItems="center" p={2}>
@@ -123,7 +119,7 @@ export const SettingsScreen = ({ navigation }) => {
             size="sm"
             onTrackColor="green.400"
             onToggle={() => handleChange('rcvVisit')}
-            value={settingObj.receive_visit_notice}
+            value={settingObj.receiveVisitNotice}
           />
         </HStack>
         <HStack alignItems="center" p={2}>
@@ -133,7 +129,7 @@ export const SettingsScreen = ({ navigation }) => {
             size="sm"
             onTrackColor="green.400"
             onToggle={() => handleChange('pshVisit')}
-            value={settingObj.push_visit_notice}
+            value={settingObj.pushVisitNotice}
           />
         </HStack>
         <Divider my={2} />
@@ -157,12 +153,12 @@ export const SettingsScreen = ({ navigation }) => {
         </Button>
       </Box>
     </SafeAreaView>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f1f5f9',
   },
-});
+})

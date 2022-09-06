@@ -1,17 +1,31 @@
-import { HStack, Spacer, Text } from 'native-base';
-import React, { useState } from 'react';
-import { StyleSheet, SafeAreaView, FlatList } from 'react-native';
-import { postData } from '../../assets/postData.json';
+import { HStack, Spacer, Text } from 'native-base'
+import { useEffect, useState } from 'react'
+import { SafeAreaView, FlatList, ListRenderItemInfo } from 'react-native'
+import { formatDate } from '../scripts/date'
+import { requestHttpGet } from '../scripts/requestBase'
 
-type PointHistory = {
-  id: string | number;
-  point: string;
-  content: string;
-  date: Date | string;
-};
+type Message = {
+  id: string
+  title: string
+  content: string
+  createdAt: string
+  user: string
+  msgType: string
+}
 
 export const NotificationScreen = () => {
-  const renderItem = ({ item }) => {
+  const [msgList, setMsgList] = useState<Message[]>([])
+
+  useEffect(() => {
+    getMessages()
+  }, [])
+
+  const getMessages = async () => {
+    const res = await requestHttpGet('/api/v1/sns/messages/')
+    res.data.length && setMsgList([...res.data])
+  }
+
+  const renderItem = ({ item }: ListRenderItemInfo<Message>) => {
     return (
       <HStack
         justifyContent="space-between"
@@ -22,24 +36,18 @@ export const NotificationScreen = () => {
         borderColor="blueGray.200"
         key={item.id}
       >
-        <Text mr={2} color="blueGray.600">
-          {item.date_time}
+        <Text mr={2} color="blueGray.500">
+          {formatDate(item.createdAt)}
         </Text>
-        <Text>{item.name}から友達申請がきました</Text>
+        <Text>{item.content}</Text>
         <Spacer />
       </HStack>
-    );
-  };
+    )
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
-      <FlatList data={postData} renderItem={renderItem} scrollEnabled />
+      <FlatList data={msgList} renderItem={renderItem} scrollEnabled />
     </SafeAreaView>
-  );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
+  )
+}

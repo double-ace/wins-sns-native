@@ -1,45 +1,49 @@
-import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import React from 'react'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import {
   CardStyleInterpolators,
   createStackNavigator,
   StackNavigationProp,
-} from '@react-navigation/stack';
-import { HomeScreen } from '../screens/HomeScreen';
-import { NotificationScreen } from '../screens/NotificationScreen';
-import { NotificationFromShopScreen } from '../screens/NotificationFromShopScreen';
-import { SearchScreen } from '../screens/SearchScreen';
-import { ChatScreen } from '../screens/ChatScreen';
-import { FriendRequestScreen } from '../screens/FriendRequestScreen';
-import { MediaScreen } from '../screens/MediaScreen';
-import { MyPageScreen } from '../screens/MyPageScreen';
-import { SettingsScreen } from '../screens/SettingsScreen';
-import { FriendsScreen } from '../screens/FriendsScreen';
-import { Entypo, Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { HeaderIcon } from '../components/HeaderIcon';
-import { Image, Box } from 'native-base';
+} from '@react-navigation/stack'
+import { HomeScreen } from '../screens/HomeScreen'
+import { NotificationScreen } from '../screens/NotificationScreen'
+import { NotificationFromShopScreen } from '../screens/NotificationFromShopScreen'
+import { SearchScreen } from '../screens/SearchScreen'
+import { ChatScreen } from '../screens/ChatScreen'
+import { FriendRequestScreen } from '../screens/FriendRequestScreen'
+import { MyPageScreen } from '../screens/MyPageScreen'
+import { SettingsScreen } from '../screens/SettingsScreen'
+import { FriendsScreen } from '../screens/FriendsScreen'
+import { Entypo, Ionicons } from '@expo/vector-icons'
+import { useNavigation } from '@react-navigation/native'
+import { HeaderIcon } from '../components/HeaderIcon'
+import { Image, Box } from 'native-base'
 
 type HomeStackParamList = {
-  Home: undefined;
-  Notification: undefined;
-  NotificationFromShop: undefined;
-};
-type HomeScreenProp = StackNavigationProp<HomeStackParamList, 'Home'>;
+  Home: undefined
+  Notification: undefined
+  NotificationFromShop: undefined
+}
+type HomeScreenProp = StackNavigationProp<HomeStackParamList, 'Home'>
 
-const Tab = createBottomTabNavigator();
-const HomeStack = createStackNavigator();
-const MyPageStack = createStackNavigator();
+const Tab = createBottomTabNavigator()
+const HomeStack = createStackNavigator()
+const MyPageStack = createStackNavigator()
 
 const HomeStackScreen = () => {
   const LogoTitle = () => {
     return (
-      <Box mb={2}>
-        <Image source={require('../../assets/wins.png')} />
+      <Box>
+        <Image
+          source={require('../../assets/header-logo.png')}
+          alt="header-logo"
+          w={146}
+          h={6}
+        />
       </Box>
-    );
-  };
-  const navigation = useNavigation<HomeScreenProp>();
+    )
+  }
+  const navigation = useNavigation<HomeScreenProp>()
   return (
     <HomeStack.Navigator>
       <HomeStack.Group screenOptions={{ headerBackTitleVisible: false }}>
@@ -82,8 +86,8 @@ const HomeStackScreen = () => {
         />
       </HomeStack.Group>
     </HomeStack.Navigator>
-  );
-};
+  )
+}
 
 const MyPageStackScreen = () => {
   return (
@@ -119,8 +123,8 @@ const MyPageStackScreen = () => {
         />
       </MyPageStack.Group>
     </MyPageStack.Navigator>
-  );
-};
+  )
+}
 
 export const MainTabNavigator = () => {
   return (
@@ -137,17 +141,6 @@ export const MainTabNavigator = () => {
           ),
         }}
       />
-      {/* <Tab.Screen
-        name="Media"
-        component={MediaScreen}
-        options={{
-          headerShown: false,
-          tabBarLabel: "WIN'Sブログ",
-          tabBarIcon: ({ size, color }) => (
-            <Entypo name="folder-images" size={size} color={color} />
-          ),
-        }}
-      /> */}
       <Tab.Screen
         name="Search"
         component={SearchScreen}
@@ -193,5 +186,5 @@ export const MainTabNavigator = () => {
         }}
       />
     </Tab.Navigator>
-  );
-};
+  )
+}

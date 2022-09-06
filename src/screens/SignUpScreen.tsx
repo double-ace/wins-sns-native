@@ -1,119 +1,150 @@
-import React, { useState } from 'react';
+import { useState } from 'react'
 import {
   TouchableWithoutFeedback,
   Keyboard,
   SafeAreaView,
-  TextInput,
-  View,
-  Text,
   StyleSheet,
-} from 'react-native';
-import { Button, Link } from 'native-base';
-import { authLogin } from '../scripts/requestAuth';
-import { setData, getData } from '../scripts/asyncStore';
-import { createAccount } from '../scripts/requestAuth';
+} from 'react-native'
+import { View, Button, Text, Input, Link } from 'native-base'
+import { createAccount } from '../scripts/requestAuth'
 
-export const SignUpScreen = ({ navigation }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPw, setConfirmPw] = useState('');
-  const [validList, setValidList] = useState({
-    common: {
-      value: 'アカウント登録に失敗しました',
-      isValid: false,
-    },
-    sendEmail: {
-      value: '既にこのメールアドレスは使われています',
-      isValid: false,
-    },
-    inputEmail: {
-      value: 'メールの形式が正しくありません',
-      isValid: false,
-    },
-    password: {
-      value: '8文字以上の半角英数字で設定してください',
-      isValid: false,
-    },
-    confirmPw: {
-      value: 'パスワードとパスワード(確認用)が一致しません',
-      isValid: false,
-    },
-  });
+const ERR_MSG = {
+  empEmail: 'メールアドレスを入力してください',
+  empPW: 'パスワードを入力してください',
+  empConfirmPW: 'パスワード(確認用)を入力してください',
+  sameEmail: '既にこのメールアドレスは使われています',
+  invalidEmail: 'メールアドレスの形式が正しくありません',
+  pwTooShort: '8文字以上の半角英数字で設定してください',
+  pwNoMatch: 'パスワードとパスワード(確認用)が一致しません',
+}
 
-  const signUp = async () => {
-    if (password === confirmPw) {
-      const param = { email, password };
-      try {
-        const res = await createAccount({ email, password });
-        if (res) {
-          navigation.reset({ index: 0, routes: [{ name: 'RegistUserInfo' }] });
-        } else {
-          const clone = Object.assign({}, validList);
-          clone.common.isValid = true;
-          setValidList({ ...clone });
-        }
-      } catch (e) {
-        const clone = Object.assign({}, validList);
-        clone.common.isValid = true;
-        setValidList({ ...clone });
-        alert(e);
-      }
-    } else {
+export const SignUpScreen = ({ navigation }: any) => {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPw, setConfirmPw] = useState('')
+  const [validation, setValidation] = useState({
+    valid: false,
+    msg: '',
+  })
+  const [isSigningUp, setIsSigningUp] = useState(false)
+
+  const ValidCheckForConfirm = (): boolean => {
+    // 未入力チェック
+    if (email === '') {
+      setValidation({ valid: true, msg: ERR_MSG.empEmail })
+      return false
+    } else if (password === '') {
+      setValidation({ valid: true, msg: ERR_MSG.empPW })
+      return false
+    } else if (confirmPw === '') {
+      setValidation({ valid: true, msg: ERR_MSG.empConfirmPW })
+      return false
     }
 
-    // 開発用
-    console.log('error');
-    // navigation.navigate('Main');
-    navigation.navigate('RegistUserInfo');
-  };
+    // メールアドレスの形式チェック
+    const regex =
+      /^[a-zA-Z0-9_+-]+(\.[a-zA-Z0-9_+-]+)*@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/
+    if (!regex.test(email)) {
+      setValidation({ valid: true, msg: ERR_MSG.invalidEmail })
+      return false
+    }
+
+    // パスワード一致チェック
+    if (password !== confirmPw) {
+      setValidation({ valid: true, msg: ERR_MSG.pwNoMatch })
+      return false
+    }
+
+    return true
+  }
+
+  const signUp = async () => {
+    setIsSigningUp(true)
+    const isValid = ValidCheckForConfirm()
+    if (isValid) {
+      const res = await createAccount({ email, password })
+      if (res) {
+        navigation.reset({ index: 0, routes: [{ name: 'RegistUserInfo' }] })
+      } else {
+        setValidation({ valid: true, msg: ERR_MSG.sameEmail })
+      }
+    }
+    setIsSigningUp(false)
+  }
+
+  const onChangePw = (value: string) => {
+    const regex = /^[0-9a-zA-Z]*$/
+    // パスワード文字数&半角英数字チェック
+    if (!regex.test(value) || password.length < 8) {
+      setValidation({ valid: true, msg: ERR_MSG.pwTooShort })
+    } else {
+      setValidation({ valid: false, msg: '' })
+    }
+    setPassword(value)
+  }
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <SafeAreaView style={styles.container}>
-        <View style={styles.inner}>
-          {validList.common.isValid ? (
-            <Text style={styles.invalidText}>
-              メールアドレスまたはパスワードが正しくありません
+        <View px={6}>
+          {validation.valid ? (
+            <Text color="red.500" mb={2}>
+              {validation.msg}
             </Text>
           ) : null}
-          <TextInput
-            style={styles.input}
+          <Input
             value={email}
             onChangeText={(text) => setEmail(text)}
+            py={3}
+            mb={4}
+            fontSize={16}
+            bg="white"
             autoCapitalize="none"
             keyboardType="email-address"
             textContentType="emailAddress"
             placeholder="メールアドレス"
           />
-          <TextInput
-            style={styles.input}
+          <Input
             value={password}
-            onChangeText={(text) => setPassword(text)}
+            onChangeText={(text) => onChangePw(text)}
+            py={3}
+            mb={4}
+            fontSize={16}
+            bg="white"
             autoCapitalize="none"
             textContentType="password"
             placeholder="パスワード"
             secureTextEntry
           />
-          <TextInput
-            style={styles.input}
+          <Input
             value={confirmPw}
             onChangeText={(text) => setConfirmPw(text)}
+            py={3}
+            mb={4}
+            fontSize={16}
+            bg="white"
             autoCapitalize="none"
             textContentType="password"
             placeholder="パスワード(確認用)"
             secureTextEntry
           />
           <Button
+            isLoading={isSigningUp}
+            _loading={{
+              bg: 'green.500:alpha.90',
+            }}
             onPress={signUp}
-            my="2"
+            my={2}
+            py={2}
             bg="green.400"
             _pressed={{ backgroundColor: 'green.500' }}
-            _text={{ color: '#fff' }}
+            _text={{ color: '#fff', fontSize: 16 }}
           >
             アカウント作成
           </Button>
           <Link
             alignSelf="flex-end"
+            _text={{ color: 'primary.600' }}
             onPress={() =>
               navigation.reset({
                 index: 0,
@@ -126,38 +157,12 @@ export const SignUpScreen = ({ navigation }) => {
         </View>
       </SafeAreaView>
     </TouchableWithoutFeedback>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
   },
-  inner: {
-    paddingHorizontal: 24,
-  },
-  input: {
-    backgroundColor: '#fff',
-    fontSize: 16,
-    height: 48,
-    paddingHorizontal: 8,
-    marginBottom: 16,
-  },
-  btn: {
-    backgroundColor: '#10B981',
-    height: 48,
-    lineHeight: 32,
-    borderRadius: 48,
-    alignItems: 'center',
-  },
-  btnTitle: {
-    fontSize: 16,
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  invalidText: {
-    color: 'red',
-    marginBottom: 8,
-  },
-});
+})

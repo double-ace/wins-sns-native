@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react'
 import {
   StyleSheet,
   SafeAreaView,
@@ -7,7 +7,7 @@ import {
   Platform,
   Keyboard,
   GestureResponderEvent,
-} from 'react-native';
+} from 'react-native'
 import {
   FlatList,
   Avatar,
@@ -18,77 +18,70 @@ import {
   KeyboardAvoidingView,
   Pressable,
   Text,
-} from 'native-base';
-import { Ionicons } from '@expo/vector-icons';
-import { format } from 'date-fns';
-import { requestHttpGet, requestHttpPost } from '../scripts/requestBase';
-import { getData } from '../scripts/asyncStore';
+} from 'native-base'
+import { Ionicons } from '@expo/vector-icons'
+import { requestHttpGet, requestHttpPost } from '../scripts/requestBase'
+import { formatDate } from '../scripts/date'
 
-type Id = string | null;
+type Id = string
+
 type Message = {
-  id: string;
-  room: string;
-  content: string;
-  sender: string;
-  created_at: string;
-};
+  id: string
+  content: string
+  sender: {
+    id: string
+    profileId: string
+    familyName: string
+    firstName: string
+    nickname: string
+    profileImage: string
+  }
+  me: string
+  room: string
+  createdAt: string
+}
 
 export const ChatScreen = () => {
-  const [content, setContent] = useState('');
-  const [dmList, setDmList] = useState<Message[]>([]);
-  const [userId, setUserId] = useState<Id>('');
-  const [roomId, setRoomId] = useState<Id>('');
-
-  const getUserId = async () => {
-    const id = await getData('userId');
-    console.log('id', id);
-    setUserId(id);
-    console.log('getUser: ', userId);
-  };
+  const [content, setContent] = useState('')
+  const [dmList, setDmList] = useState<Message[]>([])
+  const [roomId, setRoomId] = useState<Id>('')
 
   const getDm = async () => {
-    !userId && (await getUserId());
-    const roomRes = await requestHttpGet('/api/v1/chat/rooms/');
+    const roomRes = await requestHttpGet('/api/v1/chat/rooms/')
     if (roomRes.data.length) {
-      const id = roomRes.data[0].id;
+      const id = roomRes.data[0].id
       const messageRes = await requestHttpGet(
         `/api/v1/chat/messages/?room_id=${id}`
-      );
-      setRoomId(id);
-      setDmList(
-        messageRes.data.map((item: Message) => {
-          return {
-            id: item.id,
-            content: item.content,
-            sender: item.sender,
-            created_at: item.created_at,
-          };
-        })
-      );
+      )
+      setRoomId(id)
+      setDmList([...messageRes.data])
     }
-  };
+  }
 
   const sendDm = async (e: GestureResponderEvent) => {
     const param = {
       content,
       room: roomId,
-    };
-    const res = await requestHttpPost('/api/v1/chat/messages/', param, true);
-    // setDmList((pre) => [...pre, res.data]);
-    await getDm();
-    setContent('');
-    Keyboard.dismiss();
-  };
+    }
+    const res = await requestHttpPost('/api/v1/chat/messages/', param, true)
+    if (res.data) {
+      await getDm()
+      setContent('')
+    }
+    Keyboard.dismiss()
+  }
 
   useEffect(() => {
-    getDm();
-  }, []);
+    getDm()
+  }, [])
 
   const renderItem = ({ item }: ListRenderItemInfo<Message>) => {
-    console.log('userId', userId);
-    return item.sender !== userId ? (
+    return item.sender.id !== item.me ? (
       <HStack mb={4} key={item.id}>
-        <Avatar size="sm" bg="gray.300" />
+        <Avatar
+          size="sm"
+          source={require('../../assets/wins-avator-icon.jpg')}
+        />
         <Stack ml={1} alignItems="flex-start">
           <Box
             bg="blueGray.200"
@@ -99,9 +92,7 @@ export const ChatScreen = () => {
           >
             {item.content}
           </Box>
-          <Text color="blueGray.500">
-            {format(new Date(item.created_at), 'yyyy/MM/dd HH:mm')}
-          </Text>
+          <Text color="blueGray.500">{formatDate(item.createdAt)}</Text>
         </Stack>
       </HStack>
     ) : (
@@ -117,15 +108,12 @@ export const ChatScreen = () => {
             {item.content}
           </Box>
           <HStack justifyContent="flex-end">
-            <Text color="blueGray.500">
-              {format(new Date(item.created_at), 'yyyy/MM/dd HH:mm')}
-            </Text>
+            <Text color="blueGray.500">{formatDate(item.createdAt)}</Text>
           </HStack>
         </Stack>
-        <Avatar size="sm" bg="gray.300" />
       </HStack>
-    );
-  };
+    )
+  }
 
   return (
     <KeyboardAvoidingView
@@ -133,10 +121,10 @@ export const ChatScreen = () => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
-        {!userId || !dmList.length ? (
+        {!dmList.length ? (
           <Center>お店とチャットができます。</Center>
         ) : (
-          <Box px={2} pt={6}>
+          <Box px={2} pt={6} pb={12}>
             <FlatList data={dmList} renderItem={renderItem} scrollEnabled />
           </Box>
         )}
@@ -144,6 +132,7 @@ export const ChatScreen = () => {
           position="absolute"
           bottom={0}
           p={2}
+          pb={6}
           w="100%"
           minHeight={10}
           maxHeight={80}
@@ -174,14 +163,15 @@ export const ChatScreen = () => {
         </HStack>
       </SafeAreaView>
     </KeyboardAvoidingView>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   textBox: {
     backgroundColor: '#fff',
     borderRadius: 20,
     paddingHorizontal: 8,
+    paddingVertical: 8,
     width: '91%',
   },
-});
+})

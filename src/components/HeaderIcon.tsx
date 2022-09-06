@@ -1,6 +1,6 @@
-import React from 'react';
-import { HStack, Pressable } from 'native-base';
-import { Entypo, AntDesign } from '@expo/vector-icons';
+import React from 'react'
+import { HStack, Pressable } from 'native-base'
+import { Entypo, AntDesign } from '@expo/vector-icons'
 
 export const HeaderIcon = ({ navigation }) => {
   return (
@@ -15,5 +15,5 @@ export const HeaderIcon = ({ navigation }) => {
         <Entypo name="bell" size={24} color="white" />
       </Pressable>
     </HStack>
-  );
-};
+  )
+}

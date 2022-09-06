@@ -1,66 +1,94 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react'
 import {
   StyleSheet,
   SafeAreaView,
   View,
   FlatList,
-  Text,
   Alert,
-} from 'react-native';
-import { Link, Avatar, Button, HStack, Spacer } from 'native-base';
-import { requestHttpDelete, requestHttpGet } from '../scripts/requestBase';
+  RefreshControl,
+  ListRenderItemInfo,
+} from 'react-native'
+import { Avatar, Button, HStack, Spacer, Pressable, Text } from 'native-base'
+import { requestHttpDelete, requestHttpGet } from '../scripts/requestBase'
+import { DefaultAvator } from '../components/DefaultAvator'
+import { formatDate } from '../scripts/date'
+
+type Profile = {
+  user: string
+  nickname: string
+  profileImage: string | null
+}
 
 type FriendData = {
-  id: string | number;
-  nickname: string;
-};
+  id: string
+  profile: Profile
+  lastVisit: string
+}
 
 export const FriendsScreen = () => {
-  const [friendList, setFriendList] = useState<FriendData[]>([]);
+  const [friendList, setFriendList] = useState<FriendData[]>([])
+  const [refreshing, setRefreshing] = useState(false)
 
   useEffect(() => {
-    getFriend();
-  }, []);
+    getFriend()
+  }, [])
 
   const getFriend = async () => {
-    const res = await requestHttpGet('/api/v1/sns/friends/');
-    setFriendList(res.data);
-  };
+    const res = await requestHttpGet('/api/v1/sns/friends/')
+    setFriendList([...res.data])
+  }
 
-  const delFriend = async (id: string) => {
-    const res = await requestHttpGet(`/api/v1/sns/friend/?friend=${id}`);
-    console.log(res.data);
-    const FriendId = res.data[0].id;
+  const delFriend = async (id: string | number) => {
+    const res = await requestHttpGet(`/api/v1/sns/friend/?friend=${id}`)
+    console.log(res.data)
+    const FriendId = res.data[0].id
     const deleteRes = await requestHttpDelete(
       `/api/v1/sns/del-friend/${FriendId}/`
-    );
+    )
 
     if (deleteRes.result) {
-      setFriendList((pre) => [...pre.filter((item) => item.id !== id)]);
+      setFriendList((pre) => [...pre.filter((item) => item.id !== id)])
     }
-  };
+  }
 
-  const handleDel = async (id: string) => {
+  const handleDel = async (id: string | number) => {
     Alert.alert('削除しますか？', '', [
       { text: 'キャンセル' },
       { text: '削除', onPress: () => delFriend(id) },
-    ]);
-  };
+    ])
+  }
 
-  const renderItem = ({ item }) => {
+  const refreshItem = async () => {
+    setRefreshing(true)
+    await getFriend()
+    setRefreshing(false)
+  }
+
+  const renderItem = ({ item }: ListRenderItemInfo<FriendData>) => {
     return (
       <HStack style={styles.userContainer} alignItems="center" key={item.id}>
-        <Link onPress={() => console.log('Works!')}>
-          <Avatar size="md" />
-        </Link>
+        <Pressable>
+          {!item.profile.profileImage ? (
+            <DefaultAvator />
+          ) : (
+            <Avatar
+              size="md"
+              source={{ uri: item.profile.profileImage }}
+            ></Avatar>
+          )}
+        </Pressable>
         <View style={styles.userHeaderTxtContainer}>
-          <Text style={styles.userName}>{item.nickname}</Text>
+          <Text style={styles.userName}>{item.profile.nickname}</Text>
+          <Text color="blueGray.500" fontSize="xs">
+            最終来店 {item.lastVisit ? formatDate(item.lastVisit) : '-'}
+          </Text>
         </View>
         <Spacer />
         <Button
-          px="6"
+          px="8"
           h="10"
           mr="2"
+          rounded="full"
           colorScheme="error"
           variant="outline"
           onPress={() => handleDel(item.id)}
@@ -68,15 +96,26 @@ export const FriendsScreen = () => {
           削除
         </Button>
       </HStack>
-    );
-  };
+    )
+  }
 
   return (
     <SafeAreaView style={styles.container}>
-      <FlatList data={friendList} renderItem={renderItem} scrollEnabled />
+      <FlatList
+        data={friendList}
+        renderItem={renderItem}
+        scrollEnabled
+        refreshControl={
+          <RefreshControl
+            onRefresh={refreshItem}
+            refreshing={refreshing}
+            tintColor="#6ee7b7"
+          />
+        }
+      />
     </SafeAreaView>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -130,4 +169,4 @@ const styles = StyleSheet.create({
   input: {
     width: 100,
   },
-});
+})

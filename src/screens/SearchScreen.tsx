@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react'
 import {
   StyleSheet,
   SafeAreaView,
-  View,
   FlatList,
-  Text,
   ListRenderItemInfo,
-} from 'react-native';
+  TouchableWithoutFeedback,
+  Keyboard,
+} from 'react-native'
 import {
-  Link,
   Avatar,
   Button,
   Input,
@@ -16,73 +15,76 @@ import {
   HStack,
   Spacer,
   Center,
-} from 'native-base';
-import { getData } from '../scripts/asyncStore';
-import { requestHttpGet, requestHttpPost } from '../scripts/requestBase';
-import { SkeletonItem } from '../components/SkeletonUserItem';
+  Text,
+  Pressable,
+} from 'native-base'
+import { requestHttpGet, requestHttpPost } from '../scripts/requestBase'
+import { SkeletonItem } from '../components/SkeletonUserItem'
+import { DefaultAvator } from '../components/DefaultAvator'
+
+type Profile = {
+  user: string
+  nickname: string
+  profileImage: string | null
+}
 
 type UserList = {
-  id: string;
-  nickname: string;
-  imageUrl: string;
-};
+  id: string
+  profile: Profile
+}
 
 export const SearchScreen = ({ navigation }) => {
-  const [userList, setUserList] = useState<UserList[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-
-  useEffect(() => {
-    getUserList();
-  }, []);
-
-  // ユーザ取得
-  const getUserList = async () => {
-    const res = await requestHttpGet('/api/v1/sns/users/');
-    setUserList(res.data);
-  };
+  const [userList, setUserList] = useState<UserList[]>([])
+  const [isSearching, setIsSearching] = useState(false)
 
   const onChangeKeyword = async (keyword: string) => {
-    setIsSearching(true);
+    setIsSearching(true)
     // 入力値でユーザをフィルター
-    console.log('keyword: ', keyword);
+    console.log('keyword: ', keyword)
     if (keyword) {
-      const res = await requestHttpGet(`/api/v1/sns/users/?keyword=${keyword}`);
-      setUserList(res.data);
+      const res = await requestHttpGet(`/api/v1/sns/users/?keyword=${keyword}`)
+      setUserList(res.data)
     }
-    setIsSearching(false);
-  };
+    setIsSearching(false)
+  }
 
   // 友達申請
   const handleReq = async (id: string) => {
     // const res = await requestHttpPost
     const param = {
-      req_to: id,
-    };
+      reqTo: id,
+    }
     const res = await requestHttpPost(
       '/api/v1/sns/friend-request/',
       param,
       true
-    );
-    setUserList((pre) => [
-      ...pre.filter((item) => item.id !== res.data.req_to),
-    ]);
-  };
+    )
+    setUserList((pre) => [...pre.filter((item) => item.id !== res.data.reqTo)])
+  }
 
   const renderItem = ({ item }: ListRenderItemInfo<UserList>) => {
     return (
-      <Box py="3" style={styles.postContainer} key={item.id}>
+      <Box p={3} borderBottomWidth={1} borderColor="blueGray.200" key={item.id}>
         <HStack alignItems="center">
-          <Link onPress={() => console.log('Works!')}>
-            <Avatar size="md"></Avatar>
-          </Link>
-          <View style={styles.postHeaderTxtContainer}>
-            <Text style={styles.posterName}>{item.nickname}</Text>
-          </View>
+          <Pressable>
+            {!item.profile.profileImage ? (
+              <DefaultAvator />
+            ) : (
+              <Avatar
+                size="md"
+                source={{ uri: item.profile.profileImage }}
+              ></Avatar>
+            )}
+          </Pressable>
+          <Box ml={3}>
+            <Text fontSize={16}>{item.profile.nickname}</Text>
+          </Box>
           <Spacer />
           <Button
             px="6"
             h="10"
             bg="emerald.400"
+            rounded="full"
             _text={{ fontWeight: 'bold' }}
             onPress={() => handleReq(item.id)}
           >
@@ -90,28 +92,31 @@ export const SearchScreen = ({ navigation }) => {
           </Button>
         </HStack>
       </Box>
-    );
-  };
+    )
+  }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Input
-        variant="rounded"
-        mb="2"
-        mx="1"
-        placeholder="ユーザ名入力"
-        onChangeText={(value) => onChangeKeyword(value)}
-      />
-      {isSearching ? (
-        <SkeletonItem />
-      ) : !userList.length ? (
-        <Center>一致するユーザが見つかりません</Center>
-      ) : (
-        <FlatList data={userList} renderItem={renderItem} scrollEnabled />
-      )}
-    </SafeAreaView>
-  );
-};
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <SafeAreaView style={styles.container}>
+        <Input
+          variant="rounded"
+          my="2"
+          mx="1"
+          placeholder="ユーザ名入力"
+          autoFocus
+          onChangeText={(value) => onChangeKeyword(value)}
+        />
+        {isSearching ? (
+          <SkeletonItem />
+        ) : !userList.length ? (
+          <Center>一致するユーザが見つかりません</Center>
+        ) : (
+          <FlatList data={userList} renderItem={renderItem} scrollEnabled />
+        )}
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -119,31 +124,4 @@ const styles = StyleSheet.create({
     backgroundColor: '#FAFAFB',
     paddingVertical: 8,
   },
-  postContainer: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderColor: '#E9EAEB',
-  },
-  avatar: {
-    backgroundColor: '#cccccc',
-  },
-  postHeader: {
-    flexDirection: 'row',
-    marginBottom: 12,
-  },
-  postHeaderTxtContainer: {
-    justifyContent: 'space-evenly',
-    marginLeft: 8,
-  },
-  postContent: {},
-  posterName: {
-    // fontWeight: 'bold',
-    fontSize: 16,
-  },
-  postDate: {
-    color: '#A8A8A8',
-  },
-  fab: {},
-});
+})
